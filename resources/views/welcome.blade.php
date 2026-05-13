@@ -154,65 +154,62 @@
                 <p class="hero-desc">{{ $heroMovie['overview'] }}</p>
 
                 <div class="hero-actions">
-                    <a href="#all-movies" class="btn-rent">Lihat Film</a>
-
-                    @if ($search !== '')
-                        <a href="{{ route('movies.index') }}" class="btn-info">Film Populer</a>
-                    @else
-                        <a href="{{ route('movies.index', ['search' => $heroMovie['title']]) }}" class="btn-info">Cari Serupa</a>
-                    @endif
+                    <a href="{{ route('movies.show', $heroMovie['id']) }}" class="btn-rent">Play</a>
+                    <a href="{{ route('movies.show', $heroMovie['id']) }}" class="btn-info">Info Film</a>
                 </div>
             </div>
         </section>
     @endif
 
     <main class="movies-page-content">
-        <section class="movie-section" id="all-movies">
-            <div class="section-header">
-                <div class="section-copy">
-                    <h1 class="row-title">{{ $sectionTitle }}</h1>
-                    <p class="section-kicker">{{ $sectionKicker }}</p>
+        @foreach ($movieSections as $section)
+            <section class="movie-section" id="{{ $section['id'] }}">
+                <div class="section-header">
+                    <div class="section-copy">
+                        <h1 class="row-title">{{ $section['title'] }}</h1>
+                        <p class="section-kicker">{{ $section['kicker'] }}</p>
+                    </div>
+
+                    <div class="results-chip">{{ count($section['movies']) }} Film</div>
                 </div>
 
-                <div class="results-chip">{{ count($movies) }} Film</div>
-            </div>
+                @if ($section['statusMessage'])
+                    <div class="status-banner">{{ $section['statusMessage'] }}</div>
+                @endif
 
-            @if ($search !== '' && $movies !== [])
-                <div class="status-banner">Menampilkan hasil pencarian untuk "{{ $search }}".</div>
-            @endif
+                @if (empty($section['movies']))
+                    <div class="empty-state">{{ $section['emptyMessage'] }}</div>
+                @else
+                    <div class="{{ $section['layout'] === 'grid' ? 'movie-grid' : 'movie-row' }}">
+                        @foreach ($section['movies'] as $movie)
+                            <a href="{{ route('movies.show', $movie['id']) }}" class="movie-card-sm" aria-label="Lihat detail {{ $movie['title'] }}">
+                                <div class="card-rank">{{ $loop->iteration }}</div>
 
-            @if (empty($movies))
-                <div class="empty-state">{{ $emptyMessage }}</div>
-            @else
-                <div class="movie-grid">
-                    @foreach ($movies as $movie)
-                        <article class="movie-card-sm">
-                            <div class="card-rank">{{ $loop->iteration }}</div>
+                                <div class="card-poster-wrap">
+                                    @if ($movie['poster_url'])
+                                        <img src="{{ $movie['poster_url'] }}" alt="Poster {{ $movie['title'] }}" loading="lazy">
+                                    @else
+                                        <div class="no-poster">No Poster</div>
+                                    @endif
 
-                            <div class="card-poster-wrap">
-                                @if ($movie['poster_url'])
-                                    <img src="{{ $movie['poster_url'] }}" alt="Poster {{ $movie['title'] }}" loading="lazy">
-                                @else
-                                    <div class="no-poster">No Poster</div>
-                                @endif
+                                    <div class="badge-sewa">SEWA 5K</div>
+                                    <div class="badge-beli">BELI 15K</div>
+                                </div>
 
-                                <div class="badge-sewa">SEWA 5K</div>
-                                <div class="badge-beli">BELI 15K</div>
-                            </div>
+                                <div class="card-info-sm">
+                                    <span class="card-rating">Rating {{ $movie['rating'] }}</span>
+                                    <p class="card-title-sm">{{ $movie['title'] }}</p>
 
-                            <div class="card-info-sm">
-                                <span class="card-rating">Rating {{ $movie['rating'] }}</span>
-                                <p class="card-title-sm">{{ $movie['title'] }}</p>
-
-                                @if ($movie['release_year'])
-                                    <span class="card-meta">{{ $movie['release_year'] }}</span>
-                                @endif
-                            </div>
-                        </article>
-                    @endforeach
-                </div>
-            @endif
-        </section>
+                                    @if ($movie['release_year'])
+                                        <span class="card-meta">{{ $movie['release_year'] }}</span>
+                                    @endif
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                @endif
+            </section>
+        @endforeach
     </main>
 
     <footer id="footer">

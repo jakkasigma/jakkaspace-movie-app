@@ -6,13 +6,40 @@ const preSplash = document.getElementById('pre-splash');
 const splashStart = document.getElementById('splash-start');
 const introOverlay = document.getElementById('intro-overlay');
 const introSound = document.getElementById('intro-sound');
+const introStorageKey = 'jakkaspace:intro-played';
+const hasIntroScreen = Boolean(preSplash && splashStart && introOverlay);
+
+function hasPlayedIntro() {
+    try {
+        return window.sessionStorage.getItem(introStorageKey) === 'true';
+    } catch {
+        return false;
+    }
+}
+
+function rememberIntro() {
+    try {
+        window.sessionStorage.setItem(introStorageKey, 'true');
+    } catch {
+        // Storage can be unavailable in private or restricted browser modes.
+    }
+}
+
+function skipIntro() {
+    rememberIntro();
+    preSplash?.classList.add('hidden');
+    document.body.classList.add('anim-started', 'intro-complete');
+    introOverlay?.setAttribute('hidden', 'hidden');
+}
 
 function finishIntro() {
+    rememberIntro();
     document.body.classList.add('intro-complete');
     introOverlay?.setAttribute('hidden', 'hidden');
 }
 
 function startIntro() {
+    rememberIntro();
     preSplash?.classList.add('hidden');
     document.body.classList.add('anim-started');
 
@@ -23,10 +50,10 @@ function startIntro() {
     window.setTimeout(finishIntro, 4600);
 }
 
-splashStart?.addEventListener('click', startIntro);
-
-if (! splashStart) {
-    startIntro();
+if (hasPlayedIntro() || ! hasIntroScreen) {
+    skipIntro();
+} else {
+    splashStart.addEventListener('click', startIntro);
 }
 
 hamburger?.addEventListener('click', () => {

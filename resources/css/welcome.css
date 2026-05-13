@@ -667,9 +667,41 @@ body.has-hero .movies-page-content {
     gap: 28px 16px;
 }
 
+.movie-row {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 16px;
+    scroll-snap-type: x mandatory;
+    scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+    scrollbar-width: thin;
+}
+
+.movie-row::-webkit-scrollbar {
+    height: 6px;
+}
+
+.movie-row::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.movie-row::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.18);
+}
+
+.movie-row .movie-card-sm {
+    flex: 0 0 160px;
+    scroll-snap-align: start;
+}
+
 .movie-card-sm {
     position: relative;
+    display: block;
     min-width: 0;
+    color: inherit;
+    cursor: pointer;
     text-decoration: none;
     transition: transform 0.3s ease;
 }
@@ -776,6 +808,19 @@ body.has-hero .movies-page-content {
     -webkit-line-clamp: 2;
 }
 
+.card-description-sm {
+    display: -webkit-box;
+    overflow: hidden;
+    margin-top: 6px;
+    color: rgba(255, 255, 255, 0.58);
+    font-family: 'Lora', serif;
+    font-size: 11px;
+    font-style: italic;
+    line-height: 1.55;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+}
+
 .card-meta {
     display: block;
     margin-top: 4px;
@@ -814,6 +859,278 @@ body.has-hero .movies-page-content {
     letter-spacing: 0;
     padding: 50px 4vw;
     text-transform: uppercase;
+}
+
+.detail-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: #000;
+    opacity: 0;
+    transition: opacity 0.45s ease, visibility 0.45s ease;
+    visibility: hidden;
+}
+
+.detail-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.detail-back {
+    position: fixed;
+    top: 30px;
+    left: 4vw;
+    z-index: 9010;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    cursor: pointer;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0;
+    padding: 0.6rem 1.4rem;
+    text-decoration: none;
+    transition: background 0.25s ease, transform 0.2s ease;
+    backdrop-filter: blur(10px);
+}
+
+.detail-back:hover,
+.detail-back:focus-visible {
+    background: rgba(255, 255, 255, 0.12);
+    outline: none;
+    transform: translateX(-4px);
+}
+
+.detail-container {
+    position: relative;
+    min-height: 100vh;
+}
+
+.detail-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 560px;
+    background-position: center 40%;
+    background-size: cover;
+    filter: brightness(0.35) saturate(0.7);
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, 0));
+}
+
+.detail-body {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    max-width: 1100px;
+    align-items: flex-start;
+    gap: 48px;
+    margin: 0 auto;
+    padding: 120px 4vw 80px;
+}
+
+.detail-poster-wrap {
+    flex: 0 0 300px;
+}
+
+.detail-poster {
+    width: 100%;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    aspect-ratio: 2 / 3;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.detail-poster:hover {
+    transform: scale(1.02);
+}
+
+.detail-poster-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #111;
+    color: rgba(255, 255, 255, 0.45);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+}
+
+.detail-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.detail-title {
+    margin-bottom: 12px;
+    color: #ffffff;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.4rem, 5vw, 3.6rem);
+    letter-spacing: 0;
+    line-height: 0.95;
+    text-transform: uppercase;
+}
+
+.detail-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    align-items: center;
+    margin-bottom: 24px;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.85rem;
+    font-weight: 300;
+}
+
+.detail-score-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.detail-star-rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.star-icon {
+    color: #fff;
+    font-size: 1.1rem;
+}
+
+.score-text {
+    color: #fff;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    line-height: 1;
+}
+
+.score-label {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.detail-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.btn-sewa-detail,
+.btn-beli-detail,
+.btn-trailer {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    cursor: pointer;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0;
+    padding: 0.6rem 1.6rem;
+    text-decoration: none;
+    transition: background 0.25s ease, filter 0.25s ease, transform 0.2s ease;
+    backdrop-filter: blur(4px);
+}
+
+.btn-sewa-detail {
+    border: 1px solid rgba(0, 102, 255, 0.2);
+    background: rgba(0, 102, 255, 0.1);
+}
+
+.btn-beli-detail {
+    border: 1px solid rgba(0, 153, 51, 0.2);
+    background: rgba(0, 153, 51, 0.1);
+}
+
+.btn-trailer {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: transparent;
+}
+
+.btn-sewa-detail:hover,
+.btn-beli-detail:hover,
+.btn-trailer:hover,
+.btn-sewa-detail:focus-visible,
+.btn-beli-detail:focus-visible,
+.btn-trailer:focus-visible {
+    outline: none;
+    transform: translateY(-2px);
+}
+
+.btn-sewa-detail:hover,
+.btn-beli-detail:hover {
+    filter: brightness(1.2);
+}
+
+.btn-trailer:hover,
+.btn-trailer:focus-visible {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.detail-tagline {
+    margin-bottom: 28px;
+    color: rgba(255, 255, 255, 0.45);
+    font-family: 'Lora', serif;
+    font-size: 1.05rem;
+    font-style: italic;
+    line-height: 1.5;
+}
+
+.detail-section-label {
+    margin-bottom: 10px;
+    color: #fff;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 0;
+}
+
+.detail-synopsis {
+    max-width: 650px;
+    margin-bottom: 32px;
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 0.95rem;
+    font-weight: 300;
+    line-height: 1.8;
+}
+
+.detail-crew {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 20px;
+}
+
+.crew-name {
+    margin-bottom: 2px;
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.crew-role {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.8rem;
+    font-weight: 300;
+}
+
+.detail-empty-state {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 160px 4vw 80px;
+    color: rgba(255, 255, 255, 0.7);
+    font-family: 'Lora', serif;
+    font-size: 1.1rem;
+    font-style: italic;
+    line-height: 1.7;
+    text-align: center;
 }
 
 @media (max-width: 1024px) {
@@ -940,6 +1257,15 @@ body.has-hero .movies-page-content {
         gap: 18px 8px;
     }
 
+    .movie-row {
+        gap: 10px;
+        padding-bottom: 12px;
+    }
+
+    .movie-row .movie-card-sm {
+        flex-basis: 120px;
+    }
+
     .movie-card-sm:hover {
         transform: none;
     }
@@ -964,6 +1290,36 @@ body.has-hero .movies-page-content {
         gap: 10px;
         padding: 30px 6vw;
         text-align: center;
+    }
+
+    .detail-body {
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+        padding: 100px 5vw 60px;
+    }
+
+    .detail-poster-wrap {
+        flex: none;
+        width: 220px;
+    }
+
+    .detail-info {
+        width: 100%;
+    }
+
+    .detail-title {
+        font-size: clamp(2rem, 7vw, 3rem);
+    }
+
+    .detail-back {
+        top: 20px;
+        font-size: 1rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .detail-backdrop {
+        height: 350px;
     }
 }
 
@@ -996,6 +1352,10 @@ body.has-hero .movies-page-content {
         gap: 16px 7px;
     }
 
+    .movie-row .movie-card-sm {
+        flex-basis: 98px;
+    }
+
     .card-info-sm {
         padding-top: 7px;
     }
@@ -1003,6 +1363,13 @@ body.has-hero .movies-page-content {
     .card-title-sm {
         font-size: 8px;
         line-height: 1.25;
+    }
+
+    .card-description-sm {
+        margin-top: 4px;
+        font-size: 7px;
+        line-height: 1.35;
+        -webkit-line-clamp: 2;
     }
 
     .card-rating,
@@ -1019,6 +1386,19 @@ body.has-hero .movies-page-content {
         right: auto;
         bottom: 3px;
         left: 3px;
+    }
+
+    .detail-poster-wrap {
+        width: 180px;
+    }
+
+    .detail-body {
+        padding: 90px 5vw 50px;
+    }
+
+    .btn-trailer {
+        font-size: 0.85rem;
+        padding: 0.5rem 1.2rem;
     }
 }
 
