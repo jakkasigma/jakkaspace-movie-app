@@ -1,0 +1,53 @@
+@extends('layouts.movie')
+
+@section('title', 'Followers — ' . ($profile->name ?? $profile->username))
+@section('body-class', 'movie-page')
+
+@section('body')
+    <x-movie.navbar />
+
+    <main class="space-page">
+        <header class="space-header">
+            <div class="space-header-inner">
+                <div>
+                    <a href="{{ route('profile.show', $profile->username) }}" class="profile-back-link">← {{ $profile->name }}</a>
+                    <h1 class="space-page-title">FOLLOWERS</h1>
+                </div>
+            </div>
+        </header>
+
+        <div class="space-body">
+            @if ($users->isEmpty())
+                <div class="space-empty">Belum ada followers.</div>
+            @else
+                <div class="user-list">
+                    @foreach ($users as $user)
+                        <div class="user-list-row">
+                            @if ($user->avatar_url)
+                                <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" class="user-list-avatar">
+                            @else
+                                <div class="user-list-avatar user-list-avatar-placeholder">
+                                    {{ strtoupper(substr($user->name ?? $user->username ?? '?', 0, 1)) }}
+                                </div>
+                            @endif
+                            <div class="user-list-info">
+                                @if ($user->username)
+                                    <a href="{{ route('profile.show', $user->username) }}" class="user-list-name">{{ $user->name }}</a>
+                                    <span class="user-list-username">{{ '@' . $user->username }}</span>
+                                @else
+                                    <span class="user-list-name">{{ $user->name }}</span>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+    </main>
+
+    <footer id="footer">
+        <div>&copy; 2026 JAKKA SPACE</div>
+        <div id="clock">YOGYAKARTA - 00:00</div>
+        <div>STAY CURIOUS / STAY WATCHING</div>
+    </footer>
+@endsection

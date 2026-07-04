@@ -1,0 +1,61 @@
+@extends('layouts.movie')
+
+@section('title', 'Pengaturan — Jakka Space')
+@section('body-class', 'movie-page')
+
+@section('body')
+    <x-movie.navbar />
+
+    <main class="space-page">
+        <header class="space-header">
+            <div class="space-header-inner">
+                <div>
+                    <h1 class="space-page-title">PENGATURAN</h1>
+                    <p class="space-page-subtitle">Kelola akun dan profil publikmu.</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="space-body">
+            <div class="settings-wrap">
+
+                {{-- Profile Info --}}
+                <section class="settings-section">
+                    <header class="settings-section-header">
+                        <h2 class="settings-section-title">Informasi Profil</h2>
+                        <p class="settings-section-desc">Nama, username, bio, dan email yang tampil di profilmu.</p>
+                    </header>
+
+                    @include('profile.partials.update-profile-information-form')
+                </section>
+
+                {{-- Password --}}
+                <section class="settings-section">
+                    <header class="settings-section-header">
+                        <h2 class="settings-section-title">Ubah Password</h2>
+                        <p class="settings-section-desc">Gunakan password yang panjang dan acak agar akunmu aman.</p>
+                    </header>
+
+                    @include('profile.partials.update-password-form')
+                </section>
+
+                {{-- Delete Account --}}
+                <section class="settings-section settings-section-danger">
+                    <header class="settings-section-header">
+                        <h2 class="settings-section-title settings-section-title-danger">Hapus Akun</h2>
+                        <p class="settings-section-desc">Setelah akun dihapus, semua data tidak bisa dipulihkan.</p>
+                    </header>
+
+                    @include('profile.partials.delete-user-form')
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <footer id="footer">
+        <div>&copy; 2026 JAKKA SPACE</div>
+        <div id="clock">YOGYAKARTA - 00:00</div>
+        <div>STAY CURIOUS / STAY WATCHING</div>
+    </footer>
+@endsection

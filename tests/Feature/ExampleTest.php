@@ -120,7 +120,9 @@ test('the application returns categorized movies from tmdb', function () {
         ->assertSee('Film Animasi')
         ->assertSee('Interstellar')
         ->assertSee('Inside Out 2')
-        ->assertSee(route('movies.show', 1), false)
+        ->assertSee('/movies/1', false)
+        ->assertDontSee('SEWA 5K')
+        ->assertDontSee('BELI 15K')
         ->assertDontSee('Rahasia kartu kedua.');
 
     Http::assertSent(fn ($request) => str_contains($request->url(), '/trending/movie/week'));
@@ -147,6 +149,9 @@ test('the application searches movies from tmdb', function () {
                 ],
             ],
         ]),
+        'https://api.themoviedb.org/3/genre/movie/list*' => Http::response([
+            'genres' => [],
+        ]),
         'https://api.themoviedb.org/3/movie/popular*' => Http::response([
             'results' => [],
         ]),
@@ -162,6 +167,64 @@ test('the application searches movies from tmdb', function () {
     Http::assertSent(fn ($request) => str_contains($request->url(), '/search/movie'));
 });
 
+test('the application falls back to english movie overviews when indonesian overviews are unavailable', function () {
+    $this->withoutVite();
+    Http::preventStrayRequests();
+
+    Http::fake(function ($request) {
+        $url = $request->url();
+
+        if (str_contains($url, '/trending/movie/week') && str_contains($url, 'language=id-ID')) {
+            return Http::response([
+                'results' => [
+                    [
+                        'id' => 7,
+                        'title' => 'Fallback Movie',
+                        'overview' => '',
+                        'poster_path' => '/poster-fallback.jpg',
+                        'backdrop_path' => '/backdrop-fallback.jpg',
+                        'vote_average' => 7.9,
+                        'release_date' => '2026-05-01',
+                    ],
+                ],
+            ]);
+        }
+
+        if (str_contains($url, '/trending/movie/week') && str_contains($url, 'language=en-US')) {
+            return Http::response([
+                'results' => [
+                    [
+                        'id' => 7,
+                        'title' => 'Fallback Movie',
+                        'overview' => 'An English synopsis from TMDB.',
+                        'poster_path' => '/poster-fallback.jpg',
+                        'backdrop_path' => '/backdrop-fallback.jpg',
+                        'vote_average' => 7.9,
+                        'release_date' => '2026-05-01',
+                    ],
+                ],
+            ]);
+        }
+
+        return Http::response([
+            'results' => [],
+        ]);
+    });
+
+    $response = $this->get(route('movies.index'));
+
+    $response
+        ->assertSuccessful()
+        ->assertSee('Fallback Movie')
+        ->assertSee('An English synopsis from TMDB.');
+
+    Http::assertSent(fn ($request) => str_contains($request->url(), '/trending/movie/week')
+        && str_contains($request->url(), 'language=id-ID'));
+
+    Http::assertSent(fn ($request) => str_contains($request->url(), '/trending/movie/week')
+        && str_contains($request->url(), 'language=en-US'));
+});
+
 test('the application displays a movie detail page from tmdb', function () {
     $this->withoutVite();
     Http::preventStrayRequests();
@@ -175,11 +238,37 @@ test('the application displays a movie detail page from tmdb', function () {
             'poster_path' => '/poster-interstellar.jpg',
             'backdrop_path' => '/backdrop-interstellar.jpg',
             'vote_average' => 8.7,
+            'vote_count' => 12345,
             'release_date' => '2014-11-07',
+            'original_language' => 'en',
             'runtime' => 169,
             'genres' => [
                 ['name' => 'Adventure'],
                 ['name' => 'Science Fiction'],
+            ],
+            'production_countries' => [
+                ['name' => 'United States of America'],
+                ['name' => 'United Kingdom'],
+            ],
+            'production_companies' => [
+                ['name' => 'Paramount Pictures'],
+                ['name' => 'Legendary Pictures'],
+            ],
+            'release_dates' => [
+                'results' => [
+                    [
+                        'iso_3166_1' => 'ID',
+                        'release_dates' => [
+                            ['certification' => '13+'],
+                        ],
+                    ],
+                    [
+                        'iso_3166_1' => 'US',
+                        'release_dates' => [
+                            ['certification' => 'PG-13'],
+                        ],
+                    ],
+                ],
             ],
             'videos' => [
                 'results' => [
@@ -192,10 +281,28 @@ test('the application displays a movie detail page from tmdb', function () {
                 ],
             ],
             'credits' => [
+                'cast' => [
+                    [
+                        'name' => 'Matthew McConaughey',
+                        'character' => 'Cooper',
+                        'profile_path' => '/profile-matthew.jpg',
+                        'order' => 0,
+                    ],
+                    [
+                        'name' => 'Anne Hathaway',
+                        'character' => 'Brand',
+                        'profile_path' => null,
+                        'order' => 1,
+                    ],
+                ],
                 'crew' => [
                     [
                         'job' => 'Director',
                         'name' => 'Christopher Nolan',
+                    ],
+                    [
+                        'job' => 'Writer',
+                        'name' => 'Jonathan Nolan',
                     ],
                 ],
             ],
@@ -208,11 +315,118 @@ test('the application displays a movie detail page from tmdb', function () {
         ->assertSuccessful()
         ->assertSee('Interstellar')
         ->assertSee('Perjalanan lintas galaksi.')
-        ->assertSee('SEWA Rp5K')
-        ->assertSee('BELI Rp15K')
-        ->assertSee('Play Trailer')
+        ->assertSee('Bagikan')
+        ->assertSee('Film Diary Story')
+        ->assertSee('Template dengan poster, rating')
+        ->assertSee('Story Instagram')
+        ->assertSee('Unduh PNG')
+        ->assertSee('data-share-story', false)
+        ->assertSee('data-story-director="Christopher Nolan"', false)
+        ->assertSee('/tmdb-images/w500/poster-interstellar.jpg', false)
+        ->assertSee('/tmdb-images/w780/backdrop-interstellar.jpg', false)
+        ->assertDontSee('SEWA')
+        ->assertDontSee('BELI')
+        ->assertSee('Trailer')
         ->assertSee('https://www.youtube.com/watch?v=zSWdZVtXT7E', false)
-        ->assertSee('Christopher Nolan');
+        ->assertSee('Christopher Nolan')
+        ->assertSee('Penulis')
+        ->assertSee('Jonathan Nolan')
+        ->assertSee('Info Film')
+        ->assertSee('Batas Umur')
+        ->assertSee('13+')
+        ->assertSee('Jumlah Vote')
+        ->assertSee('12.345 vote')
+        ->assertSee('Bahasa Asli')
+        ->assertSee('Bahasa Inggris')
+        ->assertSee('Negara Produksi')
+        ->assertSee('United States of America')
+        ->assertSee('Studio')
+        ->assertSee('Paramount Pictures')
+        ->assertSee('Pemeran')
+        ->assertSee('Matthew McConaughey')
+        ->assertSee('Cooper')
+        ->assertSee('Anne Hathaway')
+        ->assertSee('Brand')
+        ->assertSee('https://image.tmdb.org/t/p/w185/profile-matthew.jpg', false);
 
-    Http::assertSent(fn ($request) => str_contains($request->url(), '/movie/1'));
+    Http::assertSent(fn ($request) => str_contains($request->url(), '/movie/1')
+        && str_contains($request->url(), 'release_dates'));
+});
+
+test('the application proxies tmdb images for story templates', function () {
+    Http::preventStrayRequests();
+
+    Http::fake([
+        'https://image.tmdb.org/t/p/w500/poster-interstellar.jpg' => Http::response('fake-image-body', 200, [
+            'Content-Type' => 'image/jpeg',
+        ]),
+    ]);
+
+    $response = $this->get(route('movies.image', [
+        'size' => 'w500',
+        'path' => 'poster-interstellar.jpg',
+    ]));
+
+    $response
+        ->assertSuccessful()
+        ->assertHeader('Content-Type', 'image/jpeg');
+
+    expect($response->getContent())->toBe('fake-image-body');
+
+    Http::assertSent(fn ($request) => $request->url() === 'https://image.tmdb.org/t/p/w500/poster-interstellar.jpg');
+});
+
+test('the application falls back to english overview on movie detail pages', function () {
+    $this->withoutVite();
+    Http::preventStrayRequests();
+
+    Http::fake(function ($request) {
+        $url = $request->url();
+
+        if (str_contains($url, '/movie/9') && str_contains($url, 'language=id-ID')) {
+            return Http::response([
+                'id' => 9,
+                'title' => 'Detail Fallback',
+                'overview' => '',
+                'tagline' => '',
+                'poster_path' => '/poster-detail.jpg',
+                'backdrop_path' => '/backdrop-detail.jpg',
+                'vote_average' => 7.3,
+                'release_date' => '2026-02-14',
+                'runtime' => 100,
+                'genres' => [
+                    ['name' => 'Drama'],
+                ],
+                'videos' => [
+                    'results' => [],
+                ],
+                'credits' => [
+                    'crew' => [],
+                ],
+            ]);
+        }
+
+        if (str_contains($url, '/movie/9') && str_contains($url, 'language=en-US')) {
+            return Http::response([
+                'id' => 9,
+                'title' => 'Detail Fallback',
+                'overview' => 'The English detail synopsis from TMDB.',
+            ]);
+        }
+
+        return Http::response([], 404);
+    });
+
+    $response = $this->get(route('movies.show', 9));
+
+    $response
+        ->assertSuccessful()
+        ->assertSee('Detail Fallback')
+        ->assertSee('The English detail synopsis from TMDB.');
+
+    Http::assertSent(fn ($request) => str_contains($request->url(), '/movie/9')
+        && str_contains($request->url(), 'language=id-ID'));
+
+    Http::assertSent(fn ($request) => str_contains($request->url(), '/movie/9')
+        && str_contains($request->url(), 'language=en-US'));
 });

@@ -1,56 +1,16 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $search !== '' ? 'Jakka Space - ' . $search : 'Jakka Space - Movie Indonesia' }}</title>
-    <meta name="description" content="Jakka Space menampilkan daftar film populer dan hasil pencarian film dari TMDB.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;600;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    <link href="https://fonts.cdnfonts.com/css/peace-sans" rel="stylesheet">
-    @php
-        $hotFilePath = public_path('hot');
-        $hotUrl = file_exists($hotFilePath) ? trim(file_get_contents($hotFilePath)) : null;
-        $hotParts = is_string($hotUrl) ? parse_url($hotUrl) : false;
-        $shouldUseHotAssets = false;
+@extends('layouts.movie')
 
-        if (is_array($hotParts) && isset($hotParts['host'], $hotParts['port'])) {
-            $socket = @fsockopen($hotParts['host'], (int) $hotParts['port'], $errorNumber, $errorMessage, 0.3);
+@section('title', $search !== '' ? 'Jakka Space - ' . $search : 'Jakka Space - Movie Indonesia')
+@section('description', 'Jakka Space menampilkan daftar film populer dan hasil pencarian film dari TMDB.')
 
-            if (is_resource($socket)) {
-                fclose($socket);
-                $shouldUseHotAssets = true;
-            }
-        }
+@php
+    $bodyClass = 'movie-page' . ($heroMovie ? ' has-hero' : '') . ($search === '' && ! $isFiltered ? ' is-home' : ' is-search');
+@endphp
 
-        $buildManifestPath = public_path('build/manifest.json');
-        $buildManifest = file_exists($buildManifestPath)
-            ? json_decode(file_get_contents($buildManifestPath), true)
-            : null;
-        $buildEntries = is_array($buildManifest) ? array_values($buildManifest) : [];
-        $compiledCss = collect($buildEntries)->first(
-            fn (array $entry): bool => str_ends_with($entry['file'] ?? '', '.css'),
-        );
-        $compiledJs = collect($buildEntries)->first(
-            fn (array $entry): bool => str_ends_with($entry['file'] ?? '', '.js'),
-        );
-    @endphp
+@section('body-class', $bodyClass)
 
-    @if ($shouldUseHotAssets)
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @else
-        @if ($compiledCss)
-            <link rel="stylesheet" href="{{ asset('build/' . $compiledCss['file']) }}">
-        @endif
-
-        @if ($compiledJs)
-            <script type="module" src="{{ asset('build/' . $compiledJs['file']) }}"></script>
-        @endif
-    @endif
-</head>
-<body class="movie-page{{ $heroMovie ? ' has-hero' : '' }}">
-    <audio id="intro-sound" src="{{ asset('assets/sound1.mp3') }}" preload="auto"></audio>
+@section('body')
+    <audio id="intro-sound" src="/assets/sound1.mp3" preload="auto"></audio>
 
     <div id="pre-splash">
         <p id="splash-text">Put on your headset and listen.</p>
@@ -71,152 +31,106 @@
     </div>
 
     <div id="homepage">
-    <nav id="navbar">
-        <a href="{{ route('movies.index') }}" class="nav-logo" aria-label="Jakka Space">
-            <span class="nav-jakka">JAKKA</span>
-            <span class="nav-space-wrap">
-                <span class="nav-letter" style="color:#40E0D0;">S</span>
-                <span class="nav-letter" style="color:#FF0000;">P</span>
-                <span class="nav-letter" style="color:#FF69B4;">A</span>
-                <span class="nav-letter" style="color:#00FF00;">C</span>
-                <span class="nav-letter" style="color:#8A2BE2;">E</span>
-            </span>
-        </a>
+        <x-movie.navbar />
 
-        <div class="nav-center" data-menu-panel>
-            <ul class="nav-links">
-                <li>
-                    <a href="{{ route('movies.index') }}" class="{{ $search === '' ? 'active' : '' }}" data-menu-link>HOME</a>
-                </li>
-                <li>
-                    <a href="#all-movies" class="{{ $search !== '' ? 'active' : '' }}" data-menu-link>ALL MOVIE</a>
-                </li>
-            </ul>
+        @if ($heroMovie)
+            <x-movie.hero :movie="$heroMovie" :search="$search" />
+        @endif
 
-            <form method="GET" action="{{ route('movies.index') }}" class="nav-search">
-                <button type="submit" class="search-button" aria-label="Cari film">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon" aria-hidden="true">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                </button>
-                <input
-                    type="text"
-                    name="search"
-                    value="{{ $search }}"
-                    placeholder="Cari Film..."
-                    class="search-input"
-                    aria-label="Cari Film"
-                    autocomplete="off"
-                >
+        <main class="movies-page-content">
 
-                @if ($search !== '')
-                    <a href="{{ route('movies.index') }}" class="search-reset">Reset</a>
-                @endif
-            </form>
-        </div>
-
-        <button class="hamburger" type="button" aria-label="Menu" data-menu-button>
-            <span class="hamburger-line"></span>
-            <span class="hamburger-line"></span>
-            <span class="hamburger-line"></span>
-        </button>
-    </nav>
-
-    @if ($heroMovie)
-        <section id="hero">
-            <div class="hero-overlay"></div>
-
-            @if ($heroMovie['backdrop_url'] ?? $heroMovie['poster_url'])
-                <img
-                    src="{{ $heroMovie['backdrop_url'] ?? $heroMovie['poster_url'] }}"
-                    alt="Backdrop {{ $heroMovie['title'] }}"
-                    class="hero-bg"
-                >
-            @endif
-
-            <div class="hero-content">
-                <div class="hero-badge">{{ $search !== '' ? 'Hasil Pencarian' : 'Film Populer' }}</div>
-                <h1 class="hero-title">{{ $heroMovie['title'] }}</h1>
-
-                <p class="hero-meta">
-                    @if ($heroMovie['release_date'])
-                        <span>{{ $heroMovie['release_date'] }}</span>
-                    @endif
-
-                    <span>Rating {{ $heroMovie['rating'] }}</span>
-
-                    @if ($search !== '')
-                        <span>Kata kunci "{{ $search }}"</span>
-                    @endif
-                </p>
-
-                <p class="hero-desc">{{ $heroMovie['overview'] }}</p>
-
-                <div class="hero-actions">
-                    <a href="{{ route('movies.show', $heroMovie['id']) }}" class="btn-rent">Play</a>
-                    <a href="{{ route('movies.show', $heroMovie['id']) }}" class="btn-info">Info Film</a>
-                </div>
-            </div>
-        </section>
-    @endif
-
-    <main class="movies-page-content">
-        @foreach ($movieSections as $section)
-            <section class="movie-section" id="{{ $section['id'] }}">
-                <div class="section-header">
-                    <div class="section-copy">
-                        <h1 class="row-title">{{ $section['title'] }}</h1>
-                        <p class="section-kicker">{{ $section['kicker'] }}</p>
+            {{-- Personalized section — hanya di home, bukan saat filter/search --}}
+            @if (! empty($personalizedMovies) && ! $isFiltered && $search === '')
+                <section class="discover-personal-section">
+                    <div class="discover-personal-header">
+                        <h2 class="discover-personal-title">Untukmu</h2>
+                        <p class="discover-personal-desc">Berdasarkan genre yang sering kamu tonton.</p>
                     </div>
-
-                    <div class="results-chip">{{ count($section['movies']) }} Film</div>
-                </div>
-
-                @if ($section['statusMessage'])
-                    <div class="status-banner">{{ $section['statusMessage'] }}</div>
-                @endif
-
-                @if (empty($section['movies']))
-                    <div class="empty-state">{{ $section['emptyMessage'] }}</div>
-                @else
-                    <div class="{{ $section['layout'] === 'grid' ? 'movie-grid' : 'movie-row' }}">
-                        @foreach ($section['movies'] as $movie)
-                            <a href="{{ route('movies.show', $movie['id']) }}" class="movie-card-sm" aria-label="Lihat detail {{ $movie['title'] }}">
-                                <div class="card-rank">{{ $loop->iteration }}</div>
-
-                                <div class="card-poster-wrap">
-                                    @if ($movie['poster_url'])
-                                        <img src="{{ $movie['poster_url'] }}" alt="Poster {{ $movie['title'] }}" loading="lazy">
-                                    @else
-                                        <div class="no-poster">No Poster</div>
-                                    @endif
-
-                                    <div class="badge-sewa">SEWA 5K</div>
-                                    <div class="badge-beli">BELI 15K</div>
-                                </div>
-
-                                <div class="card-info-sm">
-                                    <span class="card-rating">Rating {{ $movie['rating'] }}</span>
-                                    <p class="card-title-sm">{{ $movie['title'] }}</p>
-
-                                    @if ($movie['release_year'])
-                                        <span class="card-meta">{{ $movie['release_year'] }}</span>
-                                    @endif
-                                </div>
-                            </a>
+                    <div class="movie-row">
+                        @foreach ($personalizedMovies as $movie)
+                            <x-movie.card :movie="$movie" />
                         @endforeach
                     </div>
-                @endif
-            </section>
-        @endforeach
-    </main>
+                </section>
+            @endif
 
-    <footer id="footer">
-        <div>&copy; 2026 JAKKA SPACE</div>
-        <div id="clock">YOGYAKARTA - 00:00</div>
-        <div>STAY CURIOUS / STAY WATCHING</div>
-    </footer>
+            {{-- Filter bar — selalu tampil di bawah hero/personalized --}}
+            @if ($search === '')
+                <div class="home-filter-wrap">
+                    <form method="GET" action="{{ route('movies.index') }}" class="discover-filters">
+                        <div class="filter-group">
+                            <label class="filter-label" for="filter-genre">Genre</label>
+                            <select id="filter-genre" name="genre" class="filter-select">
+                                <option value="">Semua Genre</option>
+                                @foreach ($genres as $genre)
+                                    <option
+                                        value="{{ $genre['id'] }}"
+                                        {{ ($filters['genre'] ?? null) == $genre['id'] ? 'selected' : '' }}
+                                    >{{ $genre['name'] }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="filter-label" for="filter-year">Tahun</label>
+                            <select id="filter-year" name="year" class="filter-select">
+                                <option value="">Semua Tahun</option>
+                                @foreach (range(date('Y'), 1970) as $year)
+                                    <option
+                                        value="{{ $year }}"
+                                        {{ ($filters['year'] ?? null) == $year ? 'selected' : '' }}
+                                    >{{ $year }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="filter-label" for="filter-sort">Urutkan</label>
+                            <select id="filter-sort" name="sort_by" class="filter-select">
+                                <option value="popularity.desc" {{ ($filters['sort_by'] ?? '') === 'popularity.desc' ? 'selected' : '' }}>Paling Populer</option>
+                                <option value="vote_average.desc" {{ ($filters['sort_by'] ?? '') === 'vote_average.desc' ? 'selected' : '' }}>Rating Tertinggi</option>
+                                <option value="release_date.desc" {{ ($filters['sort_by'] ?? '') === 'release_date.desc' ? 'selected' : '' }}>Terbaru</option>
+                                <option value="release_date.asc" {{ ($filters['sort_by'] ?? '') === 'release_date.asc' ? 'selected' : '' }}>Terlama</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="filter-submit">Terapkan</button>
+
+                        @if ($isFiltered)
+                            <a href="{{ route('movies.index') }}" class="filter-reset">Reset</a>
+                        @endif
+                    </form>
+                </div>
+            @endif
+
+            {{-- Filter result grid --}}
+            @if ($isFiltered && $discoverResult !== null)
+                <div class="discover-body">
+                    @if (empty($discoverResult['movies']))
+                        <div class="empty-state">Tidak ada film yang ditemukan dengan filter ini.</div>
+                    @else
+                        <div class="movie-grid">
+                            @foreach ($discoverResult['movies'] as $movie)
+                                <x-movie.card :movie="$movie" :rank="$loop->iteration" />
+                            @endforeach
+                        </div>
+                        <x-movie.pagination :currentPage="$discoverResult['current_page']" :totalPages="$discoverResult['total_pages']" />
+                    @endif
+                </div>
+
+            {{-- Home sections or search result --}}
+            @else
+                @foreach ($movieSections as $section)
+                    <x-movie.section :section="$section" />
+                @endforeach
+            @endif
+
+        </main>
+
+        <footer id="footer">
+            <div>&copy; 2026 JAKKA SPACE</div>
+            <div id="clock">YOGYAKARTA - 00:00</div>
+            <div>STAY CURIOUS / STAY WATCHING</div>
+        </footer>
     </div>
-</body>
-</html>
+@endsection
