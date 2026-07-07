@@ -6,12 +6,10 @@
 @endphp
 
 @section('title', $title . ' — Inbox — Jakka Space')
-@section('body-class', 'movie-page')
+@section('body-class', 'inbox-chat-room')
 
 @section('body')
-    <x-movie.navbar />
-
-    <main class="inbox-page inbox-chat-page">
+    <main class="inbox-chat-page">
 
         {{-- Chat header --}}
         <header class="inbox-chat-header">
@@ -31,7 +29,7 @@
                 <div>
                     <p class="inbox-chat-name">{{ $other?->name ?? 'Pengguna' }}</p>
                     @if ($other?->username)
-                        <a href="{{ route('profile.show', $other->username) }}" class="inbox-chat-handle">@{{ $other->username }}</a>
+                        <a href="{{ route('profile.show', $other->username) }}" class="inbox-chat-handle">{{ '@' . $other->username }}</a>
                     @endif
                 </div>
             </div>
@@ -44,8 +42,29 @@
                     Mulai percakapan dengan mengirim pesan pertamamu.
                 </div>
             @else
+                @php $lastDate = null; @endphp
                 @foreach ($messages as $message)
-                    @php $isMine = $message->user_id === auth()->id(); @endphp
+                    @php
+                        $isMine = $message->user_id === auth()->id();
+                        $msgDate = $message->created_at->format('Y-m-d');
+                    @endphp
+
+                    {{-- Date separator --}}
+                    @if ($msgDate !== $lastDate)
+                        @php $lastDate = $msgDate; @endphp
+                        <div class="inbox-date-sep">
+                            <span>
+                                @if ($message->created_at->isToday())
+                                    Hari Ini
+                                @elseif ($message->created_at->isYesterday())
+                                    Kemarin
+                                @else
+                                    {{ $message->created_at->format('d/m/Y') }}
+                                @endif
+                            </span>
+                        </div>
+                    @endif
+
                     <div class="inbox-msg {{ $isMine ? 'inbox-msg--mine' : 'inbox-msg--theirs' }}">
                         @if (! $isMine)
                             <div class="inbox-msg-avatar">
@@ -59,7 +78,7 @@
                             </div>
                         @endif
 
-                        <div class="inbox-msg-bubble">
+                        <div class="inbox-msg-bubble {{ $message->sender?->isPlus() ? 'inbox-msg-premium' : '' }}" @if ($message->sender?->isPlus() && $message->sender->theme) style="--avatar-border: {{ $message->sender->theme->avatar_border_css }}" @endif>
                             @if ($message->type === 'film_share' && $message->tmdb_id)
                                 @php $film = $movieCache[$message->tmdb_id] ?? null; @endphp
                                 <a href="{{ route('movies.show', $message->tmdb_id) }}" class="inbox-film-share">
@@ -114,12 +133,11 @@
 
 @push('head')
 <script>
-    // Auto-scroll to bottom on load
     document.addEventListener('DOMContentLoaded', function () {
         const el = document.getElementById('inbox-messages');
-        if (el) { el.scrollTop = el.scrollHeight; }
+        const shouldScroll = el && (el.scrollTop + el.clientHeight >= el.scrollHeight - 60);
+        if (el && shouldScroll) { el.scrollTop = el.scrollHeight; }
 
-        // Auto-resize textarea
         const ta = document.querySelector('.inbox-textarea');
         if (ta) {
             ta.addEventListener('input', function () {
@@ -127,12 +145,76 @@
                 this.style.height = Math.min(this.scrollHeight, 120) + 'px';
             });
 
-            // Ctrl+Enter or Cmd+Enter to submit
             ta.addEventListener('keydown', function (e) {
                 if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
                     this.closest('form').submit();
                 }
             });
+        }
+
+        // Real-time listening via Echo
+        if (window.Echo) {
+            const conversationId = {{ $conversation->id }};
+            const userId = {{ auth()->id() }};
+
+            window.Echo.private('chat.' + conversationId)
+                .listen('MessageSent', function (e) {
+                    if (e.message.user_id === userId) return;
+
+                    const container = document.getElementById('inbox-messages');
+                    if (!container) return;
+
+                    // Remove empty state if present
+                    const empty = container.querySelector('.inbox-messages-empty');
+                    if (empty) empty.remove();
+
+                    const msg = e.message;
+                    const isMine = msg.user_id === userId;
+                    const isToday = (function () {
+                        const d = new Date(msg.created_at);
+                        const now = new Date();
+                        return d.toDateString() === now.toDateString();
+                    })();
+
+                    // Date separator
+                    const lastSep = container.querySelector('.inbox-date-sep:last-child');
+                    const todayStr = new Date().toDateString();
+                    if (!lastSep || lastSep.dataset.date !== todayStr) {
+                        const sep = document.createElement('div');
+                        sep.className = 'inbox-date-sep';
+                        sep.dataset.date = todayStr;
+                        sep.innerHTML = '<span>Hari Ini</span>';
+                        container.appendChild(sep);
+                    }
+
+                    // Bubble
+                    const div = document.createElement('div');
+                    div.className = 'inbox-msg ' + (isMine ? 'inbox-msg--mine' : 'inbox-msg--theirs');
+
+                    const avatarHtml = !isMine ? '<div class="inbox-msg-avatar">' +
+                        (msg.sender.avatar_url
+                            ? '<img src="' + msg.sender.avatar_url + '" alt="' + msg.sender.name + '" class="inbox-mini-avatar">'
+                            : '<div class="inbox-mini-avatar inbox-avatar-placeholder">' + (msg.sender.name ? msg.sender.name.charAt(0).toUpperCase() : '?') + '</div>'
+                        ) + '</div>' : '';
+
+                    const textHtml = msg.type === 'film_share'
+                        ? '<div class="inbox-film-share" style="padding:12px;color:rgba(255,255,255,0.5);font-size:0.8rem">🎬 Film #' + msg.tmdb_id + '</div>'
+                        : '<p class="inbox-msg-text">' + (msg.body || '') + '</p>';
+
+                    const time = new Date(msg.created_at);
+                    const timeStr = time.getHours().toString().padStart(2, '0') + ':' + time.getMinutes().toString().padStart(2, '0');
+
+                    div.innerHTML = avatarHtml
+                        + '<div class="inbox-msg-bubble">'
+                        + textHtml
+                        + '<span class="inbox-msg-time">' + timeStr + '</span>'
+                        + '</div>';
+
+                    container.appendChild(div);
+
+                    // Auto-scroll
+                    container.scrollTop = container.scrollHeight;
+                });
         }
     });
 </script>

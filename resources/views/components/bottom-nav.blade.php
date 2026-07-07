@@ -58,19 +58,7 @@
             class="bottom-nav-item {{ request()->routeIs('profile.show', 'profile.edit', 'your-space*') ? 'active' : '' }}"
             aria-label="Profil"
         >
-            @if (auth()->user()->avatar_url)
-                <img
-                    src="{{ auth()->user()->avatar_url }}"
-                    alt="{{ auth()->user()->name }}"
-                    class="bottom-nav-avatar"
-                    loading="lazy"
-                >
-            @else
-                <svg class="bottom-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                    <circle cx="12" cy="7" r="4"/>
-                </svg>
-            @endif
+            <x-user-avatar :user="auth()->user()" class="bottom-nav-avatar" placeholder-class="bottom-nav-avatar" />
             <span class="bottom-nav-label">Profil</span>
         </a>
     @else

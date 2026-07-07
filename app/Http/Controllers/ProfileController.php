@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\ActivityLog;
 use App\Services\User\FollowService;
 use App\Services\User\PinnedMovieService;
 use App\Services\User\ProfileService;
@@ -74,6 +75,7 @@ class ProfileController extends Controller
         $user->name = $request->validated('name');
         $user->username = $request->validated('username') ?: null;
         $user->bio = $request->validated('bio') ?: null;
+        $user->is_private = $request->boolean('is_private');
 
         if ($user->email !== $request->validated('email')) {
             $user->email = $request->validated('email');
@@ -92,6 +94,59 @@ class ProfileController extends Controller
         }
 
         $user->save();
+
+        $changes = $user->getChanges();
+
+        foreach ($changes as $field => $newValue) {
+            if (! in_array($field, ['name', 'username', 'bio', 'avatar', 'avatar_url', 'email', 'email_verified_at'])) {
+                continue;
+            }
+
+            $original = $user->getOriginal($field);
+
+            if ($field === 'avatar' || $field === 'avatar_url') {
+                ActivityLog::create([
+                    'user_id' => $user->id,
+                    'type' => 'profile_update',
+                    'description' => 'Mengubah foto profil',
+                    'metadata' => ['field' => 'avatar'],
+                    'created_at' => now(),
+                ]);
+            } elseif ($field === 'email') {
+                ActivityLog::create([
+                    'user_id' => $user->id,
+                    'type' => 'profile_update',
+                    'description' => "Mengubah email menjadi {$newValue}",
+                    'metadata' => ['field' => $field, 'old_value' => $original, 'new_value' => $newValue],
+                    'created_at' => now(),
+                ]);
+            } else {
+                $label = [
+                    'name' => 'nama',
+                    'username' => 'username',
+                    'bio' => 'bio',
+                    'is_private' => 'visibilitas akun',
+                ][$field] ?? $field;
+
+                if ($field === 'bio') {
+                    ActivityLog::create([
+                        'user_id' => $user->id,
+                        'type' => 'profile_update',
+                        'description' => 'Mengubah bio',
+                        'metadata' => ['field' => $field, 'old_value' => $original, 'new_value' => $newValue],
+                        'created_at' => now(),
+                    ]);
+                } else {
+                    ActivityLog::create([
+                        'user_id' => $user->id,
+                        'type' => 'profile_update',
+                        'description' => "Mengubah {$label} menjadi {$newValue}",
+                        'metadata' => ['field' => $field, 'old_value' => $original, 'new_value' => $newValue],
+                        'created_at' => now(),
+                    ]);
+                }
+            }
+        }
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }

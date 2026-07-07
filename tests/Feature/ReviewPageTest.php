@@ -7,13 +7,13 @@ describe('review page', function (): void {
     it('shows public review page', function (): void {
         $review = Review::factory()->create([
             'body' => 'Film yang sangat mengesankan.',
-            'rating' => 9,
+            'rating' => 4,
         ]);
 
         $this->get(route('reviews.show', $review))
             ->assertOk()
             ->assertSee('Film yang sangat mengesankan.')
-            ->assertSee('9/10');
+            ->assertSee('4/5');
     });
 
     it('shows like button for authenticated user', function (): void {

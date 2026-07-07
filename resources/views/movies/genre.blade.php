@@ -8,6 +8,7 @@
     <x-movie.navbar />
 
     <main class="discover-page">
+        <a href="{{ route('movies.discover') }}" class="profile-back-link" style="margin-left:24px;">← Discover</a>
         <header class="discover-header">
             <div class="discover-header-copy">
                 <p class="discover-eyebrow">Genre</p>

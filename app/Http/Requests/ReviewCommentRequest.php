@@ -18,6 +18,7 @@ class ReviewCommentRequest extends FormRequest
     {
         return [
             'body' => ['required', 'string', 'min:1', 'max:1000'],
+            'parent_id' => ['nullable', 'integer', 'exists:review_comments,id'],
         ];
     }
 }

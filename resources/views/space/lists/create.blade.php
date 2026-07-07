@@ -19,7 +19,7 @@
 
         <div class="space-body">
             <div class="list-form-wrap">
-                <form method="POST" action="{{ route('your-space.lists.store') }}" class="list-form">
+                <form method="POST" action="{{ route('your-space.lists.store') }}" class="list-form" enctype="multipart/form-data">
                     @csrf
 
                     <div class="form-row">
@@ -66,6 +66,28 @@
                             >
                             Publik — siapa saja bisa melihat list ini
                         </label>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label" for="cover_photo">Cover List <span class="form-optional">(opsional, Plus+ exclusive)</span></label>
+                        @if ($canUploadCover)
+                            <input
+                                id="cover_photo"
+                                type="file"
+                                name="cover_photo"
+                                class="form-input"
+                                accept="image/jpeg,image/png,image/webp"
+                            >
+                            <p style="font-size:0.72rem;color:var(--muted);margin-top:4px;">Format: jpg, jpeg, png, webp. Maks 2MB.</p>
+                        @else
+                            <p style="font-size:0.82rem;color:var(--muted);padding:8px 0;">
+                                💎 Hanya pelanggan <strong>Plus+</strong> yang bisa upload cover list.
+                                <a href="{{ route('plus') }}" style="color:var(--accent);">Upgrade sekarang →</a>
+                            </p>
+                        @endif
+                        @error('cover_photo')
+                            <p class="form-error">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div class="form-footer">

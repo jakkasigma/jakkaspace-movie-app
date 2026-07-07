@@ -13,18 +13,17 @@
             <div class="profile-page-header-inner">
 
                 {{-- Avatar --}}
-                @if ($profile->avatar_url)
-                    <img src="{{ $profile->avatar_url }}" alt="{{ $profile->name }}" class="profile-avatar-lg">
-                @else
-                    <div class="profile-avatar-lg profile-avatar-placeholder">
-                        {{ strtoupper(substr($profile->name ?? $profile->username ?? '?', 0, 1)) }}
-                    </div>
-                @endif
+                <x-user-avatar :user="$profile" class="profile-avatar-lg" placeholder-class="profile-avatar-lg profile-avatar-placeholder" />
 
                 {{-- Identity + stats + actions --}}
                 <div class="profile-identity-wrap">
                     <div class="profile-identity">
-                        <h1 class="profile-display-name">{{ $profile->name }}</h1>
+                        <h1 class="profile-display-name">
+                            {{ $profile->name }}
+                            @if ($profile->isPlus())
+                                <span class="plus-indicator">Plus</span>
+                            @endif
+                        </h1>
                         @if ($profile->username)
                             <p class="profile-handle">{{ '@' . $profile->username }}</p>
                         @endif
@@ -190,7 +189,7 @@
                                     <div class="profile-grid-overlay">
                                         <p class="profile-grid-title">{{ $movie['title'] }}</p>
                                         @if ($movie['review_rating'] ?? null)
-                                            <span class="profile-grid-rating">★ {{ $movie['review_rating'] }}/10</span>
+                                            <span class="profile-grid-rating">★ {{ $movie['review_rating'] }}/5</span>
                                         @endif
                                     </div>
                                 </a>
@@ -207,6 +206,11 @@
                     <div class="lists-grid profile-lists-grid">
                         @foreach ($tabData as $list)
                             <article class="list-card">
+                                @if ($list->cover_photo)
+                                    <div style="margin-bottom:8px;border-radius:8px;overflow:hidden;max-height:120px;">
+                                        <img src="{{ asset('storage/'.$list->cover_photo) }}" alt="{{ $list->name }}" style="width:100%;height:120px;object-fit:cover;display:block;">
+                                    </div>
+                                @endif
                                 <div class="list-card-header">
                                     <a href="{{ route('lists.show', $list) }}" class="list-card-name">{{ $list->name }}</a>
                                     <span class="list-card-count">{{ $list->list_movies_count }} film</span>

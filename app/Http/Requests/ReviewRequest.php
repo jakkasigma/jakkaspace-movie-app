@@ -17,7 +17,7 @@ class ReviewRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'rating' => ['nullable', 'integer', 'min:1', 'max:10'],
+            'rating' => ['nullable', 'integer', 'min:1', 'max:5'],
             'body' => ['nullable', 'string', 'max:5000'],
             'has_spoiler' => ['boolean'],
         ];

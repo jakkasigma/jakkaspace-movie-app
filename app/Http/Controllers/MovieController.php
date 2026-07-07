@@ -116,7 +116,15 @@ class MovieController extends Controller
         $communityReviews = null;
         if ($tab === 'diskusi') {
             $reviewQuery = Review::where('tmdb_id', $movie)
-                ->with('user')
+                ->with([
+                    'user',
+                    'comments' => function ($query) {
+                        $query->whereNull('parent_id')
+                            ->with(['user', 'replies' => function ($q) {
+                                $q->with(['user', 'replies.user']);
+                            }]);
+                    },
+                ])
                 ->withCount(['likes', 'comments']);
 
             if ($sort === 'popular') {

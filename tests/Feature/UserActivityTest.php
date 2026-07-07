@@ -7,7 +7,7 @@ use App\Models\Watchlist;
 use App\Services\User\UserActivityService;
 
 beforeEach(function (): void {
-    $this->service = new UserActivityService;
+    $this->service = app(UserActivityService::class);
     $this->user = User::factory()->create();
 });
 

@@ -3,16 +3,21 @@
 use App\Http\Controllers\DiaryController;
 use App\Http\Controllers\DiaryLikeController;
 use App\Http\Controllers\DiscoverController;
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\InboxController;
+use App\Http\Controllers\ListChatController;
+use App\Http\Controllers\ListMemberController;
 use App\Http\Controllers\ListMovieController;
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\MovieListController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PinnedMovieController;
+use App\Http\Controllers\PremiumController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RedeemCodeController;
 use App\Http\Controllers\ReviewCommentController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ReviewLikeController;
@@ -22,6 +27,7 @@ use App\Http\Controllers\SpaceController;
 use App\Http\Controllers\TimelineController;
 use App\Http\Controllers\WatchHistoryController;
 use App\Http\Controllers\WatchlistController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [MovieController::class, 'index'])->name('movies.index');
@@ -100,7 +106,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/inbox', [InboxController::class, 'index'])->name('inbox');
     Route::get('/inbox/{conversation}', [InboxController::class, 'show'])->whereNumber('conversation')->name('inbox.show');
     Route::post('/inbox/{conversation}/messages', [InboxController::class, 'store'])->whereNumber('conversation')->name('inbox.messages.store');
-    Route::post('/inbox/direct/{user}', [InboxController::class, 'startDirect'])->name('inbox.direct');
+    Route::match(['get', 'post'], '/inbox/direct/{user}', [InboxController::class, 'startDirect'])->name('inbox.direct');
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications');
@@ -112,6 +118,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/your-space', [SpaceController::class, 'index'])->name('your-space');
         Route::get('/your-space/analytics', [SpaceController::class, 'analytics'])->name('your-space.analytics');
         Route::get('/your-space/diary', [SpaceController::class, 'diary'])->name('your-space.diary');
+        Route::get('/your-space/diary/{entry}/edit', [SpaceController::class, 'editDiary'])->name('your-space.diary.edit');
+        Route::put('/your-space/diary/{entry}', [SpaceController::class, 'updateDiary'])->name('your-space.diary.update');
         Route::get('/your-space/history', [SpaceController::class, 'history'])->name('your-space.history');
         Route::get('/your-space/watchlist', [SpaceController::class, 'watchlist'])->name('your-space.watchlist');
         Route::get('/your-space/favorites', [SpaceController::class, 'favorites'])->name('your-space.favorites');
@@ -129,7 +137,49 @@ Route::middleware('auth')->group(function () {
             ->whereNumber('movie')->name('lists.movies.store');
         Route::delete('/lists/{list}/movies/{movie}', [ListMovieController::class, 'destroy'])
             ->whereNumber('movie')->name('lists.movies.destroy');
+
+        // List members
+        Route::post('/lists/{list}/join', [ListMemberController::class, 'join'])->name('lists.members.join');
+        Route::post('/lists/{list}/leave', [ListMemberController::class, 'leave'])->name('lists.members.leave');
+        Route::get('/lists/{list}/members', [ListMemberController::class, 'manage'])->name('lists.members.manage');
+        Route::post('/lists/{list}/members/{user}/approve', [ListMemberController::class, 'approve'])->name('lists.members.approve');
+        Route::post('/lists/{list}/members/{user}/reject', [ListMemberController::class, 'reject'])->name('lists.members.reject');
+        Route::post('/lists/{list}/members/{user}/kick', [ListMemberController::class, 'kick'])->name('lists.members.kick');
+        Route::post('/lists/{list}/members/{user}/promote', [ListMemberController::class, 'promote'])->name('lists.members.promote');
+        Route::post('/lists/{list}/members/{user}/demote', [ListMemberController::class, 'demote'])->name('lists.members.demote');
+
+        // List invitations
+        Route::post('/lists/{list}/invite', [ListMemberController::class, 'invite'])->name('lists.members.invite');
+        Route::post('/lists/{list}/invitations/accept', [ListMemberController::class, 'acceptInvite'])->name('lists.invitations.accept');
+        Route::post('/lists/{list}/invitations/decline', [ListMemberController::class, 'declineInvite'])->name('lists.invitations.decline');
+
+        // List chat
+        Route::get('/lists/{list}/chat', [ListChatController::class, 'show'])->name('lists.chat.show');
+        Route::post('/lists/{list}/chat', [ListChatController::class, 'store'])->name('lists.chat.store');
+
+        // Join by code
+        Route::post('/lists/join', [ListMemberController::class, 'joinByCode'])->name('lists.join-by-code');
     });
+
+    // Plus subscription
+    Route::get('/plus', [PremiumController::class, 'index'])->name('plus');
+    Route::post('/plus/subscribe', [PremiumController::class, 'subscribe'])->name('plus.subscribe');
+    Route::get('/plus/simulate', [PremiumController::class, 'simulatePayment'])->name('plus.simulate');
+    Route::put('/plus/theme', [PremiumController::class, 'updateTheme'])->name('plus.theme');
+    Route::post('/plus/redeem', [RedeemCodeController::class, 'redeem'])->name('plus.redeem');
+    Route::post('/plus/promo/validate', [PremiumController::class, 'validatePromo'])->name('plus.promo.validate');
+    Route::get('/plus/history', [PremiumController::class, 'history'])->name('plus.history');
+    Route::post('/plus/promo/dismiss', function () {
+        session(['promo_popup_dismissed' => true]);
+
+        return response()->json(['ok' => true]);
+    })->name('plus.promo.dismiss');
+    Route::get('/plus/settings', function (Request $request) {
+        return redirect()->route('plus');
+    })->name('plus.settings');
+
+    // Export (Plus only)
+    Route::get('/export/{type}', [ExportController::class, 'export'])->name('export');
 
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

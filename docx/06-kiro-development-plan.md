@@ -1,4 +1,4 @@
-# Jakkaspace — Development Plan
+selanjutnya apa# Jakkaspace — Development Plan
 
 > Created: 2026-07-02
 > Last Updated: 2026-07-02
@@ -288,7 +288,7 @@ search results    — tidak di-cache (hasil real-time)
 51. Phase 6 — Ecosystem                ← berikutnya
 ```
 
-**Posisi sekarang: Phase 1–5 selesai, siap masuk Phase 6.**
+**Posisi sekarang: Phase 1–6 selesai.**
 ---
 
 ## Aturan yang Diikuti Selama Development
@@ -303,6 +303,100 @@ search results    — tidak di-cache (hasil real-time)
 - Setiap fitur hanya dikerjakan jika domainnya sudah jelas
 - Struktur service: per domain (`app/Services/Movie/`, `app/Services/Tmdb/`, dst.)
 
+## Phase 6 — Account System Revision (Current)
+
+### Latar Belakang
+
+Setelah audit sistem akun, ditemukan beberapa celah dan missing feature:
+
+| Issue | Detail |
+|---|---|
+| Username tidak diminta saat registrasi | Form register cuma name + email + password. `username` nullable, padahal URL profil adalah `/@{username}`. |
+| Tidak ada halaman Account Settings dedicated | Ganti password, ubah email, manage Google account, privasi — belum terpusat. |
+| Privacy toggle (`is_private`) tidak bisa diakses user | Field di DB, tidak ada UI. |
+| Google-only user tidak bisa set password | `has_password = false`, tidak ada flow untuk set password. |
+| Email verification UX kurang mulus | Register → redirect `/your-space` → kena blok `verified` middleware. |
+| Username tidak required di ProfileUpdateRequest | Bisa disimpan null. |
+| Tidak ada Policy | Ownership cek manual di controller. |
+| Tidak ada rate limiting di register | Rawan spam registrasi. |
+
+### Phase 6A — Perbaikan Registrasi ✅ SELESAI
+
+| Langkah | Status |
+|---|---|
+| A1. Tambah field username + validasi di register | ✅ |
+| A2. Auto-suggest username dari name (JS) | ✅ |
+| A3. Fix redirect flow — ke verification.notice | ✅ |
+| A4. Redesign verify-email page (UI Jakkaspace + Bahasa) | ✅ |
+
+**File yang diubah:**
+- `resources/views/auth/register.blade.php` — tambah field username + auto-suggest
+- `app/Http/Controllers/Auth/RegisteredUserController.php` — validasi username, redirect fix
+- `resources/views/auth/verify-email.blade.php` — redesign UI
+
+### Phase 6B — Account Settings
+
+| Langkah | Status |
+|---|---|
+| B1. Toggle is_private di settings | ✅ |
+| B2. Set Password untuk Google-only users | ✅ |
+| B3. Linked Accounts section (Google status) | ✅ |
+
+**File yang diubah:**
+- `resources/views/profile/partials/update-profile-information-form.blade.php` — toggle is_private
+- `resources/views/profile/partials/update-password-form.blade.php` — conditional set password
+- `resources/views/profile/partials/linked-accounts-form.blade.php` — baru
+- `resources/views/profile/edit.blade.php` — include partial linked accounts
+- `app/Http/Controllers/Auth/PasswordController.php` — handle set password tanpa current_password
+
+### Phase 6C — Authorization & Security
+
+| Langkah | Status |
+|---|---|
+| C1. UserPolicy | ✅ |
+| C2. Rate limiting di register | ✅ |
+
+**File yang diubah:**
+- `app/Policies/UserPolicy.php` — baru
+- `app/Providers/AppServiceProvider.php` — registrasi policy
+- `app/Http/Controllers/Auth/RegisteredUserController.php` — rate limit
+
+### Phase 6D — UX Enhancement
+
+| Langkah | Status |
+|---|---|
+| D1. Onboarding flow (ditunda) | ⏳ |
+| D2. Username required di ProfileUpdateRequest | ✅ |
+
+**File yang diubah:**
+- `app/Http/Requests/ProfileUpdateRequest.php` — username jadi required
+
+### Urutan Eksekusi
+
+```
+A1 + A2 (username register)     → harus pertama, core flow
+    ↓
+A3 + A4 (verify email UX)       → tergantung A1 (redirect fix)
+    ↓
+B1 (privacy toggle)             → parallel dengan B2
+B2 (set password Google user)   → parallel dengan B1
+    ↓
+B3 (linked accounts info)       → tergantung B2
+    ↓
+C1 (Policy)                     → improve code quality
+C2 (rate limit register)        → security
+    ↓
+D2 (username required di edit)  → setelah semua user punya username
+```
+
+### Tests Phase 6
+
+| Test | Status |
+|---|---|
+| RegistrationTest — tambah username field | ✅ |
+| ProfileTest — username required, is_private toggle | ✅ |
+| PasswordUpdateTest — set password Google user | ✅ |
+
 ---
 
-*Dokumen ini akan diupdate seiring perkembangan project. Dapat dilanjutkan di AI tool apapun (Kiro, Claude Code, Cursor, dll.) selama mengacu pada dokumen ini dan folder docx sebagai source of truth.*
+*Dokumen ini akan diupdate seiring perkembangan project. Dapat dilanjutkan di AI tool apapun (Kiro, Claude Code, Cursor, dll.) selama mengacu pada dokumen ini dan folder docx sebagai source of truth.**

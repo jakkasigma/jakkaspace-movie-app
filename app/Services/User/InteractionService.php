@@ -9,6 +9,7 @@ use App\Models\ReviewComment;
 use App\Models\ReviewLike;
 use App\Models\User;
 use App\Notifications\DiaryLiked;
+use App\Notifications\MentionedInComment;
 use App\Notifications\ReviewCommented;
 use App\Notifications\ReviewLiked;
 
@@ -70,11 +71,12 @@ class InteractionService
             ->exists();
     }
 
-    public function addComment(User $user, Review $review, string $body): ReviewComment
+    public function addComment(User $user, Review $review, string $body, ?int $parentId = null): ReviewComment
     {
         $comment = ReviewComment::create([
             'user_id' => $user->id,
             'review_id' => $review->id,
+            'parent_id' => $parentId,
             'body' => $body,
         ]);
 
@@ -82,6 +84,19 @@ class InteractionService
         if ($review->user_id !== $user->id) {
             $review->loadMissing('user');
             $review->user->notify(new ReviewCommented($user, $review, $body));
+        }
+
+        // Extract and notify mentioned users
+        preg_match_all('/\B@(\w+)\b/', $body, $matches);
+        if (! empty($matches[1])) {
+            $mentionedUsernames = array_unique($matches[1]);
+            $mentionedUsers = User::whereIn('username', $mentionedUsernames)
+                ->where('id', '!=', $user->id) // Don't notify self
+                ->get();
+
+            foreach ($mentionedUsers as $mentionedUser) {
+                $mentionedUser->notify(new MentionedInComment($user, $comment, $review));
+            }
         }
 
         return $comment;

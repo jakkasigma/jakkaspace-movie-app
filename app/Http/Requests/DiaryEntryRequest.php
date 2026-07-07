@@ -19,7 +19,7 @@ class DiaryEntryRequest extends FormRequest
         return [
             'watched_at' => ['required', 'date', 'before_or_equal:today'],
             'notes' => ['nullable', 'string', 'max:2000'],
-            'mood' => ['nullable', 'string', 'in:happy,sad,thrilled,bored,moved,scared,inspired,nostalgic'],
+            'mood' => ['nullable', 'string', 'max:50'],
             'is_rewatch' => ['boolean'],
         ];
     }

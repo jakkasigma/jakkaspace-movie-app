@@ -66,7 +66,10 @@ class ActivityFeedService
                 'tmdb_id' => $review->tmdb_id,
                 'title' => null,
                 'poster_url' => null,
-                'extra' => $review->rating,
+                'extra' => [
+                    'rating' => $review->rating,
+                    'body' => $review->body,
+                ],
                 'created_at' => $review->created_at,
                 'subject_id' => $review->id,
             ]);

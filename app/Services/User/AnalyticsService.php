@@ -188,6 +188,137 @@ class AnalyticsService
     }
 
     /**
+     * Premium-only analytics: rating distribution, streak, estimated hours, favorite director, rating per year.
+     *
+     * @return array{
+     *     rating_distribution: array<int, int>,
+     *     streak: int,
+     *     estimated_hours: int,
+     *     favorite_director: string|null,
+     *     rating_per_year: array<string, float>,
+     * }
+     */
+    public function getPremiumAnalytics(Authenticatable $user): array
+    {
+        return [
+            'rating_distribution' => $this->ratingDistribution($user),
+            'streak' => $this->currentStreak($user),
+            'estimated_hours' => $this->estimatedHours($user),
+            'favorite_director' => $this->favoriteDirector($user),
+            'rating_per_year' => $this->ratingPerYear($user),
+        ];
+    }
+
+    private function ratingDistribution(Authenticatable $user): array
+    {
+        $ratings = array_fill(1, 5, 0);
+
+        Review::where('user_id', $user->id)
+            ->whereNotNull('rating')
+            ->selectRaw('rating, COUNT(*) as count')
+            ->groupBy('rating')
+            ->get()
+            ->each(fn ($row) => $ratings[(int) $row->rating] = (int) $row->count);
+
+        return $ratings;
+    }
+
+    private function currentStreak(Authenticatable $user): int
+    {
+        $dates = DiaryEntry::where('user_id', $user->id)
+            ->whereNotNull('watched_at')
+            ->orderByDesc('watched_at')
+            ->pluck('watched_at')
+            ->map(fn ($d) => $d instanceof Carbon ? $d->format('Y-m-d') : Carbon::parse($d)->format('Y-m-d'))
+            ->unique()
+            ->values();
+
+        if ($dates->isEmpty()) {
+            return 0;
+        }
+
+        $streak = 1;
+        $today = Carbon::today();
+
+        if ($dates->first() !== $today->format('Y-m-d') && $dates->first() !== $today->subDay()->format('Y-m-d')) {
+            return 0;
+        }
+
+        for ($i = 1; $i < $dates->count(); $i++) {
+            $prev = Carbon::parse($dates[$i - 1]);
+            $curr = Carbon::parse($dates[$i]);
+
+            if ($prev->diffInDays($curr) === 1) {
+                $streak++;
+            } else {
+                break;
+            }
+        }
+
+        return $streak;
+    }
+
+    private function estimatedHours(Authenticatable $user): int
+    {
+        // Approximate: assume average movie runtime ~120 min = 2 hours
+        $count = WatchHistory::where('user_id', $user->id)
+            ->where('status', 'watched')
+            ->count();
+
+        return $count * 2;
+    }
+
+    private function favoriteDirector(Authenticatable $user): ?string
+    {
+        $tmdbIds = DiaryEntry::where('user_id', $user->id)
+            ->selectRaw('tmdb_id, COUNT(*) as count')
+            ->groupBy('tmdb_id')
+            ->orderByDesc('count')
+            ->limit(20)
+            ->pluck('tmdb_id');
+
+        $directorCounts = [];
+
+        foreach ($tmdbIds as $tmdbId) {
+            [$detail] = $this->movieService->findMovie((int) $tmdbId);
+
+            if ($detail !== null && ! empty($detail['credits'])) {
+                $director = collect($detail['credits']['crew'] ?? [])
+                    ->first(fn ($c) => ($c['job'] ?? '') === 'Director');
+
+                if ($director !== null) {
+                    $name = $director['name'] ?? 'Unknown';
+                    $directorCounts[$name] = ($directorCounts[$name] ?? 0) + 1;
+                }
+            }
+        }
+
+        arsort($directorCounts);
+
+        return ! empty($directorCounts) ? array_key_first($directorCounts) : null;
+    }
+
+    /**
+     * @return array<string, float>
+     */
+    private function ratingPerYear(Authenticatable $user): array
+    {
+        $driver = config('database.connections.'.config('database.default').'.driver');
+        $yearExpr = $driver === 'sqlite'
+            ? "strftime('%Y', created_at) as year"
+            : "DATE_FORMAT(created_at, '%Y') as year";
+
+        return Review::where('user_id', $user->id)
+            ->whereNotNull('rating')
+            ->selectRaw("{$yearExpr}, ROUND(AVG(rating), 1) as avg_rating")
+            ->groupBy('year')
+            ->orderBy('year')
+            ->get()
+            ->mapWithKeys(fn ($row): array => [$row->year => (float) $row->avg_rating])
+            ->all();
+    }
+
+    /**
      * Distribution of moods from diary entries.
      *
      * @return array<string, int>

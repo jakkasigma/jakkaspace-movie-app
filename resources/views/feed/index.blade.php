@@ -37,7 +37,8 @@
             @else
                 <div class="feed-list">
                     @foreach ($feed as $item)
-                        <article class="feed-item">
+                        <article class="feed-item {{ $item['user']->isPlus() ? 'item-premium' : '' }}"
+                                 @if ($item['user']->isPlus() && $item['user']->theme) style="--item-accent: {{ $item['user']->theme->accent_color }}" @endif>
                             {{-- User avatar --}}
                             <div class="feed-item-avatar">
                                 @if ($item['user']->avatar_url)
@@ -70,7 +71,7 @@
                                         menulis review untuk
                                         <a href="{{ route('movies.show', $item['tmdb_id']) }}" class="feed-movie-link">{{ $movieTitle }}</a>
                                         @if ($item['extra'])
-                                            <span class="feed-rating">· ★ {{ $item['extra'] }}/10</span>
+                                            <span class="feed-rating">· ★ {{ $item['extra'] }}/5</span>
                                         @endif
                                     @elseif ($item['type'] === 'watchlist')
                                         menambahkan

@@ -9,8 +9,6 @@ use Illuminate\Support\Facades\Cache;
 
 class PinnedMovieService
 {
-    public const MAX_PINNED = 6;
-
     public function __construct(
         private readonly MovieService $movieService,
     ) {}
@@ -42,10 +40,6 @@ class PinnedMovieService
     public function addPinnedMovie(User $user, int $tmdbId): void
     {
         $count = PinnedMovie::where('user_id', $user->id)->count();
-
-        if ($count >= self::MAX_PINNED) {
-            return;
-        }
 
         PinnedMovie::firstOrCreate(
             ['user_id' => $user->id, 'tmdb_id' => $tmdbId],

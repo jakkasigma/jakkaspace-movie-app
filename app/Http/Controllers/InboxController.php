@@ -20,8 +20,13 @@ class InboxController extends Controller
     {
         $conversations = $this->inboxService->getConversations($request->user());
 
+        $following = $request->user()->following()
+            ->withCount(['followers', 'following'])
+            ->get();
+
         return view('inbox.index', [
             'conversations' => $conversations,
+            'following' => $following,
         ]);
     }
 

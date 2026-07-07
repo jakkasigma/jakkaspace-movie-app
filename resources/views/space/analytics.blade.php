@@ -7,6 +7,7 @@
     <x-movie.navbar />
 
     <main class="space-page">
+        <a href="{{ route('your-space') }}" class="profile-back-link">← Your Space</a>
         <header class="space-header">
             <div class="space-header-inner">
                 <h1 class="space-page-title">STATISTIK</h1>
@@ -131,16 +132,103 @@
                 </section>
             @endif
 
+            {{-- ===== Plus-Only Analytics ===== --}}
+            @if ($premiumAnalytics)
+                <section class="analytics-section">
+                    <h2 class="analytics-section-title">Plus Analytics</h2>
+                    <div class="analytics-summary-grid">
+                        <div class="analytics-stat-card">
+                            <span class="analytics-stat-value">{{ $premiumAnalytics['streak'] }} hari</span>
+                            <span class="analytics-stat-label">Streak Saat Ini</span>
+                        </div>
+                        <div class="analytics-stat-card">
+                            <span class="analytics-stat-value">~{{ $premiumAnalytics['estimated_hours'] }} jam</span>
+                            <span class="analytics-stat-label">Estimasi Nonton</span>
+                        </div>
+                        <div class="analytics-stat-card">
+                            <span class="analytics-stat-value">{{ $premiumAnalytics['favorite_director'] ?? '—' }}</span>
+                            <span class="analytics-stat-label">Sutradara Favorit</span>
+                        </div>
+                    </div>
+                </section>
+
+                @if (! empty($premiumAnalytics['rating_distribution']))
+                    <section class="analytics-section">
+                        <h2 class="analytics-section-title">Distribusi Rating</h2>
+                        @php $maxRating = max($premiumAnalytics['rating_distribution']) ?: 1; @endphp
+                        <div class="analytics-bar-chart">
+                            @foreach ($premiumAnalytics['rating_distribution'] as $rating => $count)
+                                @php $h = $maxRating > 0 ? round(($count / $maxRating) * 100) : 0; @endphp
+                                <div class="analytics-bar-col">
+                                    <span class="analytics-bar-count">{{ $count > 0 ? $count : '' }}</span>
+                                    <div class="analytics-bar-track">
+                                        <div class="analytics-bar-fill {{ $count > 0 ? 'analytics-bar-fill--active' : '' }}"
+                                             style="height: {{ $h }}%"></div>
+                                    </div>
+                                    <span class="analytics-bar-label">{{ $rating }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    </section>
+                @endif
+
+                @if (! empty($premiumAnalytics['rating_per_year']))
+                    <section class="analytics-section">
+                        <h2 class="analytics-section-title">Rating per Tahun</h2>
+                        <div class="analytics-genre-list">
+                            @foreach ($premiumAnalytics['rating_per_year'] as $year => $avg)
+                                <div class="analytics-genre-row">
+                                    <span class="analytics-genre-name">{{ $year }}</span>
+                                    <div class="analytics-genre-bar-wrap">
+                                        <div class="analytics-genre-bar" style="width: {{ ($avg / 5) * 100 }}%"></div>
+                                    </div>
+                                    <span class="analytics-genre-count">{{ $avg }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    </section>
+                @endif
+
+                {{-- Export Data --}}
+                <section class="analytics-section">
+                    <h2 class="analytics-section-title">Export Data</h2>
+                    <p class="analytics-section-desc">Download data pribadimu dalam format CSV.</p>
+                    <div class="export-buttons">
+                        <a href="{{ route('export', 'diary') }}" class="export-btn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            Diary
+                        </a>
+                        <a href="{{ route('export', 'reviews') }}" class="export-btn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            Reviews
+                        </a>
+                        <a href="{{ route('export', 'history') }}" class="export-btn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            History
+                        </a>
+                        <a href="{{ route('export', 'all') }}" class="export-btn export-btn-primary">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                            Download All (ZIP)
+                        </a>
+                    </div>
+                </section>
+            @else
+                <section class="analytics-section">
+                    <div class="space-empty" style="border: 1px dashed rgba(255,255,255,0.15); border-radius: 12px; padding: 32px;">
+                        <p style="margin-bottom: 12px;">📊 Ingin lihat rating distribution, streak, estimasi jam nonton, sutradara favorit?</p>
+                        <p style="margin-bottom: 16px; color: rgba(255,255,255,0.4); font-size: 0.85rem;">Fitur ini hanya untuk pengguna Plus.</p>
+                        <a href="{{ route('plus') }}" class="profile-action-btn" style="display: inline-block;">Upgrade ke Plus</a>
+                    </div>
+                </section>
+            @endif
+
             {{-- Empty state --}}
             @if (
                 $analytics['total_watched'] === 0 &&
                 $analytics['total_diary'] === 0 &&
                 $analytics['total_reviews'] === 0
             )
-                <div class="space-empty">
-                    Belum ada data. Mulai catat film yang kamu tonton untuk melihat statistikmu.
-                    <a href="{{ route('movies.index') }}" class="space-empty-link">Temukan film</a>.
-                </div>
+                <x-space.empty icon="clock" message="Belum ada data. Mulai catat film yang kamu tonton untuk melihat statistikmu." :link="route('movies.index')" linkText="Temukan film" />
             @endif
 
         </div>

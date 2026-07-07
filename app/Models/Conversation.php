@@ -27,7 +27,7 @@ class Conversation extends Model
     public function members(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'conversation_members')
-            ->withPivot('joined_at')
+            ->withPivot(['joined_at', 'last_read_at'])
             ->orderBy('joined_at');
     }
 

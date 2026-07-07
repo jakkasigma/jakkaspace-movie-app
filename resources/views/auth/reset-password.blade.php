@@ -1,5 +1,7 @@
 <x-guest-layout>
     <div class="auth-form-wrap">
+        <a href="{{ route('login') }}" class="auth-link-muted" style="display:inline-block; margin-bottom:12px;">← Kembali ke login</a>
+
         <div class="auth-form-heading">
             <p class="auth-form-kicker">Password Baru</p>
             <h2 class="auth-form-title">Buat password baru.</h2>

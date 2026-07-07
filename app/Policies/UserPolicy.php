@@ -1,0 +1,27 @@
+<?php
+
+namespace App\Policies;
+
+use App\Models\User;
+
+class UserPolicy
+{
+    public function view(?User $user, User $model): bool
+    {
+        if ($model->is_private) {
+            return $user?->id === $model->id || $user?->following()->where('following_id', $model->id)->exists();
+        }
+
+        return true;
+    }
+
+    public function update(User $user, User $model): bool
+    {
+        return $user->id === $model->id;
+    }
+
+    public function delete(User $user, User $model): bool
+    {
+        return $user->id === $model->id;
+    }
+}

@@ -14,7 +14,15 @@ class PinnedMovieController extends Controller
 
     public function store(Request $request, int $movie): RedirectResponse
     {
-        $this->pinnedService->addPinnedMovie($request->user(), $movie);
+        $user = $request->user();
+        $limit = $user->maxPinned();
+        $pinnedCount = $user->pinnedMovies()->count();
+
+        if ($pinnedCount >= $limit) {
+            return redirect()->back()->with('error', 'Kamu hanya bisa menyematkan '.$limit.' film. Upgrade ke Plus+ untuk 12 film.');
+        }
+
+        $this->pinnedService->addPinnedMovie($user, $movie);
 
         return redirect()->back();
     }

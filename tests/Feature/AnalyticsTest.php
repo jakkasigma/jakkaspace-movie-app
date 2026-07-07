@@ -36,7 +36,7 @@ describe('analytics page', function (): void {
         WatchHistory::factory()->for($user)->create(['status' => 'watched']);
         WatchHistory::factory()->for($user)->create(['status' => 'watched']);
         DiaryEntry::factory()->for($user)->create();
-        Review::factory()->for($user)->create(['rating' => 8]);
+        Review::factory()->for($user)->create(['rating' => 4]);
 
         $this->actingAs($user)
             ->get(route('your-space.analytics'))
@@ -73,13 +73,13 @@ describe('analytics service', function (): void {
     it('calculates average rating correctly', function (): void {
         $user = User::factory()->create();
 
-        Review::factory()->for($user)->create(['rating' => 8]);
-        Review::factory()->for($user)->create(['rating' => 6]);
+        Review::factory()->for($user)->create(['rating' => 4]);
+        Review::factory()->for($user)->create(['rating' => 3]);
 
         $service = app(AnalyticsService::class);
         $data = $service->getAnalytics($user);
 
-        expect($data['avg_rating'])->toBe(7.0);
+        expect($data['avg_rating'])->toBe(3.5);
     });
 
     it('returns null avg_rating when no reviews', function (): void {

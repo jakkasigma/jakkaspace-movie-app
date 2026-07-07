@@ -31,7 +31,6 @@ class GoogleController extends Controller
             ->first();
 
         if ($user) {
-            // User sudah ada — update google_id jika belum tersimpan
             if ($user->google_id === null) {
                 $user->update([
                     'google_id' => $googleUser->getId(),
@@ -39,9 +38,9 @@ class GoogleController extends Controller
                 ]);
             }
         } else {
-            // User baru — buat akun
             $user = User::create([
                 'name' => $googleUser->getName(),
+                'username' => $this->generateUsername($googleUser->getName()),
                 'email' => $googleUser->getEmail(),
                 'google_id' => $googleUser->getId(),
                 'avatar_url' => $googleUser->getAvatar(),
@@ -54,5 +53,27 @@ class GoogleController extends Controller
         Auth::login($user, remember: true);
 
         return redirect()->intended(route('your-space', absolute: false));
+    }
+
+    /**
+     * Generate unique username dari nama Google.
+     */
+    private function generateUsername(string $name): string
+    {
+        $base = Str::slug($name);
+
+        if (empty($base)) {
+            $base = 'user';
+        }
+
+        $username = $base;
+        $counter = 1;
+
+        while (User::where('username', $username)->exists()) {
+            $username = $base.$counter;
+            $counter++;
+        }
+
+        return $username;
     }
 }

@@ -1,21 +1,24 @@
 @props(['review'])
 
-<article class="tl-review-card">
+<article class="tl-review-card {{ $review->user?->isPlus() ? 'tl-review-card-premium' : '' }}"
+         @if ($review->user?->isPlus() && $review->user->theme) style="--plus-accent: {{ $review->user->theme->accent_color }}" @endif>
     <div class="tl-review-user">
-        @if ($review->user?->avatar_url)
-            <img src="{{ $review->user->avatar_url }}" alt="{{ $review->user->name }}" class="tl-review-avatar">
-        @else
-            <div class="tl-review-avatar tl-review-avatar-placeholder">
-                {{ strtoupper(substr($review->user?->name ?? '?', 0, 1)) }}
-            </div>
-        @endif
+        <x-user-avatar :user="$review->user" class="tl-review-avatar" placeholder-class="tl-review-avatar tl-review-avatar-placeholder" />
         <div class="tl-review-user-info">
             @if ($review->user?->username)
                 <a href="{{ route('profile.show', $review->user->username) }}" class="tl-review-user-name">
                     {{ $review->user->name }}
+                    @if ($review->user->isPlus() && $review->user->theme?->badge_icon)
+                        <span class="plus-badge">{{ $review->user->theme->badge_icon }}</span>
+                    @endif
                 </a>
             @else
-                <span class="tl-review-user-name">{{ $review->user?->name ?? 'Pengguna' }}</span>
+                <span class="tl-review-user-name">
+                    {{ $review->user?->name ?? 'Pengguna' }}
+                    @if ($review->user?->isPlus() && $review->user->theme?->badge_icon)
+                        <span class="plus-badge">{{ $review->user->theme->badge_icon }}</span>
+                    @endif
+                </span>
             @endif
             @if ($review->rating)
                 <span class="tl-review-rating">★ {{ $review->rating }}/10</span>

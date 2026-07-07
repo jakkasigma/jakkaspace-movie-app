@@ -21,6 +21,7 @@ class ReviewCommentController extends Controller
             $request->user(),
             $review,
             $request->validated('body'),
+            $request->validated('parent_id'),
         );
 
         return redirect()->back();

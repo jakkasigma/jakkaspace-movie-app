@@ -43,4 +43,24 @@ class Review extends Model
             'has_spoiler' => 'boolean',
         ];
     }
+
+    public function getParsedBodyAttribute(): string
+    {
+        // Escape HTML first for security
+        $escaped = e($this->body);
+
+        // Find and replace @mentions with links
+        $parsed = preg_replace_callback(
+            '/\B@(\w+)\b/',
+            function ($matches) {
+                $username = $matches[1];
+                $url = route('profile.show', $username);
+
+                return '<a href="'.$url.'" class="mention">@'.$username.'</a>';
+            },
+            $escaped
+        );
+
+        return $parsed ?? $escaped;
+    }
 }

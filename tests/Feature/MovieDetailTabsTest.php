@@ -95,7 +95,7 @@ describe('diskusi tab', function (): void {
         Review::factory()->create([
             'tmdb_id' => MOVIE_ID,
             'body' => 'Review luar biasa untuk film ini.',
-            'rating' => 9,
+            'rating' => 5,
         ]);
 
         $this->get(route('movies.show', MOVIE_ID).'?tab=diskusi')
@@ -109,13 +109,13 @@ describe('diskusi tab', function (): void {
         $popular = Review::factory()->create([
             'tmdb_id' => MOVIE_ID,
             'body' => 'Review paling disukai banyak orang.',
-            'rating' => 8,
+            'rating' => 4,
         ]);
 
         $recent = Review::factory()->create([
             'tmdb_id' => MOVIE_ID,
             'body' => 'Review biasa tanpa likes.',
-            'rating' => 7,
+            'rating' => 3,
         ]);
 
         // Give the popular review 5 likes
@@ -138,14 +138,14 @@ describe('diskusi tab', function (): void {
         $older = Review::factory()->create([
             'tmdb_id' => MOVIE_ID,
             'body' => 'Review lama sekali.',
-            'rating' => 6,
+            'rating' => 3,
             'created_at' => now()->subDays(5),
         ]);
 
         $newer = Review::factory()->create([
             'tmdb_id' => MOVIE_ID,
             'body' => 'Review terbaru hari ini.',
-            'rating' => 8,
+            'rating' => 4,
             'created_at' => now(),
         ]);
 
@@ -214,7 +214,7 @@ describe('community rating', function (): void {
         fakeTmdb();
         Review::factory()->create([
             'tmdb_id' => MOVIE_ID,
-            'rating' => 8,
+            'rating' => 4,
         ]);
 
         $this->get(route('movies.show', MOVIE_ID))

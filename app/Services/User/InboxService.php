@@ -2,6 +2,7 @@
 
 namespace App\Services\User;
 
+use App\Events\MessageSent;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
@@ -12,6 +13,7 @@ class InboxService
 {
     /**
      * Get all conversations for the given user, latest activity first.
+     * Each conversation includes an `unread_count` attribute.
      *
      * @return Collection<int, Conversation>
      */
@@ -22,7 +24,18 @@ class InboxService
                 'members' => fn ($q) => $q->where('users.id', '!=', $user->id)->limit(1),
                 'messages' => fn ($q) => $q->latest()->limit(1),
             ])
-            ->withCount('messages')
+            ->withCount([
+                'messages as unread_count' => fn ($q) => $q
+                    ->whereColumn('conversation_id', 'conversations.id')
+                    ->whereNotExists(function ($q) use ($user) {
+                        $q->select(DB::raw(1))
+                            ->from('conversation_members')
+                            ->whereColumn('conversation_members.conversation_id', 'messages.conversation_id')
+                            ->where('conversation_members.user_id', $user->id)
+                            ->whereNotNull('conversation_members.last_read_at')
+                            ->whereColumn('messages.created_at', '<=', 'conversation_members.last_read_at');
+                    }),
+            ])
             ->orderByDesc(
                 Message::select('created_at')
                     ->whereColumn('conversation_id', 'conversations.id')
@@ -33,14 +46,45 @@ class InboxService
     }
 
     /**
-     * Get a single conversation (only if the user is a member).
+     * Count total unread messages across all conversations for the user.
+     */
+    public function getUnreadCount(User $user): int
+    {
+        return Message::selectRaw('COUNT(*)')
+            ->join('conversation_members', 'conversation_members.conversation_id', '=', 'messages.conversation_id')
+            ->where('conversation_members.user_id', $user->id)
+            ->where(function ($q) {
+                $q->whereNull('conversation_members.last_read_at')
+                    ->orWhereColumn('messages.created_at', '>', 'conversation_members.last_read_at');
+            })
+            ->value('COUNT(*)') ?? 0;
+    }
+
+    /**
+     * Mark a conversation as read by the user.
+     */
+    public function markAsRead(User $user, Conversation $conversation): void
+    {
+        $conversation->members()->updateExistingPivot($user->id, [
+            'last_read_at' => now(),
+        ]);
+    }
+
+    /**
+     * Get a single conversation (only if the user is a member) and mark it as read.
      */
     public function findConversation(User $user, int $conversationId): ?Conversation
     {
-        return Conversation::whereHas('members', fn ($q) => $q->where('users.id', $user->id))
+        $conv = Conversation::whereHas('members', fn ($q) => $q->where('users.id', $user->id))
             ->where('id', $conversationId)
             ->with(['members', 'messages.sender'])
             ->first();
+
+        if ($conv !== null) {
+            $this->markAsRead($user, $conv);
+        }
+
+        return $conv;
     }
 
     /**
@@ -48,7 +92,6 @@ class InboxService
      */
     public function findOrCreateDirect(User $sender, User $recipient): Conversation
     {
-        // Look for existing DM between these two users
         $existing = Conversation::where('type', 'direct')
             ->whereHas('members', fn ($q) => $q->where('users.id', $sender->id))
             ->whereHas('members', fn ($q) => $q->where('users.id', $recipient->id))
@@ -64,47 +107,46 @@ class InboxService
                 'created_by' => $sender->id,
             ]);
 
+            $now = now();
+
             $conversation->members()->attach([
-                $sender->id => ['joined_at' => now()],
-                $recipient->id => ['joined_at' => now()],
+                $sender->id => ['joined_at' => $now, 'last_read_at' => $now],
+                $recipient->id => ['joined_at' => $now, 'last_read_at' => null],
             ]);
 
             return $conversation;
         });
     }
 
-    /**
-     * Send a text message.
-     */
     public function sendText(User $sender, Conversation $conversation, string $body): Message
     {
-        return Message::create([
+        $message = Message::create([
             'conversation_id' => $conversation->id,
             'user_id' => $sender->id,
             'type' => 'text',
             'body' => $body,
         ]);
+
+        broadcast(new MessageSent($message->load('sender')))->toOthers();
+
+        return $message;
     }
 
-    /**
-     * Share a film in a conversation.
-     */
     public function sendFilmShare(User $sender, Conversation $conversation, int $tmdbId): Message
     {
-        return Message::create([
+        $message = Message::create([
             'conversation_id' => $conversation->id,
             'user_id' => $sender->id,
             'type' => 'film_share',
             'body' => null,
             'tmdb_id' => $tmdbId,
         ]);
+
+        broadcast(new MessageSent($message->load('sender')))->toOthers();
+
+        return $message;
     }
 
-    /**
-     * Get paginated messages for a conversation (oldest first for chat layout).
-     *
-     * @return Collection<int, Message>
-     */
     public function getMessages(Conversation $conversation, int $limit = 50): Collection
     {
         return Message::where('conversation_id', $conversation->id)

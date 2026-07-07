@@ -17,35 +17,78 @@ class MovieListController extends Controller
 
     public function index(Request $request): View
     {
-        $lists = $this->listService->getUserLists($request->user());
+        $user = $request->user();
+
+        $ownLists = $this->listService->getUserLists($user);
+        $joinedLists = MovieList::whereIn('id', $user->listMemberships()->where('status', 'approved')->pluck('movie_list_id'))
+            ->withCount('listMovies')
+            ->get();
 
         return view('space.lists.index', [
-            'lists' => $lists,
+            'ownLists' => $ownLists,
+            'joinedLists' => $joinedLists,
         ]);
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
-        return view('space.lists.create');
+        return view('space.lists.create', [
+            'canUploadCover' => $request->user()?->canUploadCover() ?? false,
+        ]);
     }
 
     public function store(MovieListRequest $request): RedirectResponse
     {
-        $list = $this->listService->createList($request->user(), $request->validated());
+        $user = $request->user();
+
+        $maxLists = $user->maxLists();
+        if ($maxLists > 0 && $user->movieLists()->count() >= $maxLists) {
+            return redirect()->back()->with('error', 'Kamu hanya bisa membuat '.$maxLists.' list. Upgrade ke Plus+ untuk lebih banyak.');
+        }
+        if ($maxLists === 0 && $user->movieLists()->count() >= 1) {
+            return redirect()->back()->with('error', 'Free user hanya bisa membuat 1 list. Upgrade ke Plus untuk lebih banyak.');
+        }
+
+        if ($request->hasFile('cover_photo') && ! $user->canUploadCover()) {
+            return redirect()->back()->with('error', 'Hanya pelanggan Plus+ yang bisa upload cover list.');
+        }
+
+        $list = $this->listService->createList($user, $request->validated());
 
         return redirect()->route('lists.show', $list)->with('success', 'List berhasil dibuat.');
     }
 
-    public function show(MovieList $list): View
+    public function show(Request $request, MovieList $list): View
     {
-        abort_unless($list->is_public || (auth()->check() && auth()->id() === $list->user_id), 403);
+        $user = $request->user();
+        $isOwner = $user !== null && $user->id === $list->user_id;
+        $isMember = $user !== null && $this->listService->isMember($list, $user);
+        $isPending = $user !== null && $this->listService->isPendingMember($list, $user);
+        $userRole = $user !== null ? $this->listService->getMemberRole($list, $user) : null;
 
-        $movies = $this->listService->getMoviesInList($list);
+        abort_unless($list->is_public || $isOwner || $isMember, 403);
+
+        $tab = $request->query('tab', 'movies');
+
+        $canViewMovies = $isOwner || $isMember;
+        $movies = $tab === 'movies' && $canViewMovies ? $this->listService->getMoviesInList($list) : [];
+
+        $members = $this->listService->getMembers($list);
+        $messages = $tab === 'chat' && $canViewMovies ? $list->messages()->with('user')->latest()->paginate(30) : collect();
+        $following = $user ? $user->following()->get() : collect();
 
         return view('lists.show', [
             'list' => $list,
             'movies' => $movies,
-            'isOwner' => auth()->check() && auth()->id() === $list->user_id,
+            'tab' => $tab,
+            'isOwner' => $isOwner,
+            'isMember' => $isMember,
+            'isPending' => $isPending,
+            'userRole' => $userRole,
+            'canViewMovies' => $canViewMovies,
+            'members' => $members,
+            'messages' => $messages,
+            'following' => $following,
         ]);
     }
 
@@ -53,12 +96,19 @@ class MovieListController extends Controller
     {
         abort_unless($list->user_id === $request->user()->id, 403);
 
-        return view('space.lists.edit', ['list' => $list]);
+        return view('space.lists.edit', [
+            'list' => $list,
+            'canUploadCover' => $request->user()->canUploadCover(),
+        ]);
     }
 
     public function update(MovieListRequest $request, MovieList $list): RedirectResponse
     {
         abort_unless($list->user_id === $request->user()->id, 403);
+
+        if ($request->hasFile('cover_photo') && ! $request->user()->canUploadCover()) {
+            return redirect()->back()->with('error', 'Hanya pelanggan Plus+ yang bisa upload cover list.');
+        }
 
         $this->listService->updateList($list, $request->validated());
 

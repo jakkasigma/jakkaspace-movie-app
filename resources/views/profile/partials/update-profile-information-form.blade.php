@@ -84,6 +84,24 @@
     </div>
 
     <div class="form-row">
+        <label class="form-label">Privasi Akun</label>
+        <label class="settings-toggle-row">
+            <input type="hidden" name="is_private" value="0">
+            <input type="checkbox" name="is_private" value="1" class="settings-toggle-input" {{ old('is_private', $user->is_private) ? 'checked' : '' }}>
+            <span class="settings-toggle-track">
+                <span class="settings-toggle-thumb"></span>
+            </span>
+            <span class="settings-toggle-label">
+                Akun privat
+                <span class="form-hint">Profil tidak akan muncul di pencarian dan tidak bisa di-follow tanpa persetujuan.</span>
+            </span>
+        </label>
+        @error('is_private')
+            <p class="form-error">{{ $message }}</p>
+        @enderror
+    </div>
+
+    <div class="form-row">
         <label class="form-label" for="email">Email</label>
         <input
             id="email"

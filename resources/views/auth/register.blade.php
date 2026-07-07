@@ -28,9 +28,48 @@
 
             <div class="form-row">
                 <label class="form-label" for="name">Nama</label>
-                <input id="name" type="text" name="name" class="form-input" value="{{ old('name') }}" required autofocus autocomplete="name" placeholder="Nama kamu">
+                <input id="name" type="text" name="name" class="form-input" value="{{ old('name') }}" required autofocus autocomplete="name" placeholder="Nama kamu" oninput="suggestUsername(this.value)">
                 @error('name') <p class="form-error">{{ $message }}</p> @enderror
             </div>
+
+            <div class="form-row">
+                <label class="form-label" for="username">
+                    Username
+                    <span class="form-optional">— tampil di /@username</span>
+                </label>
+                <div class="settings-input-prefix-wrap">
+                    <span class="settings-input-prefix">@</span>
+                    <input
+                        id="username"
+                        type="text"
+                        name="username"
+                        class="form-input settings-input-with-prefix"
+                        value="{{ old('username') }}"
+                        required
+                        maxlength="32"
+                        autocomplete="off"
+                        placeholder="namakamu"
+                    >
+                </div>
+                @error('username') <p class="form-error">{{ $message }}</p> @enderror
+                <p class="form-hint">Hanya huruf, angka, dan underscore. Maks 32 karakter.</p>
+            </div>
+
+            <script>
+                let usernameManuallyEdited = false;
+                document.getElementById('username').addEventListener('input', function () {
+                    if (this.value !== '') usernameManuallyEdited = true;
+                });
+                function suggestUsername(name) {
+                    if (usernameManuallyEdited) return;
+                    const suggested = name.toLowerCase()
+                        .replace(/[^a-z0-9_]/g, '_')
+                        .replace(/_+/g, '_')
+                        .replace(/^_|_$/g, '')
+                        .substring(0, 32);
+                    document.getElementById('username').value = suggested;
+                }
+            </script>
 
             <div class="form-row">
                 <label class="form-label" for="email">Email</label>

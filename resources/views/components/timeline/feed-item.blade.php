@@ -8,22 +8,16 @@
 <article class="timeline-feed-item">
     {{-- Avatar --}}
     <div class="tl-feed-avatar">
-        @if ($user?->avatar_url)
-            <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" class="tl-feed-avatar-img">
-        @else
-            <div class="tl-feed-avatar-img tl-feed-avatar-placeholder">
-                {{ strtoupper(substr($user?->name ?? '?', 0, 1)) }}
-            </div>
-        @endif
+        <x-user-avatar :user="$user" class="tl-feed-avatar-img" placeholder-class="tl-feed-avatar-img tl-feed-avatar-placeholder" />
     </div>
 
     {{-- Activity text --}}
     <div class="tl-feed-body">
         <p class="tl-feed-text">
             @if ($user?->username)
-                <a href="{{ route('profile.show', $user->username) }}" class="tl-feed-user-link">{{ $user->name }}</a>
+                <x-user-name :user="$user" class="tl-feed-user-link" :href="route('profile.show', $user->username)" />
             @else
-                <strong class="tl-feed-user-link">{{ $user?->name ?? 'Pengguna' }}</strong>
+                <x-user-name :user="$user" class="tl-feed-user-link" />
             @endif
 
             @if ($item['type'] === 'diary')
@@ -35,8 +29,14 @@
             @elseif ($item['type'] === 'review')
                 menulis review untuk
                 <a href="{{ route('movies.show', $item['tmdb_id']) }}" class="tl-feed-movie-link">{{ $movieTitle }}</a>
-                @if ($item['extra'])
-                    <span class="tl-feed-rating">· ★ {{ $item['extra'] }}/10</span>
+                @if (! empty($item['extra']['rating']))
+                    <span class="tl-feed-rating">· ★ {{ $item['extra']['rating'] }}/10</span>
+                @endif
+                @if (! empty($item['extra']['body']))
+                    <br>
+                    <a href="{{ route('reviews.show', $item['subject_id']) }}" class="tl-feed-review-body">
+                        {{ Str::limit(strip_tags($item['extra']['body']), 120) }}
+                    </a>
                 @endif
             @elseif ($item['type'] === 'watchlist')
                 menambahkan

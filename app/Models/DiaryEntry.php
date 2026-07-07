@@ -16,6 +16,7 @@ class DiaryEntry extends Model
     protected $fillable = [
         'user_id',
         'tmdb_id',
+        'movie_title',
         'watched_at',
         'notes',
         'mood',

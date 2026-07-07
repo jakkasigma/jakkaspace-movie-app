@@ -7,6 +7,7 @@
     <x-movie.navbar />
 
     <main class="space-page">
+        <a href="{{ route('profile.show', auth()->user()->username) }}" class="profile-back-link">← Kembali ke profil</a>
         <header class="space-header">
             <div class="space-header-inner">
                 <div>
@@ -37,6 +38,16 @@
                     </header>
 
                     @include('profile.partials.update-password-form')
+                </section>
+
+                {{-- Linked Accounts --}}
+                <section class="settings-section">
+                    <header class="settings-section-header">
+                        <h2 class="settings-section-title">Akun Terhubung</h2>
+                        <p class="settings-section-desc">Kelola layanan yang terhubung ke akun Jakka Space-mu.</p>
+                    </header>
+
+                    @include('profile.partials.linked-accounts-form')
                 </section>
 
                 {{-- Delete Account --}}

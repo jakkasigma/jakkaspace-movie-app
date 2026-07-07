@@ -16,7 +16,7 @@ class ReviewFactory extends Factory
         return [
             'user_id' => User::factory(),
             'tmdb_id' => fake()->numberBetween(1, 999999),
-            'rating' => fake()->numberBetween(1, 10),
+            'rating' => fake()->numberBetween(1, 5),
             'body' => fake()->optional(0.7)->paragraphs(2, true),
             'has_spoiler' => fake()->boolean(15),
         ];

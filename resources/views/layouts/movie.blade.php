@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Jakka Space')</title>
     <meta name="description" content="@yield('description', 'Jakka Space — personal movie diary dan platform film.')">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -55,7 +56,7 @@
 </head>
 <body class="@yield('body-class')">
     @yield('body')
-    @unless(request()->is('login', 'register', 'forgot-password', 'reset-password', 'verify-email', 'confirm-password'))
+    @unless(request()->is('login', 'register', 'forgot-password', 'reset-password', 'verify-email', 'confirm-password', 'inbox/*'))
         <x-bottom-nav />
     @endunless
 </body>
