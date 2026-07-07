@@ -19,7 +19,10 @@ class SubscriptionPlanSeeder extends Seeder
         ];
 
         foreach ($plans as $plan) {
-            SubscriptionPlan::create($plan);
+            SubscriptionPlan::firstOrCreate(
+                ['name' => $plan['name'], 'tier' => $plan['tier']],
+                $plan
+            );
         }
     }
 }
