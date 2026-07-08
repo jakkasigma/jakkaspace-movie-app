@@ -43,11 +43,4 @@ RUN COMPOSER_ALLOW_SUPERUSER=1 composer dump-autoload --optimize \
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "\
-    php artisan config:cache && \
-    php artisan route:cache && \
-    php artisan view:cache && \
-    php artisan migrate --force && \
-    php artisan db:seed --class=ProductionSeeder --force && \
-    php artisan serve --host=0.0.0.0 --port=${PORT:-8080} \
-"]
+CMD ["sh", "-c", "php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"]
