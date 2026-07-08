@@ -1,20 +1,31 @@
 #!/bin/bash
 # Make sure this file has executable permissions, run `chmod +x railway/init-app.sh`
 
-# Exit the script if any command fails
-set -e
+echo "=== Starting init-app.sh ==="
+echo "APP_ENV: $APP_ENV"
+echo "DB_HOST: $DB_HOST"
+echo "DB_DATABASE: $DB_DATABASE"
+echo "DB_USERNAME: $DB_USERNAME"
 
-# Run migrations
+echo "=== Running migrate ==="
 php artisan migrate --force
+MIGRATE_EXIT=$?
+echo "=== migrate exit code: $MIGRATE_EXIT ==="
 
-# Seed required production data (idempotent)
-php artisan db:seed --class=ProductionSeeder --force
+if [ $MIGRATE_EXIT -ne 0 ]; then
+    echo "=== MIGRATE FAILED, skipping seed ==="
+else
+    echo "=== Running seed ==="
+    php artisan db:seed --class=ProductionSeeder --force
+fi
 
-# Clear cache
+echo "=== Clearing cache ==="
 php artisan optimize:clear
 
-# Cache the various components of the Laravel application
+echo "=== Caching config/routes/views ==="
 php artisan config:cache
 php artisan event:cache
 php artisan route:cache
 php artisan view:cache
+
+echo "=== init-app.sh done ==="
