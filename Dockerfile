@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -y \
     git curl zip unzip \
     libpng-dev libonig-dev libxml2-dev libzip-dev \
     libfreetype6-dev libjpeg62-turbo-dev \
-    libmariadb-dev-compat \
+    libmariadb-dev-compat libicu-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
         pdo pdo_mysql mbstring exif pcntl bcmath gd zip intl \
