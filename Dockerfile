@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     libzip-dev \
-    libmysqlclient-dev \
+    libmariadb-dev \
     zip \
     unzip \
     && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip intl \
