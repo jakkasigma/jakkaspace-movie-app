@@ -1,20 +1,17 @@
-FROM php:8.3-cli
+FROM php:8.3-fpm-bullseye
 
-# Install system dependencies
+# Install system dependencies + PHP extensions in one layer
 RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    libzip-dev \
-    libmariadb-dev \
-    zip \
-    unzip \
-    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip intl \
+    git curl zip unzip \
+    libpng-dev libonig-dev libxml2-dev libzip-dev \
+    libfreetype6-dev libjpeg62-turbo-dev \
+    libmariadb-dev-compat \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) \
+        pdo pdo_mysql mbstring exif pcntl bcmath gd zip intl \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install Node.js 20
+# Install Node.js 20 via NodeSource
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -24,32 +21,33 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
 
-# Copy composer files first for layer caching
+# Copy and install PHP deps (cached layer)
 COPY composer.json composer.lock ./
+RUN COMPOSER_ALLOW_SUPERUSER=1 composer install \
+    --no-dev --no-interaction --prefer-dist \
+    --optimize-autoloader --no-scripts
 
-# Install PHP dependencies
-RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-scripts
-
-# Copy package files
+# Copy and install Node deps (cached layer)
 COPY package.json package-lock.json ./
+RUN npm ci --prefer-offline
 
-# Install Node dependencies
-RUN npm ci
-
-# Copy application code
+# Copy full app
 COPY . .
 
-# Run composer scripts now that full app is present
-RUN composer dump-autoload --optimize
-
-# Build frontend assets
-RUN npm run build
-
-# Create storage symlink and set permissions
-RUN php artisan storage:link --force \
-    && chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
-    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+# Finish composer setup + build frontend
+RUN COMPOSER_ALLOW_SUPERUSER=1 composer dump-autoload --optimize \
+    && npm run build \
+    && php artisan storage:link --force \
+    && chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan migrate --force && php artisan db:seed --class=ProductionSeeder --force && php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"]
+CMD ["sh", "-c", "\
+    php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan view:cache && \
+    php artisan migrate --force && \
+    php artisan db:seed --class=ProductionSeeder --force && \
+    php artisan serve --host=0.0.0.0 --port=${PORT:-8080} \
+"]
