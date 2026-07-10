@@ -19,48 +19,49 @@
 | 13 | Preconnect TMDB CDN | ✅ |
 | 14 | Audio intro `preload=none` | ✅ |
 | 15 | Inter font 300 → 400 (hemat ~100KB) | ✅ |
+| 16 | Poster card `w500` → `w185` | ✅ |
+| 17 | Backdrop `original` → `w1280` (hero turun 1.5MB→200KB) | ✅ |
+| 18 | Detail poster `w500` → `w342` | ✅ |
+| 19 | Split intro CSS → async (`intro.css` 4.5KB) | ✅ |
+| 20 | Peace Sans → Bebas Neue (hemat ~50KB) | ✅ |
+| 21 | Cast photo `w185` → `w92`, lingkaran 80px | ✅ |
 
 ## Todo 🟡
 
 | # | Item | Impact | Notes |
 |---|------|--------|-------|
-| A | Split intro CSS dari welcome.css | ⭐⭐ First paint lebih cepat | Pisah ke `intro.css`, load async |
-| B | Ganti Peace Sans → Bebas Neue | ⭐ Hemat ~50KB | 3 tempat di CSS + hapus cdnfonts |
-| C | Hapus Lora italic (1,400) | ⭐ Hemat ~50KB | Jarang kepake |
+| A | Home: kurangi section (sisakan Rekomendasi + Film Baru Rilis) | ⭐⭐ Hemat 67% poster | Guest: 30→10 film, Login: 40→20 film |
+| B | Filter mobile collapsible | ⭐ UI lebih rapi | Tombol `⋮ Filter`, klik baru muncul |
 
 ---
 
-### A. Split Intro CSS
+### A. Home Page — Kurangi Section
 
-**Tujuan:** Pisah CSS animasi intro (~30KB) dari welcome.css, load async.
-
-**CSS yang dipindah ke `resources/css/intro.css`:**
-- `#pre-splash`, `#splash-text`, `#splash-start`
-- `#intro-overlay`, `#intro-logo`, `#jakka-word`, `#space-word`, `.space-letter`
-- `@keyframes overlayFadeOut`, `barSweep`, `jakkaZoomOut`, `spaceRollIn`, `homeReveal`
-- `.anim-started`, `body.intro-complete` rules
-- Bagian intro di media queries
-
-**File yang diubah:**
-1. Buat `resources/css/intro.css`
-2. Edit `resources/css/welcome.css` — hapus CSS intro
-3. Edit `resources/views/layouts/movie.blade.php` — load intro.css async
-4. Edit `resources/views/layouts/guest.blade.php` — load intro.css async (kalau ada intro)
-
-**Hasil:**
-- `welcome.css` 200KB → ~170KB (sync, blocking)
-- `intro.css` ~30KB (async, non-blocking)
-- First paint lebih cepat
-
-### B. Peace Sans → Bebas Neue
+**Sekarang:** 3 section (Trending TMDB, Film Baru Rilis, Animasi) + Rekomendasi (login)
+**Sesudah:** 1 section (Film Baru Rilis) + Rekomendasi (login)
 
 **File:**
-- `resources/css/welcome.css:175,343` — ganti `Peace Sans` jadi `Bebas Neue`
-- `resources/views/layouts/movie.blade.php:13` — hapus `<link ...peace-sans>`
-- `resources/views/layouts/guest.blade.php:11` — hapus `<link ...peace-sans>`
+- `app/Services/Movie/MovieService.php` — hapus Trending + Animasi dari `$categories`
 
-### C. Lora italic
+**Hemat:**
+| | Guest | Login |
+|--|-------|-------|
+| Poster | 900KB → **300KB** (↓ **67%**) | 1.2MB → **600KB** (↓ **50%**) |
+| API call | 3× → **1×** (↓ **67%**) | 3× → **1×** (↓ **67%**) |
+
+### B. Filter Mobile — Collapsible
+
+**Sekarang:** Filter bar selalu kelihatan di mobile.
+**Sesudah:** Tombol `⋮ Filter` → klik baru muncul dropdown.
 
 **File:**
-- `layouts/movie.blade.php:12` — `1,400` hapus
-- `layouts/guest.blade.php:10` — sama
+- `resources/css/welcome.css` — tambah aturan `.home-filter-wrap.collapsed`
+- `resources/views/welcome.blade.php` — tambah toggle + Alpine/JS
+
+## On-hold 🟢
+
+| # | Item | Alasan |
+|---|------|--------|
+| C | Lora italic 1,400 hapus | Dipake di splash text intro |
+| D | Hero `loading="lazy"` | Udah `w1280` 200KB, efek kecil |
+| E | Audit/purge welcome.css 10rb baris | ~80% CSS dipake, hemat dikit effort besar |
