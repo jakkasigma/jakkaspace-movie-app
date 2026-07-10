@@ -24,10 +24,12 @@ class PinnedMovieService
                 ->pluck('tmdb_id')
                 ->all();
 
+            $movieDetails = $this->movieService->findMovies($tmdbIds);
+
             $movies = [];
 
             foreach ($tmdbIds as $tmdbId) {
-                [$detail] = $this->movieService->findMovie((int) $tmdbId);
+                $detail = $movieDetails[$tmdbId] ?? null;
                 if ($detail !== null) {
                     $movies[] = $detail;
                 }

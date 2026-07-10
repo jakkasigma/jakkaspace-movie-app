@@ -114,16 +114,14 @@ class TimelineService
      */
     private function fetchMostWatchlisted(): array
     {
-        return Watchlist::where('created_at', '>=', now()->subDays(7))
+        $rows = Watchlist::where('created_at', '>=', now()->subDays(7))
             ->selectRaw('tmdb_id, COUNT(*) as count')
             ->groupBy('tmdb_id')
             ->orderByDesc('count')
             ->limit(6)
-            ->get()
-            ->map(fn ($row): array => $this->enrichMovieRow((int) $row->tmdb_id, (int) $row->count))
-            ->filter(fn (array $row): bool => $row['movie'] !== null)
-            ->values()
-            ->all();
+            ->get();
+
+        return $this->enrichMovieRows($rows);
     }
 
     /**
@@ -131,16 +129,14 @@ class TimelineService
      */
     private function fetchMostReviewed(): array
     {
-        return Review::where('created_at', '>=', now()->subDays(7))
+        $rows = Review::where('created_at', '>=', now()->subDays(7))
             ->selectRaw('tmdb_id, COUNT(*) as count')
             ->groupBy('tmdb_id')
             ->orderByDesc('count')
             ->limit(6)
-            ->get()
-            ->map(fn ($row): array => $this->enrichMovieRow((int) $row->tmdb_id, (int) $row->count))
-            ->filter(fn (array $row): bool => $row['movie'] !== null)
-            ->values()
-            ->all();
+            ->get();
+
+        return $this->enrichMovieRows($rows);
     }
 
     /**
@@ -148,16 +144,14 @@ class TimelineService
      */
     private function fetchMostDiaryThisWeek(): array
     {
-        return DiaryEntry::where('created_at', '>=', now()->subDays(7))
+        $rows = DiaryEntry::where('created_at', '>=', now()->subDays(7))
             ->selectRaw('tmdb_id, COUNT(*) as count')
             ->groupBy('tmdb_id')
             ->orderByDesc('count')
             ->limit(6)
-            ->get()
-            ->map(fn ($row): array => $this->enrichMovieRow((int) $row->tmdb_id, (int) $row->count))
-            ->filter(fn (array $row): bool => $row['movie'] !== null)
-            ->values()
-            ->all();
+            ->get();
+
+        return $this->enrichMovieRows($rows);
     }
 
     /** @return array<int, array<string, mixed>> */
@@ -169,34 +163,45 @@ class TimelineService
             return [];
         }
 
-        return Watchlist::whereIn('user_id', $followingIds)
+        $rows = Watchlist::whereIn('user_id', $followingIds)
             ->where('created_at', '>=', now()->subDays(30))
             ->selectRaw('tmdb_id, COUNT(*) as count')
             ->groupBy('tmdb_id')
             ->orderByDesc('count')
             ->limit(6)
-            ->get()
-            ->map(function ($row): ?array {
-                [$detail] = $this->movieService->findMovie((int) $row->tmdb_id);
+            ->get();
 
-                return $detail;
-            })
+        $tmdbIds = $rows->pluck('tmdb_id')->all();
+        $movieDetails = $this->movieService->findMovies($tmdbIds);
+
+        return $rows
+            ->map(fn ($row): ?array => $movieDetails[(int) $row->tmdb_id] ?? null)
             ->filter()
             ->values()
             ->all();
     }
 
     /**
-     * @return array{tmdb_id: int, count: int, movie: array<string, mixed>|null}
+     * @param  Collection<int, object>  $rows
+     * @return array<int, array{tmdb_id: int, count: int, movie: array<string, mixed>|null}>
      */
-    private function enrichMovieRow(int $tmdbId, int $count): array
+    private function enrichMovieRows(Collection $rows): array
     {
-        [$detail] = $this->movieService->findMovie($tmdbId);
+        if ($rows->isEmpty()) {
+            return [];
+        }
 
-        return [
-            'tmdb_id' => $tmdbId,
-            'count' => $count,
-            'movie' => $detail,
-        ];
+        $tmdbIds = $rows->pluck('tmdb_id')->all();
+        $movieDetails = $this->movieService->findMovies($tmdbIds);
+
+        return $rows
+            ->map(fn ($row): array => [
+                'tmdb_id' => (int) $row->tmdb_id,
+                'count' => (int) $row->count,
+                'movie' => $movieDetails[(int) $row->tmdb_id] ?? null,
+            ])
+            ->filter(fn (array $row): bool => $row['movie'] !== null)
+            ->values()
+            ->all();
     }
 }

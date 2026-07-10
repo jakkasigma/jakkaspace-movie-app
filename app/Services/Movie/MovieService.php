@@ -162,6 +162,53 @@ class MovieService
     }
 
     /**
+     * @param  array<int, int>  $tmdbIds
+     * @return array<int, array<string, mixed>|null>
+     */
+    public function findMovies(array $tmdbIds): array
+    {
+        if (empty($tmdbIds)) {
+            return [];
+        }
+
+        $localMovies = Movie::whereIn('tmdb_id', $tmdbIds)->get()->keyBy('tmdb_id');
+
+        $result = [];
+
+        foreach ($tmdbIds as $tmdbId) {
+            $local = $localMovies->get($tmdbId);
+
+            if ($local !== null) {
+                $result[$tmdbId] = [
+                    'id' => $local->tmdb_id,
+                    'title' => $local->title,
+                    'overview' => $local->overview ?? '',
+                    'poster_url' => $local->poster_url,
+                    'backdrop_url' => null,
+                    'rating' => $local->rating !== null ? number_format((float) $local->rating, 1) : '0.0',
+                    'release_date' => $local->release_date?->locale('id')->translatedFormat('d M Y'),
+                    'release_year' => $local->release_year,
+                    'genres' => $local->genres ?? '',
+                    'tagline' => '',
+                    'runtime' => null,
+                    'director' => null,
+                    'writers' => null,
+                    'trailer_url' => null,
+                    'facts' => [],
+                    'cast' => [],
+                    'story_poster_url' => null,
+                    'story_backdrop_url' => null,
+                ];
+            } else {
+                [$detail] = $this->findMovie($tmdbId);
+                $result[$tmdbId] = $detail;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * @return array<int, array{id: int, name: string}>
      */
     public function genres(): array

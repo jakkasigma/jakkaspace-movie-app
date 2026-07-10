@@ -97,10 +97,13 @@ class ProfileService
                 ->limit(24)
                 ->get();
 
+            $tmdbIds = $reviews->pluck('tmdb_id')->all();
+            $movieDetails = $this->movieService->findMovies($tmdbIds);
+
             $movies = [];
 
             foreach ($reviews as $review) {
-                [$detail] = $this->movieService->findMovie((int) $review->tmdb_id);
+                $detail = $movieDetails[(int) $review->tmdb_id] ?? null;
                 if ($detail !== null) {
                     $movies[] = array_merge($detail, [
                         'review_id' => $review->id,
@@ -120,10 +123,12 @@ class ProfileService
      */
     private function fetchMovies(array $tmdbIds): array
     {
+        $movieDetails = $this->movieService->findMovies($tmdbIds);
+
         $movies = [];
 
         foreach ($tmdbIds as $tmdbId) {
-            [$detail] = $this->movieService->findMovie((int) $tmdbId);
+            $detail = $movieDetails[$tmdbId] ?? null;
             if ($detail !== null) {
                 $movies[] = $detail;
             }

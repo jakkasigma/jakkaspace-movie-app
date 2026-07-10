@@ -100,8 +100,10 @@ class AnalyticsService
 
         $genreCounts = [];
 
+        $movieDetails = $this->movieService->findMovies($tmdbIds);
+
         foreach ($tmdbIds as $tmdbId) {
-            [$detail] = $this->movieService->findMovie((int) $tmdbId);
+            $detail = $movieDetails[$tmdbId] ?? null;
 
             if ($detail === null) {
                 continue;
@@ -138,10 +140,13 @@ class AnalyticsService
             ->limit(5)
             ->get();
 
+        $tmdbIds = $rows->pluck('tmdb_id')->all();
+        $movieDetails = $this->movieService->findMovies($tmdbIds);
+
         $result = [];
 
         foreach ($rows as $row) {
-            [$detail] = $this->movieService->findMovie((int) $row->tmdb_id);
+            $detail = $movieDetails[(int) $row->tmdb_id] ?? null;
 
             if ($detail !== null) {
                 $detail['watch_count'] = $row->watch_count;

@@ -318,10 +318,12 @@ class SpaceService
             return [];
         }
 
+        $movieDetails = $this->movieService->findMovies($tmdbIds);
+
         $info = [];
 
         foreach ($tmdbIds as $tmdbId) {
-            [$detail] = $this->movieService->findMovie((int) $tmdbId);
+            $detail = $movieDetails[$tmdbId] ?? null;
             if ($detail !== null) {
                 $info[$tmdbId] = [
                     'title' => $detail['title'],
@@ -344,11 +346,12 @@ class SpaceService
             return [];
         }
 
+        $movieDetails = $this->movieService->findMovies($tmdbIds);
+
         $movies = [];
 
         foreach ($tmdbIds as $tmdbId) {
-            [$detail] = $this->movieService->findMovie($tmdbId);
-
+            $detail = $movieDetails[$tmdbId] ?? null;
             if ($detail !== null) {
                 $movies[] = $detail;
             }
