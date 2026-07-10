@@ -29,115 +29,119 @@ class ActivityFeedService
      */
     public function getFeed(User $user, int $limit = 30): Collection
     {
-        $followingIds = $user->following()->pluck('users.id');
+        $cacheKey = "feed.{$user->id}.{$limit}";
 
-        if ($followingIds->isEmpty()) {
-            return collect();
-        }
+        return Cache::remember($cacheKey, 300, function () use ($user, $limit): Collection {
+            $followingIds = $user->following()->pluck('users.id');
 
-        $activities = collect();
+            if ($followingIds->isEmpty()) {
+                return collect();
+            }
 
-        // Diary entries
-        $diaries = DiaryEntry::whereIn('user_id', $followingIds)
-            ->with('user')
-            ->latest()
-            ->limit($limit)
-            ->get()
-            ->map(fn ($entry): array => [
-                'type' => 'diary',
-                'user' => $entry->user,
-                'tmdb_id' => $entry->tmdb_id,
-                'title' => null,
-                'poster_url' => null,
-                'extra' => $entry->mood,
-                'created_at' => $entry->created_at,
-                'subject_id' => $entry->id,
-            ]);
+            $activities = collect();
 
-        // Reviews
-        $reviews = Review::whereIn('user_id', $followingIds)
-            ->with('user')
-            ->latest()
-            ->limit($limit)
-            ->get()
-            ->map(fn ($review): array => [
-                'type' => 'review',
-                'user' => $review->user,
-                'tmdb_id' => $review->tmdb_id,
-                'title' => null,
-                'poster_url' => null,
-                'extra' => [
-                    'rating' => $review->rating,
-                    'body' => $review->body,
-                ],
-                'created_at' => $review->created_at,
-                'subject_id' => $review->id,
-            ]);
+            // Diary entries
+            $diaries = DiaryEntry::whereIn('user_id', $followingIds)
+                ->with('user')
+                ->latest()
+                ->limit($limit)
+                ->get()
+                ->map(fn ($entry): array => [
+                    'type' => 'diary',
+                    'user' => $entry->user,
+                    'tmdb_id' => $entry->tmdb_id,
+                    'title' => null,
+                    'poster_url' => null,
+                    'extra' => $entry->mood,
+                    'created_at' => $entry->created_at,
+                    'subject_id' => $entry->id,
+                ]);
 
-        // Watchlist adds
-        $watchlists = Watchlist::whereIn('user_id', $followingIds)
-            ->with('user')
-            ->latest()
-            ->limit($limit)
-            ->get()
-            ->map(fn ($item): array => [
-                'type' => 'watchlist',
-                'user' => $item->user,
-                'tmdb_id' => $item->tmdb_id,
-                'title' => null,
-                'poster_url' => null,
-                'extra' => null,
-                'created_at' => $item->created_at,
-                'subject_id' => $item->id,
-            ]);
+            // Reviews
+            $reviews = Review::whereIn('user_id', $followingIds)
+                ->with('user')
+                ->latest()
+                ->limit($limit)
+                ->get()
+                ->map(fn ($review): array => [
+                    'type' => 'review',
+                    'user' => $review->user,
+                    'tmdb_id' => $review->tmdb_id,
+                    'title' => null,
+                    'poster_url' => null,
+                    'extra' => [
+                        'rating' => $review->rating,
+                        'body' => $review->body,
+                    ],
+                    'created_at' => $review->created_at,
+                    'subject_id' => $review->id,
+                ]);
 
-        // Favorites
-        $favorites = Favorite::whereIn('user_id', $followingIds)
-            ->with('user')
-            ->latest()
-            ->limit($limit)
-            ->get()
-            ->map(fn ($item): array => [
-                'type' => 'favorite',
-                'user' => $item->user,
-                'tmdb_id' => $item->tmdb_id,
-                'title' => null,
-                'poster_url' => null,
-                'extra' => null,
-                'created_at' => $item->created_at,
-                'subject_id' => $item->id,
-            ]);
+            // Watchlist adds
+            $watchlists = Watchlist::whereIn('user_id', $followingIds)
+                ->with('user')
+                ->latest()
+                ->limit($limit)
+                ->get()
+                ->map(fn ($item): array => [
+                    'type' => 'watchlist',
+                    'user' => $item->user,
+                    'tmdb_id' => $item->tmdb_id,
+                    'title' => null,
+                    'poster_url' => null,
+                    'extra' => null,
+                    'created_at' => $item->created_at,
+                    'subject_id' => $item->id,
+                ]);
 
-        // Movie lists created
-        $lists = MovieList::whereIn('user_id', $followingIds)
-            ->where('is_public', true)
-            ->with('user')
-            ->latest()
-            ->limit($limit)
-            ->get()
-            ->map(fn ($list): array => [
-                'type' => 'list',
-                'user' => $list->user,
-                'tmdb_id' => null,
-                'title' => $list->name,
-                'poster_url' => null,
-                'extra' => $list->id,
-                'created_at' => $list->created_at,
-                'subject_id' => $list->id,
-            ]);
+            // Favorites
+            $favorites = Favorite::whereIn('user_id', $followingIds)
+                ->with('user')
+                ->latest()
+                ->limit($limit)
+                ->get()
+                ->map(fn ($item): array => [
+                    'type' => 'favorite',
+                    'user' => $item->user,
+                    'tmdb_id' => $item->tmdb_id,
+                    'title' => null,
+                    'poster_url' => null,
+                    'extra' => null,
+                    'created_at' => $item->created_at,
+                    'subject_id' => $item->id,
+                ]);
 
-        $feed = $activities
-            ->merge($diaries)
-            ->merge($reviews)
-            ->merge($watchlists)
-            ->merge($favorites)
-            ->merge($lists)
-            ->sortByDesc('created_at')
-            ->take($limit)
-            ->values();
+            // Movie lists created
+            $lists = MovieList::whereIn('user_id', $followingIds)
+                ->where('is_public', true)
+                ->with('user')
+                ->latest()
+                ->limit($limit)
+                ->get()
+                ->map(fn ($list): array => [
+                    'type' => 'list',
+                    'user' => $list->user,
+                    'tmdb_id' => null,
+                    'title' => $list->name,
+                    'poster_url' => null,
+                    'extra' => $list->id,
+                    'created_at' => $list->created_at,
+                    'subject_id' => $list->id,
+                ]);
 
-        // Enrich with movie titles from TMDB (cached per tmdb_id)
-        return $feed->map(fn (array $item): array => $this->enrichWithMovie($item));
+            $feed = $activities
+                ->merge($diaries)
+                ->merge($reviews)
+                ->merge($watchlists)
+                ->merge($favorites)
+                ->merge($lists)
+                ->sortByDesc('created_at')
+                ->take($limit)
+                ->values();
+
+            // Enrich with movie titles from TMDB (cached per tmdb_id)
+            return $feed->map(fn (array $item): array => $this->enrichWithMovie($item));
+        });
     }
 
     /**

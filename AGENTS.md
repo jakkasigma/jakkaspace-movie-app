@@ -12,6 +12,7 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - php - 8.3
 - laravel/framework (LARAVEL) - v12
 - laravel/prompts (PROMPTS) - v0
+- laravel/reverb (REVERB) - v1
 - laravel/socialite (SOCIALITE) - v5
 - laravel/boost (BOOST) - v2
 - laravel/breeze (BREEZE) - v2
@@ -21,6 +22,7 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - laravel/sail (SAIL) - v1
 - pestphp/pest (PEST) - v3
 - phpunit/phpunit (PHPUNIT) - v11
+- laravel-echo (ECHO) - v2
 - alpinejs (ALPINEJS) - v3
 - tailwindcss (TAILWINDCSS) - v4
 

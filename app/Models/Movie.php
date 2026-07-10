@@ -19,6 +19,12 @@ class Movie extends Model
         'poster_path',
         'backdrop_path',
         'release_date',
+        'overview',
+        'genres',
+        'rating',
+        'poster_url',
+        'release_year',
+        'cached_at',
     ];
 
     public function diaryEntries(): HasMany
@@ -50,6 +56,7 @@ class Movie extends Model
     {
         return [
             'release_date' => 'date',
+            'cached_at' => 'datetime',
         ];
     }
 }

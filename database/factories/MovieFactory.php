@@ -19,6 +19,12 @@ class MovieFactory extends Factory
             'poster_path' => '/'.fake()->bothify('??########.jpg'),
             'backdrop_path' => '/'.fake()->bothify('??########.jpg'),
             'release_date' => fake()->dateTimeBetween('-30 years', 'now')->format('Y-m-d'),
+            'overview' => fake()->paragraph(),
+            'genres' => fake()->randomElement(['Action, Adventure', 'Drama, Romance', 'Comedy', 'Horror, Thriller']),
+            'rating' => fake()->randomFloat(1, 1, 10),
+            'poster_url' => 'https://image.tmdb.org/t/p/w500/'.fake()->bothify('??########.jpg'),
+            'release_year' => fake()->year(),
+            'cached_at' => now(),
         ];
     }
 }

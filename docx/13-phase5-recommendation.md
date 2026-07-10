@@ -63,7 +63,7 @@ Di halaman Feed (`/feed`), tambahkan section di atas activity stream: **"Lagi di
 **File:** `app/Services/Movie/RecommendationService.php`
 
 ```php
-// Fitur 1
+// Fitur 1d
 getGenreRecommendations(User $user, array $movieGenreIds, int $watchedTmdbId): array
   → fetch dari TMDB by genre, filter sudah ditonton, return maks 10
 

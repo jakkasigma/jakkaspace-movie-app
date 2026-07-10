@@ -2,6 +2,7 @@
 
 namespace App\Services\Movie;
 
+use App\Models\Movie;
 use App\Services\Tmdb\TmdbClient;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -126,33 +127,56 @@ class MovieService
      */
     public function findMovie(int $movieId): array
     {
+        // Check local DB first
+        $local = Movie::where('tmdb_id', $movieId)->first();
+
+        if ($local !== null && $local->cached_at !== null && $local->cached_at->diffInHours(now()) < 24) {
+            return [$local->toArray(), null];
+        }
+
         if (! $this->tmdb->isConfigured()) {
+            if ($local !== null) {
+                return [$local->toArray(), null];
+            }
+
             return [null, 'Konfigurasi TMDB belum lengkap. Cek TMDB_API_KEY dan TMDB_BASE_URL di file .env.'];
         }
 
-        $cacheKey = "movie_detail_{$movieId}";
+        [$data, $error] = $this->tmdb->get("/movie/{$movieId}", [
+            'append_to_response' => 'videos,credits,release_dates',
+        ]);
 
-        $result = Cache::remember($cacheKey, 86400, function () use ($movieId): ?array {
-            [$data, $error] = $this->tmdb->get("/movie/{$movieId}", [
-                'append_to_response' => 'videos,credits,release_dates',
-            ]);
-
-            if ($error !== null) {
-                return null;
+        if ($error !== null) {
+            if ($local !== null) {
+                return [$local->toArray(), $error];
             }
 
-            $fallback = $this->transformer->needsOverviewFallback($data)
-                ? $this->fetchFallbackMovie($movieId)
-                : [];
-
-            return $this->transformer->transformDetail($data, $fallback);
-        });
-
-        if ($result === null) {
-            return [null, 'Detail film tidak bisa dimuat saat ini.'];
+            return [null, $error];
         }
 
-        return [$result, null];
+        $fallback = $this->transformer->needsOverviewFallback($data)
+            ? $this->fetchFallbackMovie($movieId)
+            : [];
+
+        $transformed = $this->transformer->transformDetail($data, $fallback);
+
+        Movie::updateOrCreate(
+            ['tmdb_id' => $movieId],
+            [
+                'title' => $transformed['title'],
+                'poster_path' => $data['poster_path'] ?? null,
+                'backdrop_path' => $data['backdrop_path'] ?? null,
+                'release_date' => $data['release_date'] ?? null,
+                'overview' => $transformed['overview'] ?? null,
+                'genres' => $transformed['genres'] ?? null,
+                'rating' => $transformed['rating'] ?? null,
+                'poster_url' => $transformed['poster_url'] ?? null,
+                'release_year' => $transformed['release_year'] ?? null,
+                'cached_at' => now(),
+            ]
+        );
+
+        return [$transformed, null];
     }
 
     /**

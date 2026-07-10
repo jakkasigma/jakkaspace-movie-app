@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\ReviewCommentFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -40,15 +41,9 @@ class ReviewComment extends Model
         return $this->hasMany(ReviewComment::class, 'parent_id');
     }
 
-    public function getAllReplies()
+    public function getAllReplies(): Collection
     {
-        $replies = collect();
-        foreach ($this->replies()->with('user')->get() as $reply) {
-            $replies->push($reply);
-            $replies = $replies->merge($reply->getAllReplies());
-        }
-
-        return $replies->sortBy('created_at');
+        return $this->replies()->with('user')->get()->sortBy('created_at');
     }
 
     public function getParsedBodyAttribute(): string
