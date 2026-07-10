@@ -2,31 +2,65 @@
     @csrf
 </form>
 
-<form method="post" action="{{ route('profile.update') }}" class="settings-form" enctype="multipart/form-data">
-    @csrf
-    @method('patch')
+{{-- Avatar upload — standalone, terpisah dari form utama --}}
+<div
+    x-data="avatarCropper()"
+    data-current-avatar="{{ $user->avatar_url ?? '' }}"
+    class="form-row"
+>
+    <label class="form-label">Foto Profil</label>
+    <div class="settings-avatar-wrap">
+        @if ($user->avatar_url)
+            <img x-ref="avatarPreview" src="{{ $user->avatar_url }}" alt="{{ $user->name }}" class="settings-avatar-preview">
+        @else
+            <div x-ref="avatarPreview" class="settings-avatar-preview settings-avatar-placeholder">
+                {{ strtoupper(substr($user->name ?? '?', 0, 1)) }}
+            </div>
+        @endif
+        <div class="settings-avatar-input-wrap">
+            <label for="avatar" class="settings-avatar-btn">Pilih Foto</label>
+            <input
+                id="avatar"
+                type="file"
+                accept="image/*"
+                class="settings-avatar-input"
+                @change="fileSelected"
+            >
+            <p class="form-hint">JPG, PNG, WebP. Foto akan di-crop 1:1 dan dikompres.</p>
+        </div>
+    </div>
+    <template x-if="error">
+        <p class="form-error" x-text="error"></p>
+    </template>
 
-    {{-- Avatar upload --}}
-    <div class="form-row">
-        <label class="form-label">Foto Profil</label>
-        <div class="settings-avatar-wrap">
-            @if ($user->avatar_url)
-                <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" class="settings-avatar-preview">
-            @else
-                <div class="settings-avatar-preview settings-avatar-placeholder">
-                    {{ strtoupper(substr($user->name ?? '?', 0, 1)) }}
+    {{-- Crop modal --}}
+    <template x-teleport="body">
+        <div x-show="showModal" class="avatar-crop-overlay" x-cloak>
+            <div class="avatar-crop-modal" @click.outside="cancel">
+                <h3 class="avatar-crop-title">Crop Foto Profil</h3>
+                <div class="avatar-crop-container">
+                    <img x-ref="cropImage" :src="imageUrl" alt="Crop preview">
                 </div>
-            @endif
-            <div class="settings-avatar-input-wrap">
-                <label for="avatar" class="settings-avatar-btn">Pilih Foto</label>
-                <input id="avatar" type="file" name="avatar" accept="image/*" class="settings-avatar-input">
-                <p class="form-hint">JPG, PNG, WebP. Maks 2MB.</p>
+                <div class="avatar-crop-controls">
+                    <button type="button" class="avatar-crop-btn" @click="zoomOut" title="Perkecil">−</button>
+                    <button type="button" class="avatar-crop-btn" @click="reset" title="Reset">↺</button>
+                    <button type="button" class="avatar-crop-btn" @click="zoomIn" title="Perbesar">+</button>
+                </div>
+                <div class="avatar-crop-actions">
+                    <button type="button" class="avatar-crop-cancel" @click="cancel">Batal</button>
+                    <button type="button" class="avatar-crop-save" @click="save" :disabled="loading">
+                        <span x-show="!loading">Simpan Foto</span>
+                        <span x-show="loading" class="avatar-crop-spinner"></span>
+                    </button>
+                </div>
             </div>
         </div>
-        @error('avatar')
-            <p class="form-error">{{ $message }}</p>
-        @enderror
-    </div>
+    </template>
+</div>
+
+<form method="post" action="{{ route('profile.update') }}" class="settings-form">
+    @csrf
+    @method('patch')
 
     <div class="form-row">
         <label class="form-label" for="name">Nama</label>

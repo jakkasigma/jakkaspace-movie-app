@@ -7,6 +7,7 @@ use App\Models\ActivityLog;
 use App\Services\User\FollowService;
 use App\Services\User\PinnedMovieService;
 use App\Services\User\ProfileService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,6 +22,39 @@ class ProfileController extends Controller
         private readonly FollowService $followService,
         private readonly PinnedMovieService $pinnedService,
     ) {}
+
+    public function updateAvatar(Request $request): JsonResponse
+    {
+        $request->validate([
+            'avatar' => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:10240'],
+        ]);
+
+        $user = $request->user();
+
+        if ($user->avatar && ! str_starts_with((string) $user->avatar_url, 'https://')) {
+            Storage::disk('public')->delete($user->avatar);
+        }
+
+        $path = $request->file('avatar')->store('avatars', 'public');
+
+        if ($path === false) {
+            return response()->json(['message' => 'Upload foto gagal. Coba lagi.'], 500);
+        }
+
+        $user->avatar = $path;
+        $user->avatar_url = '/storage/'.$path;
+        $user->save();
+
+        ActivityLog::create([
+            'user_id' => $user->id,
+            'type' => 'profile_update',
+            'description' => 'Mengubah foto profil',
+            'metadata' => ['field' => 'avatar'],
+            'created_at' => now(),
+        ]);
+
+        return response()->json(['url' => $user->avatar_url]);
+    }
 
     public function show(Request $request, string $username): View
     {
@@ -82,22 +116,6 @@ class ProfileController extends Controller
             $user->email_verified_at = null;
         }
 
-        if ($request->hasFile('avatar')) {
-            // Hapus avatar lama kalau bukan dari Google (avatar_url lokal)
-            if ($user->avatar && ! str_starts_with((string) $user->avatar_url, 'https://')) {
-                Storage::disk('public')->delete($user->avatar);
-            }
-
-            $path = $request->file('avatar')->store('avatars', 'public');
-
-            if ($path === false) {
-                return back()->withErrors(['avatar' => 'Upload foto gagal. Coba lagi.'])->withInput();
-            }
-
-            $user->avatar = $path;
-            $user->avatar_url = '/storage/'.$path;
-        }
-
         $user->save();
 
         $changes = $user->getChanges();
@@ -109,15 +127,7 @@ class ProfileController extends Controller
 
             $original = $user->getOriginal($field);
 
-            if ($field === 'avatar' || $field === 'avatar_url') {
-                ActivityLog::create([
-                    'user_id' => $user->id,
-                    'type' => 'profile_update',
-                    'description' => 'Mengubah foto profil',
-                    'metadata' => ['field' => 'avatar'],
-                    'created_at' => now(),
-                ]);
-            } elseif ($field === 'email') {
+            if ($field === 'email') {
                 ActivityLog::create([
                     'user_id' => $user->id,
                     'type' => 'profile_update',

@@ -6060,6 +6060,133 @@ body.auth-body {
     color: #fff;
 }
 
+/* ── Avatar crop modal ── */
+.avatar-crop-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.avatar-crop-modal {
+    background: #1a1a2e;
+    border-radius: 16px;
+    padding: 24px;
+    width: 90%;
+    max-width: 480px;
+}
+
+.avatar-crop-title {
+    font-family: var(--font-heading, "Bebas Neue", sans-serif);
+    font-size: 1.25rem;
+    color: #fff;
+    margin: 0 0 16px;
+    letter-spacing: 0.05em;
+}
+
+.avatar-crop-container {
+    max-height: 360px;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #0d0d1a;
+}
+
+.avatar-crop-container img {
+    display: block;
+    max-width: 100%;
+}
+
+.avatar-crop-controls {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.avatar-crop-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: transparent;
+    color: #ccc;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
+}
+
+.avatar-crop-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.avatar-crop-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.avatar-crop-cancel {
+    padding: 8px 20px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: transparent;
+    color: #ccc;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.15s;
+}
+
+.avatar-crop-cancel:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
+}
+
+.avatar-crop-save {
+    padding: 8px 24px;
+    border-radius: 8px;
+    border: none;
+    background: #e50914;
+    color: #fff;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: background 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.avatar-crop-save:hover:not(:disabled) {
+    background: #c20812;
+}
+
+.avatar-crop-save:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.avatar-crop-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: avatar-spin 0.6s linear infinite;
+}
+
+@keyframes avatar-spin {
+    to { transform: rotate(360deg); }
+}
+
 /* ============================================================
    FEED — POSTER MINI + POLISH
    ============================================================ */
