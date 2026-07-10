@@ -111,8 +111,6 @@ class MovieController extends Controller
                 ->first()
         );
 
-        $reviewCount = Review::where('tmdb_id', $movie)->count();
-
         $communityReviews = null;
         if ($tab === 'diskusi') {
             $reviewQuery = Review::where('tmdb_id', $movie)
@@ -150,7 +148,7 @@ class MovieController extends Controller
             'movie' => $movieDetail,
             'tab' => $tab,
             'sort' => $sort,
-            'reviewCount' => $reviewCount,
+            'reviewCount' => (int) ($communityRating?->review_count ?? Review::where('tmdb_id', $movie)->count()),
             'communityRating' => $communityRating,
             'communityReviews' => $communityReviews,
             'similarMovies' => $similarMovies,

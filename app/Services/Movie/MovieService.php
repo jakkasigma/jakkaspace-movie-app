@@ -14,6 +14,19 @@ class MovieService
     ) {}
 
     /**
+     * @return array{title: string, poster_url: string|null}
+     */
+    public function getLocalMovieInfo(int $tmdbId): array
+    {
+        $movie = Movie::where('tmdb_id', $tmdbId)->first(['title', 'poster_url']);
+
+        return [
+            'title' => $movie?->title ?? "Film #{$tmdbId}",
+            'poster_url' => $movie?->poster_url,
+        ];
+    }
+
+    /**
      * @return array<int, array{id: string, title: string, kicker: string, movies: array<int, array<string, mixed>>, emptyMessage: string, layout: string, statusMessage: string|null}>
      */
     public function homeMovieSections(): array

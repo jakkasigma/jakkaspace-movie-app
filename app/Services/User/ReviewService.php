@@ -6,6 +6,7 @@ use App\Models\ActivityLog;
 use App\Models\Review;
 use App\Models\User;
 use App\Services\Movie\MovieService;
+use Illuminate\Support\Facades\Cache;
 
 class ReviewService
 {
@@ -33,8 +34,8 @@ class ReviewService
 
         $review->save();
 
-        [$detail] = $this->movieService->findMovie($tmdbId);
-        $title = $detail['title'] ?? "Film #{$tmdbId}";
+        $detail = $this->movieService->getLocalMovieInfo($tmdbId);
+        $title = $detail['title'];
 
         ActivityLog::create([
             'user_id' => $user->id,
@@ -43,12 +44,14 @@ class ReviewService
             'metadata' => [
                 'tmdb_id' => $tmdbId,
                 'movie_title' => $title,
-                'poster_url' => $detail['poster_url'] ?? null,
+                'poster_url' => $detail['poster_url'],
                 'rating' => $review->rating,
                 'body' => $review->body,
             ],
             'created_at' => now(),
         ]);
+
+        Cache::forget("movie.community_rating.{$tmdbId}");
 
         return $review;
     }
@@ -56,6 +59,8 @@ class ReviewService
     public function deleteReview(Review $review): void
     {
         $review->delete();
+
+        Cache::forget("movie.community_rating.{$review->tmdb_id}");
     }
 
     public function getUserReview(User $user, int $tmdbId): ?Review

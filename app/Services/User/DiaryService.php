@@ -20,10 +20,10 @@ class DiaryService
      */
     public function createEntry(User $user, int $tmdbId, array $data): DiaryEntry
     {
-        [$detail] = $this->movieService->findMovie($tmdbId);
+        $detail = $this->movieService->getLocalMovieInfo($tmdbId);
 
-        $title = $detail['title'] ?? "Film #{$tmdbId}";
-        $posterUrl = $detail['poster_url'] ?? null;
+        $title = $detail['title'];
+        $posterUrl = $detail['poster_url'];
 
         $entry = DiaryEntry::create([
             'user_id' => $user->id,
@@ -67,7 +67,7 @@ class DiaryService
 
         $fresh = $entry->fresh();
 
-        [$detail] = $this->movieService->findMovie($fresh->tmdb_id);
+        $detail = $this->movieService->getLocalMovieInfo($fresh->tmdb_id);
 
         ActivityLog::create([
             'user_id' => $fresh->user_id,
@@ -76,7 +76,7 @@ class DiaryService
             'metadata' => [
                 'tmdb_id' => $fresh->tmdb_id,
                 'movie_title' => $fresh->movie_title,
-                'poster_url' => $detail['poster_url'] ?? null,
+                'poster_url' => $detail['poster_url'],
                 'notes' => $fresh->notes,
                 'mood' => $fresh->mood,
                 'is_rewatch' => $fresh->is_rewatch,

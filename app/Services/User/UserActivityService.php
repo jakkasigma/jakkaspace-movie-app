@@ -20,12 +20,7 @@ class UserActivityService
      */
     private function getMovieInfo(int $tmdbId): array
     {
-        [$detail] = $this->movieService->findMovie($tmdbId);
-
-        return [
-            'title' => $detail['title'] ?? "Film #{$tmdbId}",
-            'poster_url' => $detail['poster_url'] ?? null,
-        ];
+        return $this->movieService->getLocalMovieInfo($tmdbId);
     }
 
     // ── Watch History ─────────────────────────────────────────────────────────
