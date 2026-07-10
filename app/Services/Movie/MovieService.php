@@ -136,7 +136,7 @@ class MovieService
                     'title' => $transformed['title'],
                     'poster_path' => $data['poster_path'] ?? null,
                     'backdrop_path' => $data['backdrop_path'] ?? null,
-                    'release_date' => $data['release_date'] ?? null,
+                    'release_date' => ! empty($data['release_date']) ? $data['release_date'] : null,
                     'overview' => $transformed['overview'] ?? null,
                     'genres' => $transformed['genres'] ?? null,
                     'rating' => $transformed['rating'] ?? null,
