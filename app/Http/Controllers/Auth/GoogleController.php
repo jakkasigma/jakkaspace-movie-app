@@ -31,6 +31,25 @@ class GoogleController extends Controller
             return Socialite::driver('google')->redirect();
         }
 
+        // CASE 1: User sudah login — linking dari Settings
+        if (Auth::check()) {
+            $user = Auth::user();
+
+            abort_if(
+                User::where('google_id', $googleUser->getId())->where('id', '!=', $user->id)->exists(),
+                409,
+                'Akun Google sudah terhubung ke pengguna lain.',
+            );
+
+            $user->update([
+                'google_id' => $googleUser->getId(),
+                'avatar_url' => $googleUser->getAvatar(),
+            ]);
+
+            return redirect()->route('profile.edit')->with('status', 'Akun Google berhasil dihubungkan.');
+        }
+
+        // CASE 2: Login / register via Google
         $user = User::where('google_id', $googleUser->getId())
             ->orWhere('email', $googleUser->getEmail())
             ->first();

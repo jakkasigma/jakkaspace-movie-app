@@ -36,10 +36,11 @@ Route::middleware('guest')->group(function () {
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
 
-    // Google OAuth
-    Route::get('auth/google', [GoogleController::class, 'redirect'])->name('auth.google');
-    Route::get('auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');
 });
+
+// Google OAuth — guest & auth (buat linking dari Settings)
+Route::get('auth/google', [GoogleController::class, 'redirect'])->name('auth.google');
+Route::get('auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');
 
 Route::middleware('auth')->group(function () {
     Route::get('verify-email', EmailVerificationPromptController::class)
