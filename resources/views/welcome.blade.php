@@ -10,7 +10,7 @@
 @section('body-class', $bodyClass)
 
 @section('body')
-    <audio id="intro-sound" src="/assets/sound1.mp3" preload="auto"></audio>
+    <audio id="intro-sound" src="/assets/sound1.mp3" preload="none"></audio>
 
     <div id="pre-splash">
         <p id="splash-text">Put on your headset and listen.</p>

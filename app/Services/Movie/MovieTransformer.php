@@ -23,7 +23,7 @@ class MovieTransformer
                 'id' => $id,
                 'title' => (string) Arr::get($movie, 'title', 'Tanpa Judul'),
                 'overview' => $this->overview($movie, $fallbackById[$id] ?? []),
-                'poster_url' => $this->imageUrl(Arr::get($movie, 'poster_path'), 'w500'),
+                'poster_url' => $this->imageUrl(Arr::get($movie, 'poster_path'), 'w342'),
                 'backdrop_url' => $this->imageUrl(
                     Arr::get($movie, 'backdrop_path') ?: Arr::get($movie, 'poster_path'),
                     'original',
