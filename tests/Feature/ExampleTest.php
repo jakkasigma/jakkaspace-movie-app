@@ -115,8 +115,6 @@ test('the application returns categorized movies from tmdb', function () {
         ->assertSuccessful()
         ->assertSee('Trending TMDB')
         ->assertSee('Film Baru Rilis')
-        ->assertSee('Film Indonesia Trending')
-        ->assertSee('Film Indonesia Baru Rilis')
         ->assertSee('Film Animasi')
         ->assertSee('Interstellar')
         ->assertSee('Inside Out 2')
@@ -127,7 +125,6 @@ test('the application returns categorized movies from tmdb', function () {
 
     Http::assertSent(fn ($request) => str_contains($request->url(), '/trending/movie/week'));
     Http::assertSent(fn ($request) => str_contains($request->url(), '/movie/now_playing'));
-    Http::assertSent(fn ($request) => str_contains($request->url(), 'with_origin_country=ID'));
     Http::assertSent(fn ($request) => str_contains($request->url(), 'with_genres=16'));
 });
 

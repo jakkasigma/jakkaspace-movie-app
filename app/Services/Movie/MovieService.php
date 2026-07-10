@@ -4,7 +4,6 @@ namespace App\Services\Movie;
 
 use App\Models\Movie;
 use App\Services\Tmdb\TmdbClient;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 
 class MovieService
@@ -19,8 +18,6 @@ class MovieService
      */
     public function homeMovieSections(): array
     {
-        $today = Carbon::today();
-
         $categories = [
             [
                 'id' => 'all-movies',
@@ -36,34 +33,6 @@ class MovieService
                 'kicker' => 'Film yang sedang atau baru tayang berdasarkan data rilis TMDB.',
                 'endpoint' => '/movie/now_playing',
                 'query' => ['region' => 'ID'],
-                'ttl' => 21600,
-            ],
-            [
-                'id' => 'indonesia-trending',
-                'title' => 'Film Indonesia Trending',
-                'kicker' => 'Pendekatan trending memakai film asal Indonesia yang diurutkan berdasarkan popularitas TMDB.',
-                'endpoint' => '/discover/movie',
-                'query' => [
-                    'region' => 'ID',
-                    'sort_by' => 'popularity.desc',
-                    'with_origin_country' => 'ID',
-                    'with_original_language' => 'id',
-                ],
-                'ttl' => 21600,
-            ],
-            [
-                'id' => 'indonesia-new-releases',
-                'title' => 'Film Indonesia Baru Rilis',
-                'kicker' => 'Film asal Indonesia dengan tanggal rilis terbaru di TMDB.',
-                'endpoint' => '/discover/movie',
-                'query' => [
-                    'primary_release_date.gte' => $today->copy()->subMonths(8)->toDateString(),
-                    'primary_release_date.lte' => $today->toDateString(),
-                    'region' => 'ID',
-                    'sort_by' => 'primary_release_date.desc',
-                    'with_origin_country' => 'ID',
-                    'with_original_language' => 'id',
-                ],
                 'ttl' => 21600,
             ],
             [
@@ -91,6 +60,8 @@ class MovieService
 
                 return $error !== null ? [] : $movies;
             });
+
+            $movies = array_slice($movies, 0, 10);
 
             return [
                 'id' => (string) $category['id'],
