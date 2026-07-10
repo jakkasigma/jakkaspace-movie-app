@@ -483,7 +483,7 @@ body.intro-complete #homepage {
     margin-bottom: 1.1rem;
     color: rgba(255, 255, 255, 0.6);
     font-size: 0.86rem;
-    font-weight: 300;
+    font-weight: 400;
 }
 
 .hero-desc {
@@ -947,7 +947,7 @@ body.has-hero .movies-page-content {
     margin-bottom: 24px;
     color: rgba(255, 255, 255, 0.45);
     font-size: 0.85rem;
-    font-weight: 300;
+    font-weight: 400;
 }
 
 .detail-score-row {
@@ -1223,7 +1223,7 @@ body.has-hero .movies-page-content {
     margin-bottom: 0;
     color: rgba(255, 255, 255, 0.65);
     font-size: 0.95rem;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1.8;
 }
 
@@ -1266,7 +1266,7 @@ body.has-hero .movies-page-content {
 .crew-role {
     color: rgba(255, 255, 255, 0.4);
     font-size: 0.8rem;
-    font-weight: 300;
+    font-weight: 400;
 }
 
 .detail-facts-section {
@@ -1368,7 +1368,7 @@ body.has-hero .movies-page-content {
     overflow: hidden;
     color: rgba(255, 255, 255, 0.46);
     font-size: 0.72rem;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1.35;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
