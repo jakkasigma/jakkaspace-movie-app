@@ -9,6 +9,14 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
         pdo pdo_mysql mbstring exif pcntl bcmath gd zip intl \
+    && docker-php-ext-enable opcache \
+    && { \
+        echo 'opcache.enable=1'; \
+        echo 'opcache.memory_consumption=128'; \
+        echo 'opcache.max_accelerated_files=10000'; \
+        echo 'opcache.revalidate_freq=120'; \
+        echo 'opcache.validate_timestamps=0'; \
+    } > $PHP_INI_DIR/conf.d/opcache.ini \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Node.js 20 via NodeSource
@@ -43,4 +51,4 @@ RUN COMPOSER_ALLOW_SUPERUSER=1 composer dump-autoload --optimize \
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"]
+CMD ["sh", "-c", "php artisan optimize && php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"]
