@@ -53,6 +53,8 @@
         @endif
     @endif
 
+    <link rel="preload" href="/css/intro.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/css/intro.css"></noscript>
     @stack('head')
 </head>
 <body class="@yield('body-class')">
