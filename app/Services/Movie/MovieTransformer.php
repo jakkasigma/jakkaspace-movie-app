@@ -26,7 +26,7 @@ class MovieTransformer
                 'poster_url' => $this->imageUrl(Arr::get($movie, 'poster_path'), 'w342'),
                 'backdrop_url' => $this->imageUrl(
                     Arr::get($movie, 'backdrop_path') ?: Arr::get($movie, 'poster_path'),
-                    'original',
+                    'w1280',
                 ),
                 'rating' => number_format((float) Arr::get($movie, 'vote_average', 0), 1),
                 'release_date' => $this->formatReleaseDate(Arr::get($movie, 'release_date')),
@@ -53,10 +53,10 @@ class MovieTransformer
             'title' => (string) Arr::get($movie, 'title', 'Tanpa Judul'),
             'overview' => $this->overview($movie, $fallbackMovie),
             'tagline' => trim((string) Arr::get($movie, 'tagline', '')),
-            'poster_url' => $this->imageUrl(Arr::get($movie, 'poster_path'), 'w500'),
+            'poster_url' => $this->imageUrl(Arr::get($movie, 'poster_path'), 'w342'),
             'backdrop_url' => $this->imageUrl(
                 Arr::get($movie, 'backdrop_path') ?: Arr::get($movie, 'poster_path'),
-                'original',
+                'w1280',
             ),
             'story_poster_url' => $this->imageProxyUrl(Arr::get($movie, 'poster_path'), 'w500'),
             'story_backdrop_url' => $this->imageProxyUrl(
