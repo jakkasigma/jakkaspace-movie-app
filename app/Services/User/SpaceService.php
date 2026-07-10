@@ -13,6 +13,7 @@ use App\Services\Movie\MovieTransformer;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 
 class SpaceService
 {
@@ -26,16 +27,18 @@ class SpaceService
      */
     public function getStats(User $user): array
     {
-        $totalWatched = WatchHistory::where('user_id', $user->id)->where('status', 'watched')->count();
+        return Cache::remember("stats.{$user->id}", 300, function () use ($user): array {
+            $totalWatched = WatchHistory::where('user_id', $user->id)->where('status', 'watched')->count();
 
-        return [
-            'total_watched' => $totalWatched,
-            'total_diary' => DiaryEntry::where('user_id', $user->id)->count(),
-            'total_reviews' => Review::where('user_id', $user->id)->count(),
-            'total_watchlist' => Watchlist::where('user_id', $user->id)->count(),
-            'total_favorites' => Favorite::where('user_id', $user->id)->count(),
-            'estimated_hours' => $totalWatched * 2,
-        ];
+            return [
+                'total_watched' => $totalWatched,
+                'total_diary' => DiaryEntry::where('user_id', $user->id)->count(),
+                'total_reviews' => Review::where('user_id', $user->id)->count(),
+                'total_watchlist' => Watchlist::where('user_id', $user->id)->count(),
+                'total_favorites' => Favorite::where('user_id', $user->id)->count(),
+                'estimated_hours' => $totalWatched * 2,
+            ];
+        });
     }
 
     /**
@@ -208,21 +211,23 @@ class SpaceService
      */
     public function getDiarySummaryStats(User $user): array
     {
-        $totalEntries = DiaryEntry::where('user_id', $user->id)->count();
+        return Cache::remember("diary_summary.{$user->id}", 300, function () use ($user): array {
+            $totalEntries = DiaryEntry::where('user_id', $user->id)->count();
 
-        $monthlyAvg = 0;
-        if ($totalEntries > 0) {
-            $firstDate = DiaryEntry::where('user_id', $user->id)->min('watched_at');
-            if ($firstDate !== null) {
-                $monthsActive = max(1, now()->diffInMonths($firstDate) + 1);
-                $monthlyAvg = (int) round($totalEntries / $monthsActive);
+            $monthlyAvg = 0;
+            if ($totalEntries > 0) {
+                $firstDate = DiaryEntry::where('user_id', $user->id)->min('watched_at');
+                if ($firstDate !== null) {
+                    $monthsActive = max(1, now()->diffInMonths($firstDate) + 1);
+                    $monthlyAvg = (int) round($totalEntries / $monthsActive);
+                }
             }
-        }
 
-        return [
-            'total_entries' => $totalEntries,
-            'monthly_avg' => $monthlyAvg,
-        ];
+            return [
+                'total_entries' => $totalEntries,
+                'monthly_avg' => $monthlyAvg,
+            ];
+        });
     }
 
     /**

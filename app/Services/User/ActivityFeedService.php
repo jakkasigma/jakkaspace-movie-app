@@ -152,78 +152,82 @@ class ActivityFeedService
      */
     public function getEnrichedFeed(User $user, int $limit = 40): Collection
     {
-        $followingIds = $user->following()->pluck('users.id');
+        $cacheKey = "enriched_feed.{$user->id}.{$limit}";
 
-        if ($followingIds->isEmpty()) {
-            return collect();
-        }
+        return Cache::remember($cacheKey, 300, function () use ($user, $limit): Collection {
+            $followingIds = $user->following()->pluck('users.id');
 
-        $baseFeed = $this->getFeed($user, $limit);
+            if ($followingIds->isEmpty()) {
+                return collect();
+            }
 
-        // Pinned movies
-        $pinned = PinnedMovie::whereIn('user_id', $followingIds)
-            ->with('user')
-            ->latest()
-            ->limit($limit)
-            ->get()
-            ->map(fn ($pin): array => [
-                'type' => 'pinned',
-                'user' => $pin->user,
-                'tmdb_id' => $pin->tmdb_id,
-                'title' => null,
-                'poster_url' => null,
-                'extra' => null,
-                'created_at' => $pin->created_at,
-                'subject_id' => $pin->id,
-            ]);
+            $baseFeed = $this->getFeed($user, $limit);
 
-        // Films added to public lists
-        $listMovies = ListMovie::whereHas(
-            'movieList',
-            fn ($q) => $q->whereIn('user_id', $followingIds)->where('is_public', true)
-        )
-            ->with(['movieList.user'])
-            ->latest()
-            ->limit($limit)
-            ->get()
-            ->map(fn ($item): array => [
-                'type' => 'list_movie_add',
-                'user' => $item->movieList?->user,
-                'tmdb_id' => $item->tmdb_id,
-                'title' => null,
-                'poster_url' => null,
-                'extra' => $item->movieList?->id,
-                'created_at' => $item->created_at,
-                'subject_id' => $item->id,
-            ])
-            ->filter(fn (array $item): bool => $item['user'] !== null);
+            // Pinned movies
+            $pinned = PinnedMovie::whereIn('user_id', $followingIds)
+                ->with('user')
+                ->latest()
+                ->limit($limit)
+                ->get()
+                ->map(fn ($pin): array => [
+                    'type' => 'pinned',
+                    'user' => $pin->user,
+                    'tmdb_id' => $pin->tmdb_id,
+                    'title' => null,
+                    'poster_url' => null,
+                    'extra' => null,
+                    'created_at' => $pin->created_at,
+                    'subject_id' => $pin->id,
+                ]);
 
-        // New follows
-        $follows = Follow::whereIn('follower_id', $followingIds)
-            ->with(['follower', 'following'])
-            ->latest()
-            ->limit($limit)
-            ->get()
-            ->map(fn ($follow): array => [
-                'type' => 'follow',
-                'user' => $follow->follower,
-                'tmdb_id' => null,
-                'title' => $follow->following?->name,
-                'poster_url' => $follow->following?->avatar_url,
-                'extra' => $follow->following?->username,
-                'created_at' => $follow->created_at,
-                'subject_id' => $follow->id,
-            ])
-            ->filter(fn (array $item): bool => $item['user'] !== null);
+            // Films added to public lists
+            $listMovies = ListMovie::whereHas(
+                'movieList',
+                fn ($q) => $q->whereIn('user_id', $followingIds)->where('is_public', true)
+            )
+                ->with(['movieList.user'])
+                ->latest()
+                ->limit($limit)
+                ->get()
+                ->map(fn ($item): array => [
+                    'type' => 'list_movie_add',
+                    'user' => $item->movieList?->user,
+                    'tmdb_id' => $item->tmdb_id,
+                    'title' => null,
+                    'poster_url' => null,
+                    'extra' => $item->movieList?->id,
+                    'created_at' => $item->created_at,
+                    'subject_id' => $item->id,
+                ])
+                ->filter(fn (array $item): bool => $item['user'] !== null);
 
-        return $baseFeed
-            ->merge($pinned)
-            ->merge($listMovies)
-            ->merge($follows)
-            ->sortByDesc('created_at')
-            ->take($limit)
-            ->values()
-            ->map(fn (array $item): array => $this->enrichWithMovie($item));
+            // New follows
+            $follows = Follow::whereIn('follower_id', $followingIds)
+                ->with(['follower', 'following'])
+                ->latest()
+                ->limit($limit)
+                ->get()
+                ->map(fn ($follow): array => [
+                    'type' => 'follow',
+                    'user' => $follow->follower,
+                    'tmdb_id' => null,
+                    'title' => $follow->following?->name,
+                    'poster_url' => $follow->following?->avatar_url,
+                    'extra' => $follow->following?->username,
+                    'created_at' => $follow->created_at,
+                    'subject_id' => $follow->id,
+                ])
+                ->filter(fn (array $item): bool => $item['user'] !== null);
+
+            return $baseFeed
+                ->merge($pinned)
+                ->merge($listMovies)
+                ->merge($follows)
+                ->sortByDesc('created_at')
+                ->take($limit)
+                ->values()
+                ->map(fn (array $item): array => $this->enrichWithMovie($item));
+        });
     }
 
     /**
