@@ -10,7 +10,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://image.tmdb.org">
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    <link href="https://fonts.cdnfonts.com/css/peace-sans" rel="stylesheet">
     @php
         $hotFilePath = public_path('hot');
         $hotUrl = file_exists($hotFilePath) ? trim(file_get_contents($hotFilePath)) : null;
