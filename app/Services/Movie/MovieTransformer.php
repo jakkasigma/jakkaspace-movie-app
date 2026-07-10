@@ -391,7 +391,7 @@ class MovieTransformer
             ->map(fn (array $person): array => [
                 'name' => (string) Arr::get($person, 'name'),
                 'character' => trim((string) Arr::get($person, 'character', '')),
-                'profile_url' => $this->imageUrl(Arr::get($person, 'profile_path'), 'w185'),
+                'profile_url' => $this->imageUrl(Arr::get($person, 'profile_path'), 'w92'),
             ])
             ->values()
             ->all();

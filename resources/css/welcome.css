@@ -1085,16 +1085,15 @@ body.has-hero .movies-page-content {
 }
 
 .cast-card {
-    flex: 0 0 118px;
+    flex: 0 0 80px;
     min-width: 0;
 }
 
 .cast-photo {
     display: block;
     width: 100%;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    aspect-ratio: 2 / 3;
+    border-radius: 50%;
+    aspect-ratio: 1;
     background: rgba(255, 255, 255, 0.06);
     object-fit: cover;
 }
