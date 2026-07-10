@@ -29,15 +29,18 @@ export default function avatarCropper() {
                 this.cropper.destroy();
             }
             this.cropper = new Cropper(this.$refs.cropImage, {
-                aspectRatio: 1,
-                viewMode: 1,
-                dragMode: 'move',
-                scalable: false,
-                zoomable: true,
-                cropBoxMovable: true,
-                cropBoxResizable: false,
-                minContainerWidth: 300,
-                minContainerHeight: 300,
+                template: [
+                    '<cropper-canvas background>',
+                    '<cropper-image rotatable scalable skewable translatable></cropper-image>',
+                    '<cropper-shade hidden></cropper-shade>',
+                    '<cropper-handle action="select" plain></cropper-handle>',
+                    '<cropper-selection initial-coverage="1" aspect-ratio="1">',
+                    '<cropper-grid role="grid" bordered covered></cropper-grid>',
+                    '<cropper-crosshair centered></cropper-crosshair>',
+                    '<cropper-handle action="move" theme-color="rgba(255, 255, 255, 0.35)"></cropper-handle>',
+                    '</cropper-selection>',
+                    '</cropper-canvas>',
+                ].join(''),
             });
         },
 
