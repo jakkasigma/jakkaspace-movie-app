@@ -96,7 +96,7 @@ class TmdbClient
             $response = Http::baseUrl('https://image.tmdb.org/t/p')
                 ->connectTimeout(5)
                 ->timeout(10)
-                ->retry([200, 400], throw: false)
+                ->retry(3, 100, throw: false)
                 ->get("/{$size}/{$path}");
         } catch (ConnectionException $exception) {
             report($exception);
@@ -135,7 +135,7 @@ class TmdbClient
             ->acceptJson()
             ->connectTimeout(5)
             ->timeout(10)
-            ->retry([200, 400], throw: false)
+            ->retry(3, 100, throw: false)
             ->get($endpoint, $query);
     }
 }

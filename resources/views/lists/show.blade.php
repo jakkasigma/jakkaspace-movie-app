@@ -7,7 +7,9 @@
     <x-movie.navbar />
 
     <main class="space-page">
-        <a href="{{ route('profile.show', $list->user->username) }}" class="profile-back-link">← Kembali ke profil {{ $list->user->name }}</a>
+        @if ($list->user)
+            <a href="{{ route('profile.show', $list->user->username) }}" class="profile-back-link">← Kembali ke profil {{ $list->user->name }}</a>
+        @endif
 
         @if ($list->cover_photo)
             <div class="list-cover-wrap" style="margin-bottom:16px;border-radius:12px;overflow:hidden;max-height:240px;">
