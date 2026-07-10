@@ -89,6 +89,11 @@ class ProfileController extends Controller
             }
 
             $path = $request->file('avatar')->store('avatars', 'public');
+
+            if ($path === false) {
+                return back()->withErrors(['avatar' => 'Upload foto gagal. Coba lagi.'])->withInput();
+            }
+
             $user->avatar = $path;
             $user->avatar_url = '/storage/'.$path;
         }
