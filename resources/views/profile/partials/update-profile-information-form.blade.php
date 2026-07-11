@@ -46,6 +46,12 @@
                     <button type="button" class="avatar-crop-btn" @click="reset" title="Reset">↺</button>
                     <button type="button" class="avatar-crop-btn" @click="zoomIn" title="Perbesar">+</button>
                 </div>
+                <div class="avatar-crop-controls">
+                    <button type="button" class="avatar-crop-btn" @click="rotateLeft" title="Putar Kiri">↶</button>
+                    <button type="button" class="avatar-crop-btn" @click="flipHorizontal" title="Balik Horizontal">⇄</button>
+                    <button type="button" class="avatar-crop-btn" @click="flipVertical" title="Balik Vertikal">⇅</button>
+                    <button type="button" class="avatar-crop-btn" @click="rotateRight" title="Putar Kanan">↷</button>
+                </div>
                 <div class="avatar-crop-actions">
                     <button type="button" class="avatar-crop-cancel" @click="cancel">Batal</button>
                     <button type="button" class="avatar-crop-save" @click="save" :disabled="loading">

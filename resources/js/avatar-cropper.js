@@ -56,6 +56,24 @@ export default function avatarCropper() {
             this.cropper?.reset();
         },
 
+        rotateLeft() {
+            this.cropper?.rotate(-90);
+        },
+
+        rotateRight() {
+            this.cropper?.rotate(90);
+        },
+
+        flipHorizontal() {
+            const scaleX = this.cropper?.$ready ? this.cropper.$viewed.transform.scaleX : 1;
+            this.cropper?.scale(-scaleX, undefined);
+        },
+
+        flipVertical() {
+            const scaleY = this.cropper?.$ready ? this.cropper.$viewed.transform.scaleY : 1;
+            this.cropper?.scale(undefined, -scaleY);
+        },
+
         cancel() {
             this.showModal = false;
             this.imageUrl = null;
