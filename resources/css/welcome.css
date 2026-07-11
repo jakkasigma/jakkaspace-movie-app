@@ -2805,7 +2805,7 @@ body.has-hero .movies-page-content {
 }
 
 /* ============================================================
-   MOBILE — SPACE TAB BAR (bottom nav untuk your-space)
+   MOBILE — SPACE TAB BAR (inline horizontal scroll)
    ============================================================ */
 
 .space-tab-bar {
@@ -2818,52 +2818,56 @@ body.has-hero .movies-page-content {
         display: none;
     }
 
-    /* Show bottom tab bar */
+    /* Show inline tab bar */
     .space-tab-bar {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        z-index: 200;
         display: flex;
-        border-top: 1px solid rgba(255, 255, 255, 0.08);
-        background: rgba(0, 0, 0, 0.94);
-        padding-bottom: env(safe-area-inset-bottom, 0px);
-        backdrop-filter: blur(20px);
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        border-bottom: 1px solid var(--panel-border);
+        background: transparent;
+    }
+
+    .space-tab-bar::-webkit-scrollbar {
+        display: none;
     }
 
     .space-tab-item {
+        flex-shrink: 0;
         display: flex;
-        flex: 1;
-        flex-direction: column;
         align-items: center;
-        gap: 3px;
+        gap: 6px;
+        padding: 14px 16px;
         color: var(--text-subtle);
-        padding: 10px 4px;
         text-decoration: none;
-        transition: color 0.15s ease;
+        font-size: 0.85rem;
+        font-weight: 500;
+        white-space: nowrap;
+        border-bottom: 2px solid transparent;
+        transition: color 0.15s, border-color 0.15s;
+        -webkit-tap-highlight-color: transparent;
     }
 
-    .space-tab-item.active,
-    .space-tab-item:hover {
+    .space-tab-item.active {
         color: #fff;
+        border-bottom-color: #fff;
+    }
+
+    .space-tab-item:hover {
+        color: rgba(255, 255, 255, 0.75);
     }
 
     .space-tab-icon {
-        width: 20px;
-        height: 20px;
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
     }
 
     .space-tab-label {
-        font-size: 0.58rem;
-        font-weight: 600;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-    }
-
-    /* Add padding so content isn't hidden behind tab bar */
-    .space-body {
-        padding-bottom: 80px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        line-height: 1;
     }
 
     /* Adjust navbar user button on mobile */
@@ -7620,11 +7624,6 @@ a.notif-actor:hover {
     /* Reserve space so content isn't hidden behind nav */
     body {
         padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px));
-    }
-
-    /* YourSpace pages: bottom-nav hidden, space-tab-bar handles it */
-    body.movie-page {
-        padding-bottom: 0;
     }
 
     .bottom-nav {

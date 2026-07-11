@@ -58,7 +58,7 @@
 </head>
 <body class="@yield('body-class')">
     @yield('body')
-    @unless(request()->is('login', 'register', 'forgot-password', 'reset-password', 'verify-email', 'confirm-password', 'inbox/*', 'your-space*'))
+    @unless(request()->is('login', 'register', 'forgot-password', 'reset-password', 'verify-email', 'confirm-password', 'inbox/*'))
         <x-bottom-nav />
     @endunless
 </body>
