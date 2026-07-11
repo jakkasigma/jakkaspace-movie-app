@@ -2824,7 +2824,7 @@ body.has-hero .movies-page-content {
         bottom: 0;
         left: 0;
         right: 0;
-        z-index: 50;
+        z-index: 200;
         display: flex;
         border-top: 1px solid rgba(255, 255, 255, 0.08);
         background: rgba(0, 0, 0, 0.94);
@@ -7620,6 +7620,11 @@ a.notif-actor:hover {
     /* Reserve space so content isn't hidden behind nav */
     body {
         padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* YourSpace pages: bottom-nav hidden, space-tab-bar handles it */
+    body.movie-page {
+        padding-bottom: 0;
     }
 
     .bottom-nav {
