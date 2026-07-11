@@ -2583,12 +2583,45 @@ body.has-hero .movies-page-content {
         align-items: flex-start;
     }
 
+    .space-header {
+        padding: 24px 5vw 20px;
+    }
+
+    .space-avatar {
+        width: 44px;
+        height: 44px;
+    }
+
+    .space-name {
+        font-size: 1.2rem;
+    }
+
     .space-stats {
-        gap: 20px;
+        gap: 12px;
+    }
+
+    .space-stat-value {
+        font-size: 1.3rem;
+    }
+
+    .space-stat-label {
+        font-size: 0.6rem;
     }
 
     .space-body {
         padding: 24px 5vw 60px;
+    }
+
+    .space-section {
+        margin-bottom: 32px;
+    }
+
+    .space-section-title {
+        font-size: 1.15rem;
+    }
+
+    .space-section-header {
+        margin-bottom: 10px;
     }
 
     .space-nav-link {
@@ -2825,7 +2858,6 @@ body.has-hero .movies-page-content {
         overflow-y: hidden;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
-        border-bottom: 1px solid var(--panel-border);
         background: transparent;
     }
 
