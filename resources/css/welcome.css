@@ -8206,43 +8206,6 @@ body.list-chat-room #footer {
 
 /* --- Responsive -------------------------------------------- */
 
-@media (max-width: 768px) {
-    /* Inbox index full-screen mobile — kaya chat room */
-    body.inbox-index-page #navbar,
-    body.inbox-index-page #footer {
-        display: none;
-    }
-
-    body.inbox-index-page .inbox-page {
-        padding-top: 0;
-        display: flex;
-        flex-direction: column;
-        min-height: 100dvh;
-    }
-
-    body.inbox-index-page .inbox-header {
-        flex-shrink: 0;
-    }
-
-    body.inbox-index-page .inbox-header-inner {
-        padding: 16px 4vw 16px;
-    }
-
-    body.inbox-index-page .inbox-title {
-        font-size: 1.4rem;
-    }
-
-    body.inbox-index-page .inbox-body {
-        flex: 1;
-        overflow-y: auto;
-        padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px));
-    }
-
-    body.inbox-index-page .inbox-alert {
-        margin: 12px 4vw 0;
-    }
-}
-
 @media (max-width: 640px) {
     .inbox-msg {
         max-width: 92%;

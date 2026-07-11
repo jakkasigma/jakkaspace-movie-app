@@ -1,7 +1,7 @@
 @extends('layouts.movie')
 
 @section('title', 'Inbox — Jakka Space')
-@section('body-class', 'inbox-index-page')
+@section('body-class', 'movie-page')
 
 @section('body')
     <x-movie.navbar />
