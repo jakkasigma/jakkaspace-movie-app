@@ -45,13 +45,7 @@
                                     <div class="history-item">
                                         <div class="history-item-left">
                                             @if ($type === 'profile_update')
-                                                @if ($user->avatar_url)
-                                                    <img src="{{ $user->avatar_url }}" alt="" class="history-item-avatar" loading="lazy">
-                                                @else
-                                                    <div class="history-item-poster history-item-poster-empty">
-                                                        <span class="history-type-icon">👤</span>
-                                                    </div>
-                                                @endif
+                                                <x-user-avatar :user="$user" class="history-item-avatar" placeholder-class="history-item-poster history-item-poster-empty" />
                                             @elseif ($isMovie && ! empty($meta['poster_url']))
                                                 <img src="{{ $meta['poster_url'] }}" alt="" class="history-item-poster" loading="lazy">
                                             @else

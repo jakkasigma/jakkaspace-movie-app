@@ -132,13 +132,7 @@
                         @foreach ($users as $user)
                             <article class="search-user-card">
                                 <a href="{{ route('profile.show', $user->username ?? $user->id) }}" class="search-user-avatar-link" tabindex="-1" aria-hidden="true">
-                                    @if ($user->avatar_url)
-                                        <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" class="search-user-avatar">
-                                    @else
-                                        <div class="search-user-avatar search-user-avatar-placeholder" aria-hidden="true">
-                                            {{ strtoupper(substr($user->name ?? '?', 0, 1)) }}
-                                        </div>
-                                    @endif
+                                    <x-user-avatar :user="$user" class="search-user-avatar" placeholder-class="search-user-avatar search-user-avatar-placeholder" />
                                 </a>
                                 <div class="search-user-info">
                                     <a href="{{ route('profile.show', $user->username ?? $user->id) }}" class="search-user-name">

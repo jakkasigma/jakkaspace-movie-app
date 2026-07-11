@@ -39,13 +39,7 @@
                          @if ($review->user->isPlus() && $review->user->theme) style="--plus-accent: {{ $review->user->theme->accent_color }}" @endif>
                     <header class="review-page-header">
                         <div class="review-page-author">
-                            @if ($review->user->avatar_url)
-                                <img src="{{ $review->user->avatar_url }}" alt="{{ $review->user->name }}" class="review-page-avatar">
-                            @else
-                                <div class="review-page-avatar review-page-avatar-placeholder">
-                                    {{ strtoupper(substr($review->user->name ?? '?', 0, 1)) }}
-                                </div>
-                            @endif
+                            <x-user-avatar :user="$review->user" class="review-page-avatar" placeholder-class="review-page-avatar review-page-avatar-placeholder" />
                             <div>
                                 @if ($review->user->username)
                                     <a href="{{ route('profile.show', $review->user->username) }}" class="review-page-author-name">
@@ -118,13 +112,7 @@
                                 <article class="review-comment {{ $comment->user->isPlus() ? 'item-premium' : '' }}" id="review-comment-{{ $comment->id }}"
                                          @if ($comment->user->isPlus() && $comment->user->theme) style="--item-accent: {{ $comment->user->theme->accent_color }}" @endif>
                                     <div class="review-comment-header">
-                                        @if ($comment->user->avatar_url)
-                                            <img src="{{ $comment->user->avatar_url }}" alt="{{ $comment->user->name }}" class="review-comment-avatar">
-                                        @else
-                                            <div class="review-comment-avatar review-comment-avatar-placeholder">
-                                                {{ strtoupper(substr($comment->user->name ?? '?', 0, 1)) }}
-                                            </div>
-                                        @endif
+                                        <x-user-avatar :user="$comment->user" class="review-comment-avatar" placeholder-class="review-comment-avatar review-comment-avatar-placeholder" />
                                         <div class="review-comment-meta">
                                             @if ($comment->user->username)
                                                 <a href="{{ route('profile.show', $comment->user->username) }}" class="review-comment-author">
@@ -160,13 +148,7 @@
                                                 <article class="review-comment review-comment-reply {{ $reply->user->isPlus() ? 'item-premium' : '' }}" id="review-comment-{{ $reply->id }}"
                                                          @if ($reply->user->isPlus() && $reply->user->theme) style="--item-accent: {{ $reply->user->theme->accent_color }}" @endif>
                                                     <div class="review-comment-header">
-                                                        @if ($reply->user->avatar_url)
-                                                            <img src="{{ $reply->user->avatar_url }}" alt="{{ $reply->user->name }}" class="review-comment-avatar">
-                                                        @else
-                                                            <div class="review-comment-avatar review-comment-avatar-placeholder">
-                                                                {{ strtoupper(substr($reply->user->name ?? '?', 0, 1)) }}
-                                                            </div>
-                                                        @endif
+                                                        <x-user-avatar :user="$reply->user" class="review-comment-avatar" placeholder-class="review-comment-avatar review-comment-avatar-placeholder" />
                                                         <div class="review-comment-meta">
                                                             @if ($reply->user->username)
                                                                 <a href="{{ route('profile.show', $reply->user->username) }}" class="review-comment-author">

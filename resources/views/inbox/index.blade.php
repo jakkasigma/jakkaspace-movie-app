@@ -31,14 +31,8 @@
                         @endphp
                         <a href="{{ route('inbox.show', $conversation) }}" class="inbox-conv-item {{ $other?->isPlus() ? 'item-premium' : '' }}"
                            @if ($other?->isPlus() && $other->theme) style="--item-accent: {{ $other->theme->accent_color }}" @endif>
-                            <div class="inbox-conv-avatar">
-                                @if ($other?->avatar_url)
-                                    <img src="{{ $other->avatar_url }}" alt="{{ $other->name }}" class="inbox-avatar-img">
-                                @else
-                                    <div class="inbox-avatar-img inbox-avatar-placeholder">
-                                        {{ strtoupper(substr($other?->name ?? '?', 0, 1)) }}
-                                    </div>
-                                @endif
+                             <div class="inbox-conv-avatar">
+                                <x-user-avatar :user="$other" class="inbox-avatar-img" placeholder-class="inbox-avatar-img inbox-avatar-placeholder" />
                             </div>
                             <div class="inbox-conv-info">
                                 <p class="inbox-conv-name">{{ $other?->name ?? 'Pengguna' }}</p>
@@ -82,13 +76,7 @@
                        @if (! $existingConv) data-new-chat="1" @endif
                        @if ($contact->isPlus() && $contact->theme) style="--item-accent: {{ $contact->theme->accent_color }}" @endif>
                         <div class="inbox-contact-avatar">
-                            @if ($contact->avatar_url)
-                                <img src="{{ $contact->avatar_url }}" alt="{{ $contact->name }}" class="inbox-avatar-img">
-                            @else
-                                <div class="inbox-avatar-img inbox-avatar-placeholder">
-                                    {{ strtoupper(substr($contact->name, 0, 1)) }}
-                                </div>
-                            @endif
+                            <x-user-avatar :user="$contact" class="inbox-avatar-img" placeholder-class="inbox-avatar-img inbox-avatar-placeholder" />
                         </div>
                         <div class="inbox-contact-info">
                             <p class="inbox-contact-name">{{ $contact->name }}</p>

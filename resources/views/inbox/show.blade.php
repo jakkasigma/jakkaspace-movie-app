@@ -19,13 +19,7 @@
                 </svg>
             </a>
             <div class="inbox-chat-user">
-                @if ($other?->avatar_url)
-                    <img src="{{ $other->avatar_url }}" alt="{{ $other->name }}" class="inbox-chat-avatar">
-                @else
-                    <div class="inbox-chat-avatar inbox-avatar-placeholder">
-                        {{ strtoupper(substr($other?->name ?? '?', 0, 1)) }}
-                    </div>
-                @endif
+                <x-user-avatar :user="$other" class="inbox-chat-avatar" placeholder-class="inbox-chat-avatar inbox-avatar-placeholder" />
                 <div>
                     <p class="inbox-chat-name">{{ $other?->name ?? 'Pengguna' }}</p>
                     @if ($other?->username)

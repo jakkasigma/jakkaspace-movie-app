@@ -23,13 +23,7 @@
                 <div class="user-list">
                     @foreach ($users as $user)
                         <div class="user-list-row">
-                            @if ($user->avatar_url)
-                                <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" class="user-list-avatar">
-                            @else
-                                <div class="user-list-avatar user-list-avatar-placeholder">
-                                    {{ strtoupper(substr($user->name ?? $user->username ?? '?', 0, 1)) }}
-                                </div>
-                            @endif
+                            <x-user-avatar :user="$user" class="user-list-avatar" placeholder-class="user-list-avatar user-list-avatar-placeholder" />
                             <div class="user-list-info">
                                 @if ($user->username)
                                     <a href="{{ route('profile.show', $user->username) }}" class="user-list-name">{{ $user->name }}</a>

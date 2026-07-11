@@ -41,13 +41,7 @@
                                  @if ($item['user']->isPlus() && $item['user']->theme) style="--item-accent: {{ $item['user']->theme->accent_color }}" @endif>
                             {{-- User avatar --}}
                             <div class="feed-item-avatar">
-                                @if ($item['user']->avatar_url)
-                                    <img src="{{ $item['user']->avatar_url }}" alt="{{ $item['user']->name }}" class="feed-avatar">
-                                @else
-                                    <div class="feed-avatar feed-avatar-placeholder">
-                                        {{ strtoupper(substr($item['user']->name ?? '?', 0, 1)) }}
-                                    </div>
-                                @endif
+                                <x-user-avatar :user="$item['user']" class="feed-avatar" placeholder-class="feed-avatar feed-avatar-placeholder" />
                             </div>
 
                             {{-- Activity text --}}
