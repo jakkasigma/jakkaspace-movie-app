@@ -139,7 +139,7 @@
                                         {{ $user->name }}
                                     </a>
                                     @if ($user->username)
-                                        <span class="search-user-handle">{{ $user->username }}</span>
+                                        <span class="search-user-handle">{{ '@' . $user->username }}</span>
                                     @endif
                                     <span class="search-user-followers">{{ $user->followers_count }} followers</span>
                                 </div>
