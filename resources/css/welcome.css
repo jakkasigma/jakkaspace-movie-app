@@ -6548,12 +6548,7 @@ a.notif-actor:hover {
 /* --- Header ------------------------------------------------ */
 
 .search-header {
-    position: sticky;
-    top: 62px;
-    z-index: 50;
     border-bottom: 1px solid var(--panel-border);
-    background: rgba(5, 5, 5, 0.92);
-    backdrop-filter: blur(16px);
 }
 
 .search-header-inner {
@@ -6957,10 +6952,6 @@ a.notif-actor:hover {
         padding-top: 70px;
     }
 
-    .search-header {
-        top: 56px;
-    }
-
     .search-tab {
         font-size: 0.74rem;
         gap: 5px;
@@ -7000,12 +6991,7 @@ a.notif-actor:hover {
 /* --- Header ----------------------------------------------- */
 
 .timeline-header {
-    position: sticky;
-    top: 62px;
-    z-index: 50;
     border-bottom: 1px solid var(--panel-border);
-    background: rgba(5, 5, 5, 0.92);
-    backdrop-filter: blur(16px);
 }
 
 .timeline-header-inner {
@@ -7472,10 +7458,6 @@ a.notif-actor:hover {
 @media (max-width: 768px) {
     .timeline-page {
         padding-top: 70px;
-    }
-
-    .timeline-header {
-        top: 56px;
     }
 
     .timeline-title-row {
