@@ -18,49 +18,23 @@
             </div>
         @endif
         <div class="settings-avatar-input-wrap">
-            <label for="avatar" class="settings-avatar-btn">Pilih Foto</label>
+            <label for="avatar" class="settings-avatar-btn" :class="{ 'opacity-50 cursor-not-allowed': loading }">
+                <span x-show="!loading">Pilih Foto</span>
+                <span x-show="loading" class="avatar-upload-spinner"></span>
+            </label>
             <input
                 id="avatar"
                 type="file"
                 accept="image/*"
                 class="settings-avatar-input"
                 @change="fileSelected"
+                :disabled="loading"
             >
-            <p class="form-hint">JPG, PNG, WebP. Foto akan di-crop 1:1 dan dikompres.</p>
+            <p class="form-hint">JPG, PNG, WebP. Otomatis di-crop center 1:1 (400x400px).</p>
         </div>
     </div>
     <template x-if="error">
         <p class="form-error" x-text="error"></p>
-    </template>
-
-    {{-- Crop modal --}}
-    <template x-teleport="body">
-        <div x-show="showModal" class="avatar-crop-overlay" x-cloak>
-            <div class="avatar-crop-modal" @click.outside="cancel">
-                <h3 class="avatar-crop-title">Crop Foto Profil</h3>
-                <div class="avatar-crop-container">
-                    <img x-ref="cropImage" :src="imageUrl" alt="Crop preview">
-                </div>
-                <div class="avatar-crop-controls">
-                    <button type="button" class="avatar-crop-btn" @click="zoomOut" title="Perkecil">−</button>
-                    <button type="button" class="avatar-crop-btn" @click="reset" title="Reset">↺</button>
-                    <button type="button" class="avatar-crop-btn" @click="zoomIn" title="Perbesar">+</button>
-                </div>
-                <div class="avatar-crop-controls">
-                    <button type="button" class="avatar-crop-btn" @click="rotateLeft" title="Putar Kiri">↶</button>
-                    <button type="button" class="avatar-crop-btn" @click="flipHorizontal" title="Balik Horizontal">⇄</button>
-                    <button type="button" class="avatar-crop-btn" @click="flipVertical" title="Balik Vertikal">⇅</button>
-                    <button type="button" class="avatar-crop-btn" @click="rotateRight" title="Putar Kanan">↷</button>
-                </div>
-                <div class="avatar-crop-actions">
-                    <button type="button" class="avatar-crop-cancel" @click="cancel">Batal</button>
-                    <button type="button" class="avatar-crop-save" @click="save" :disabled="loading">
-                        <span x-show="!loading">Simpan Foto</span>
-                        <span x-show="loading" class="avatar-crop-spinner"></span>
-                    </button>
-                </div>
-            </div>
-        </div>
     </template>
 </div>
 

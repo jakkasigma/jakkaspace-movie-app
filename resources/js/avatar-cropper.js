@@ -1,141 +1,79 @@
-import Cropper from 'cropperjs';
-
 export default function avatarCropper() {
     return {
-        cropper: null,
-        imageUrl: null,
-        showModal: false,
         loading: false,
         error: null,
 
-        fileSelected(event) {
+        async fileSelected(event) {
             const file = event.target.files[0];
             if (!file) return;
 
             this.error = null;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                this.imageUrl = e.target.result;
-                this.showModal = true;
-                this.$nextTick(() => this.initCropper());
-            };
-            reader.readAsDataURL(file);
+            this.loading = true;
+
+            try {
+                const img = await this.loadImage(file);
+                const blob = await this.centerCrop(img, 400, 400);
+                await this.upload(blob);
+                this.loading = false;
+            } catch (err) {
+                this.error = err.message;
+                this.loading = false;
+            }
 
             event.target.value = '';
         },
 
-        initCropper() {
-            if (this.cropper) {
-                this.cropper.destroy();
-            }
-            this.cropper = new Cropper(this.$refs.cropImage, {
-                template: [
-                    '<cropper-canvas background>',
-                    '<cropper-image rotatable scalable skewable translatable></cropper-image>',
-                    '<cropper-shade hidden></cropper-shade>',
-                    '<cropper-handle action="select" plain></cropper-handle>',
-                    '<cropper-selection initial-coverage="1" aspect-ratio="1">',
-                    '<cropper-grid role="grid" bordered covered></cropper-grid>',
-                    '<cropper-crosshair centered></cropper-crosshair>',
-                    '<cropper-handle action="move" theme-color="rgba(255, 255, 255, 0.35)"></cropper-handle>',
-                    '</cropper-selection>',
-                    '</cropper-canvas>',
-                ].join(''),
+        loadImage(file) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = () => reject(new Error('Gagal memuat gambar'));
+                img.src = URL.createObjectURL(file);
             });
         },
 
-        zoomIn() {
-            this.cropper?.zoom(0.1);
-        },
+        centerCrop(img, targetWidth, targetHeight) {
+            const canvas = document.createElement('canvas');
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
+            const ctx = canvas.getContext('2d');
 
-        zoomOut() {
-            this.cropper?.zoom(-0.1);
-        },
+            const size = Math.min(img.width, img.height);
+            const x = (img.width - size) / 2;
+            const y = (img.height - size) / 2;
 
-        reset() {
-            this.cropper?.reset();
-        },
+            ctx.drawImage(img, x, y, size, size, 0, 0, targetWidth, targetHeight);
 
-        rotateLeft() {
-            this.cropper?.rotate(-90);
-        },
-
-        rotateRight() {
-            this.cropper?.rotate(90);
-        },
-
-        flipHorizontal() {
-            const scaleX = this.cropper?.$ready ? this.cropper.$viewed.transform.scaleX : 1;
-            this.cropper?.scale(-scaleX, undefined);
-        },
-
-        flipVertical() {
-            const scaleY = this.cropper?.$ready ? this.cropper.$viewed.transform.scaleY : 1;
-            this.cropper?.scale(undefined, -scaleY);
-        },
-
-        cancel() {
-            this.showModal = false;
-            this.imageUrl = null;
-            if (this.cropper) {
-                this.cropper.destroy();
-                this.cropper = null;
-            }
-        },
-
-        async save() {
-            if (!this.cropper) return;
-
-            this.loading = true;
-            this.error = null;
-
-            const canvas = this.cropper.getCroppedCanvas({
-                width: 400,
-                height: 400,
-                imageSmoothingQuality: 'high',
+            return new Promise((resolve) => {
+                canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.8);
             });
+        },
 
-            const blob = await new Promise((resolve) => {
-                canvas.toBlob((b) => resolve(b), 'image/jpeg', 0.8);
-            });
-
-            if (!blob) {
-                this.error = 'Gagal memproses foto. Coba lagi.';
-                this.loading = false;
-                return;
-            }
-
+        async upload(blob) {
             const formData = new FormData();
             formData.append('avatar', blob, 'avatar.jpg');
 
-            try {
-                const token = document.querySelector('meta[name="csrf-token"]')?.content;
-                const response = await fetch('/profile/avatar', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': token,
-                        'Accept': 'application/json',
-                    },
-                    body: formData,
-                });
+            const token = document.querySelector('meta[name="csrf-token"]')?.content;
+            const response = await fetch('/profile/avatar', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json',
+                },
+                body: formData,
+            });
 
-                if (!response.ok) {
-                    const data = await response.json().catch(() => ({}));
-                    throw new Error(data.message || data.avatar?.[0] || 'Upload gagal');
-                }
-
-                const data = await response.json();
-                this.cancel();
-
-                const img = this.$refs.avatarPreview;
-                if (img) img.src = data.url;
-
-                window.dispatchEvent(new CustomEvent('avatar-updated', { detail: { url: data.url } }));
-            } catch (err) {
-                this.error = err.message;
-            } finally {
-                this.loading = false;
+            if (!response.ok) {
+                const data = await response.json().catch(() => ({}));
+                throw new Error(data.message || data.avatar?.[0] || 'Upload gagal');
             }
+
+            const data = await response.json();
+
+            const img = this.$refs.avatarPreview;
+            if (img) img.src = data.url;
+
+            window.dispatchEvent(new CustomEvent('avatar-updated', { detail: { url: data.url } }));
         },
     };
 }
