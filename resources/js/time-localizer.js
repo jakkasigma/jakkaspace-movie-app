@@ -1,6 +1,6 @@
 export default function localizeTimestamps() {
     document.querySelectorAll('[data-utc]').forEach((el) => {
-        const utc = new Date(el.getAttribute('data-utc') + 'Z');
+        const utc = new Date(el.getAttribute('data-utc'));
         if (isNaN(utc.getTime())) return;
 
         const fmt = el.dataset.fmt || 'time';

@@ -164,7 +164,7 @@
                     const utcStr = msg.created_at;
 
                     const lastSep = container.querySelector('.inbox-date-sep:last-child');
-                    const sepDate = new Date(utcStr + 'Z');
+                    const sepDate = new Date(utcStr);
                     const today = new Date();
                     const sepKey = today.toDateString();
 
