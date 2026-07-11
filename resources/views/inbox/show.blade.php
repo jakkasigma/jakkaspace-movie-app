@@ -53,15 +53,7 @@
                     @if ($msgDate !== $lastDate)
                         @php $lastDate = $msgDate; @endphp
                         <div class="inbox-date-sep">
-                            <span>
-                                @if ($message->created_at->isToday())
-                                    Hari Ini
-                                @elseif ($message->created_at->isYesterday())
-                                    Kemarin
-                                @else
-                                    {{ $message->created_at->format('d/m/Y') }}
-                                @endif
-                            </span>
+                            <span data-utc="{{ $message->created_at->toIso8601String() }}" data-fmt="date-sep">{{ $message->created_at->format('d/m/Y') }}</span>
                         </div>
                     @endif
 
@@ -98,7 +90,7 @@
                             @else
                                 <p class="inbox-msg-text">{{ $message->body }}</p>
                             @endif
-                            <span class="inbox-msg-time">{{ $message->created_at->format('H:i') }}</span>
+                            <span class="inbox-msg-time" data-utc="{{ $message->created_at->toIso8601String() }}" data-fmt="time">{{ $message->created_at->format('H:i') }}</span>
                         </div>
                     </div>
                 @endforeach
@@ -164,30 +156,30 @@
                     const container = document.getElementById('inbox-messages');
                     if (!container) return;
 
-                    // Remove empty state if present
                     const empty = container.querySelector('.inbox-messages-empty');
                     if (empty) empty.remove();
 
                     const msg = e.message;
                     const isMine = msg.user_id === userId;
-                    const isToday = (function () {
-                        const d = new Date(msg.created_at);
-                        const now = new Date();
-                        return d.toDateString() === now.toDateString();
-                    })();
+                    const utcStr = msg.created_at;
 
-                    // Date separator
                     const lastSep = container.querySelector('.inbox-date-sep:last-child');
-                    const todayStr = new Date().toDateString();
-                    if (!lastSep || lastSep.dataset.date !== todayStr) {
+                    const sepDate = new Date(utcStr + 'Z');
+                    const today = new Date();
+                    const sepKey = today.toDateString();
+
+                    if (!lastSep || lastSep.dataset.date !== sepKey) {
                         const sep = document.createElement('div');
                         sep.className = 'inbox-date-sep';
-                        sep.dataset.date = todayStr;
-                        sep.innerHTML = '<span>Hari Ini</span>';
+                        sep.dataset.date = sepKey;
+                        const span = document.createElement('span');
+                        span.setAttribute('data-utc', utcStr);
+                        span.setAttribute('data-fmt', 'date-sep');
+                        span.textContent = 'Hari Ini';
+                        sep.appendChild(span);
                         container.appendChild(sep);
                     }
 
-                    // Bubble
                     const div = document.createElement('div');
                     div.className = 'inbox-msg ' + (isMine ? 'inbox-msg--mine' : 'inbox-msg--theirs');
 
@@ -201,19 +193,16 @@
                         ? '<div class="inbox-film-share" style="padding:12px;color:rgba(255,255,255,0.5);font-size:0.8rem">🎬 Film #' + msg.tmdb_id + '</div>'
                         : '<p class="inbox-msg-text">' + (msg.body || '') + '</p>';
 
-                    const time = new Date(msg.created_at);
-                    const timeStr = time.getHours().toString().padStart(2, '0') + ':' + time.getMinutes().toString().padStart(2, '0');
-
                     div.innerHTML = avatarHtml
                         + '<div class="inbox-msg-bubble">'
                         + textHtml
-                        + '<span class="inbox-msg-time">' + timeStr + '</span>'
+                        + '<span class="inbox-msg-time" data-utc="' + utcStr + '" data-fmt="time"></span>'
                         + '</div>';
 
                     container.appendChild(div);
-
-                    // Auto-scroll
                     container.scrollTop = container.scrollHeight;
+
+                    window.dispatchEvent(new CustomEvent('timestamps-updated'));
                 });
         }
     });
