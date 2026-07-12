@@ -108,9 +108,7 @@
 
             @elseif ($tab === 'chat')
                 @if ($isOwner || $isMember)
-                    <div class="list-chat-tab">
-                        @include('lists.chat')
-                    </div>
+                    @include('lists.chat')
                 @else
                     <div class="space-empty">Gabung ke list untuk mengobrol dengan anggota.</div>
                 @endif

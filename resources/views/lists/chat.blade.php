@@ -53,9 +53,10 @@
                         <div class="inbox-msg-bubble {{ $msg->user?->isPlus() ? 'inbox-msg-premium' : '' }}"
                              @if ($msg->user?->isPlus() && $msg->user->theme) style="--avatar-border: {{ $msg->user->theme->avatar_border_css }}" @endif>
                             @if (! $isMine)
-                                <p class="inbox-msg-sender" style="font-size: 0.73rem; color: rgba(255,255,255,0.4); margin-bottom: 4px; padding: 0 16px;">{{ $msg->user?->name ?? 'Pengguna' }}</p>
+                                <p class="inbox-msg-sender">{{ $msg->user?->name ?? 'Pengguna' }}</p>
                             @endif
                             <p class="inbox-msg-text">{{ $msg->message }}</p>
+                            <span class="inbox-msg-time">{{ $msg->created_at->format('H:i') }}</span>
                         </div>
                     </div>
                 @endif
@@ -133,8 +134,9 @@
                                 : '<div class="inbox-mini-avatar inbox-avatar-placeholder">' + (e.user.name ? e.user.name.charAt(0) : '?') + '</div>';
                             div.innerHTML = '<div class="inbox-msg-avatar">' + avatarHtml + '</div>'
                                 + '<div class="inbox-msg-bubble' + pClass + '"' + pStyle + '>'
-                                + '<p class="inbox-msg-sender" style="font-size:0.73rem;color:rgba(255,255,255,0.4);margin-bottom:4px;padding:0 16px;">' + (e.user.name || 'Pengguna') + '</p>'
+                                + '<p class="inbox-msg-sender">' + (e.user.name || 'Pengguna') + '</p>'
                                 + '<p class="inbox-msg-text">' + e.message + '</p>'
+                                + '<span class="inbox-msg-time"></span>'
                                 + '</div>';
                         }
 
