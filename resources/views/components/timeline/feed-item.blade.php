@@ -30,7 +30,7 @@
                 menulis review untuk
                 <a href="{{ route('movies.show', $item['tmdb_id']) }}" class="tl-feed-movie-link">{{ $movieTitle }}</a>
                 @if (! empty($item['extra']['rating']))
-                    <span class="tl-feed-rating">· ★ {{ $item['extra']['rating'] }}/10</span>
+                    <span class="tl-feed-rating">· ★ {{ $item['extra']['rating'] }}/5</span>
                 @endif
                 @if (! empty($item['extra']['body']))
                     <br>

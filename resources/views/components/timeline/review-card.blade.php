@@ -21,7 +21,7 @@
                 </span>
             @endif
             @if ($review->rating)
-                <span class="tl-review-rating">★ {{ $review->rating }}/10</span>
+                <span class="tl-review-rating">★ {{ $review->rating }}/5</span>
             @endif
         </div>
         <div class="tl-review-likes">

@@ -111,23 +111,24 @@
                 <form method="POST" action="{{ route('movies.review.store', $movieId) }}" class="detail-form">
                     @csrf
                     <div class="form-row">
-                        <label class="form-label">Rating (1–5)</label>
-                        <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;" id="rating-picker">
+                        <label class="form-label">Rating</label>
+                        <div style="display: flex; gap: 4px; margin-top: 8px;" id="rating-picker">
                             @for ($i = 1; $i <= 5; $i++)
                                 <button type="button" onclick="selectRating({{ $i }})" data-rating="{{ $i }}"
-                                    class="rating-btn">
-                                    {{ $i }}
+                                    class="rating-btn" aria-label="{{ $i }} bintang">
+                                    ★
                                 </button>
                             @endfor
                         </div>
                         <input type="hidden" name="rating" id="rating-input" required>
-                        <p id="rating-hint">Klik angka untuk memilih rating</p>
+                        <p id="rating-hint">Tap bintang untuk memilih rating</p>
                     </div>
                     <script>
                     function selectRating(n) {
                         document.getElementById('rating-input').value = n;
                         document.querySelectorAll('#rating-picker button').forEach(btn => {
-                            if (btn.getAttribute('data-rating') === n.toString()) {
+                            const val = parseInt(btn.getAttribute('data-rating'));
+                            if (val <= n) {
                                 btn.classList.add('rating-btn--active');
                             } else {
                                 btn.classList.remove('rating-btn--active');

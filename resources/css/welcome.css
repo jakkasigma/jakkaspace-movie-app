@@ -773,29 +773,29 @@ body.has-hero .movies-page-content {
 
 /* Rating picker buttons (review form) */
 .rating-btn {
-    width: 48px;
-    height: 48px;
-    border: 2px solid rgba(255, 255, 255, 0.18);
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.06);
-    color: rgba(255, 255, 255, 0.8);
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.2);
     cursor: pointer;
-    font-weight: 700;
-    font-size: 1rem;
-    transition: all 0.2s;
+    font-size: 1.8rem;
+    transition: color 0.2s, transform 0.2s;
     font-family: inherit;
+    line-height: 1;
+    padding: 0;
 }
 .rating-btn:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.35);
-    color: #fff;
-    transform: scale(1.08);
+    color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.15);
 }
 .rating-btn--active {
-    background: #a3e635 !important;
-    border-color: #a3e635 !important;
-    color: #1a1a1a !important;
+    color: #a3e635 !important;
     transform: scale(1.1);
+}
+.rating-btn--active:hover {
+    color: #bef264 !important;
 }
 
 .star-icon {
@@ -2190,7 +2190,7 @@ body.has-hero .movies-page-content {
     border-radius: 3px;
     background: rgba(255, 255, 255, 0.06);
     cursor: pointer;
-    accent-color: #fff;
+    accent-color: #a3e635;
 }
 
 .form-submit {

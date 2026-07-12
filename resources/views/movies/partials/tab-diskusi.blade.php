@@ -44,7 +44,7 @@
                     </div>
                     <div class="detail-review-meta">
                         @if ($review->rating)
-                            <span class="detail-review-rating">★ {{ $review->rating }}/10</span>
+                            <span class="detail-review-rating">★ {{ $review->rating }}/5</span>
                         @endif
                     </div>
                 </div>

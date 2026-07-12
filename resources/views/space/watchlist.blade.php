@@ -18,7 +18,7 @@
                     <span class="space-header-stat">{{ $watchlistInfo['count'] }} film</span>
                     @if ($watchlistInfo['avg_rating'])
                         <span class="space-header-stat-sep">·</span>
-                        <span class="space-header-stat">Rata-rata {{ $watchlistInfo['avg_rating'] }}/10</span>
+                        <span class="space-header-stat">Rata-rata {{ $watchlistInfo['avg_rating'] }}/5</span>
                     @endif
                 </div>
             </div>

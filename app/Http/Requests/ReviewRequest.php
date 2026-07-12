@@ -30,7 +30,7 @@ class ReviewRequest extends FormRequest
     {
         return [
             'rating.min' => 'Rating minimal 1.',
-            'rating.max' => 'Rating maksimal 10.',
+            'rating.max' => 'Rating maksimal 5.',
             'body.max' => 'Review maksimal 5000 karakter.',
         ];
     }

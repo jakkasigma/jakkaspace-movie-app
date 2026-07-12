@@ -37,7 +37,7 @@
                     </div>
                     <div class="analytics-stat-card">
                         <span class="analytics-stat-value">
-                            {{ $analytics['avg_rating'] !== null ? $analytics['avg_rating'] . '/10' : '—' }}
+                            {{ $analytics['avg_rating'] !== null ? $analytics['avg_rating'] . '/5' : '—' }}
                         </span>
                         <span class="analytics-stat-label">Rata-rata Rating</span>
                     </div>
