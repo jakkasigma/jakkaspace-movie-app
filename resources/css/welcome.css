@@ -9051,59 +9051,18 @@ body.list-chat-room {
 }
 
 /* Chat bubble premium — gradient border */
-.inbox-msg-premium {
-    position: relative;
-    border-radius: 18px;
-}
-.inbox-msg-premium::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    border-radius: 20px;
-    background: var(--avatar-border);
-    z-index: 0;
-    pointer-events: none;
-}
 .inbox-msg-premium .inbox-msg-text {
-    position: relative;
-    z-index: 1;
+    background: var(--avatar-border) !important;
+    border: none;
+    color: #fff;
 }
 .inbox-msg-premium .inbox-film-share {
-    position: relative;
-    z-index: 1;
+    background: var(--avatar-border) !important;
+    border: none;
+    color: #fff;
 }
 .inbox-msg-premium .inbox-msg-time {
-    position: relative;
-    z-index: 1;
-    color: rgba(0, 0, 0, 0.55);
-}
-.inbox-msg-premium .inbox-msg-sender {
-    position: relative;
-    z-index: 1;
-    background: rgba(12, 12, 12, 0.6);
-    margin: -10px -16px 0;
-    padding: 8px 16px 2px;
-    border-radius: 18px 18px 0 0;
-}
-.inbox-msg--mine .inbox-msg-premium .inbox-msg-text {
-    background: rgba(12, 12, 12, 0.82) !important;
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-}
-.inbox-msg--mine .inbox-msg-premium .inbox-film-share {
-    background: rgba(12, 12, 12, 0.82) !important;
-    backdrop-filter: blur(8px);
-    border-color: rgba(255, 255, 255, 0.08);
-}
-.inbox-msg--theirs .inbox-msg-premium .inbox-msg-text {
-    background: rgba(12, 12, 12, 0.6) !important;
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-}
-.inbox-msg--theirs .inbox-msg-premium .inbox-film-share {
-    background: rgba(12, 12, 12, 0.6) !important;
-    backdrop-filter: blur(8px);
-    border-color: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.7);
 }
 
 
