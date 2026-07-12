@@ -7991,6 +7991,24 @@ body.list-chat-room {
     font-size: 1.2rem;
 }
 
+.list-member-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    object-fit: cover;
+    display: block;
+}
+
+.list-member-avatar-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.65rem;
+}
+
 .inbox-conv-info {
     flex: 1;
     min-width: 0;
