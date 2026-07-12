@@ -2184,13 +2184,32 @@ body.has-hero .movies-page-content {
 }
 
 .form-checkbox {
-    width: 16px;
-    height: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: 3px;
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    border-radius: 4px;
     background: rgba(255, 255, 255, 0.06);
     cursor: pointer;
-    accent-color: #a3e635;
+    position: relative;
+    flex-shrink: 0;
+}
+.form-checkbox:checked {
+    background: #a3e635;
+    border-color: #a3e635;
+}
+.form-checkbox:checked::after {
+    content: '✓';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
 }
 
 .form-submit {
