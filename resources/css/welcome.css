@@ -7836,7 +7836,7 @@ body.list-chat-room {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 0;
+    padding: 10px 0;
     border-bottom: 1px solid var(--panel-border);
     transition: background 0.18s ease;
 }
@@ -7851,7 +7851,6 @@ body.list-chat-room {
 }
 
 .list-member-name {
-    color: #fff;
     font-size: 0.85rem;
     font-weight: 500;
 }
@@ -7866,9 +7865,20 @@ body.list-chat-room {
 }
 
 .list-member-meta {
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.4);
-    margin-top: 2px;
+    font-size: 0.7rem;
+    margin-top: 1px;
+}
+
+.list-member-role-owner {
+    color: #a3e635;
+}
+
+.list-member-role-admin {
+    color: #60a5fa;
+}
+
+.list-member-role-member {
+    color: rgba(255, 255, 255, 0.45);
 }
 
 .list-member-actions {
@@ -7882,11 +7892,17 @@ body.list-chat-room {
     opacity: 1;
 }
 
+@media (max-width: 640px) {
+    .list-member-actions {
+        opacity: 1;
+    }
+}
+
 .list-member-btn {
     border: none;
     border-radius: 6px;
-    padding: 6px 14px;
-    font-size: 0.78rem;
+    padding: 5px 12px;
+    font-size: 0.75rem;
     font-weight: 600;
     cursor: pointer;
 }
@@ -7905,10 +7921,10 @@ body.list-chat-room {
     background: rgba(255, 255, 255, 0.06);
     border: none;
     border-radius: 6px;
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -7923,10 +7939,10 @@ body.list-chat-room {
     background: rgba(239, 68, 68, 0.1);
     border: none;
     border-radius: 6px;
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     display: flex;
     align-items: center;
     justify-content: center;
