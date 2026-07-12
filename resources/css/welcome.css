@@ -9068,12 +9068,12 @@ body.list-chat-room {
 
 /* Chat bubble premium — gradient border */
 .inbox-msg-premium .inbox-msg-text {
-    background: var(--avatar-border) !important;
+    background: var(--accent-color, #a3e635) !important;
     border: none;
     color: #fff;
 }
 .inbox-msg-premium .inbox-film-share {
-    background: var(--avatar-border) !important;
+    background: var(--accent-color, #a3e635) !important;
     border: none;
     color: #fff;
 }

@@ -50,7 +50,7 @@
                         const isPremium = e.user.is_plus;
                         const pClass = isPremium ? ' inbox-msg-premium' : '';
                         const pStyle = isPremium && e.user.theme
-                            ? ' style="--avatar-border:' + e.user.theme.avatar_border_css + '"'
+                            ? ' style="--avatar-border:' + e.user.theme.avatar_border_css + '; --accent-color:' + e.user.theme.accent_color + '"'
                             : '';
 
                         div.className = 'inbox-msg inbox-msg--theirs';

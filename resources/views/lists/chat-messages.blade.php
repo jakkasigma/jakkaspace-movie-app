@@ -49,7 +49,7 @@
                         </div>
                     @endif
                     <div class="inbox-msg-bubble {{ $msg->user?->isPlus() ? 'inbox-msg-premium' : '' }}"
-                         @if ($msg->user?->isPlus() && $msg->user->theme) style="--avatar-border: {{ $msg->user->theme->avatar_border_css }}" @endif>
+                         @if ($msg->user?->isPlus() && $msg->user->theme) style="--avatar-border: {{ $msg->user->theme->avatar_border_css }}; --accent-color: {{ $msg->user->theme->accent_color }};" @endif>
                         @if (! $isMine)
                             <p class="inbox-msg-sender">{{ $msg->user?->name ?? 'Pengguna' }}</p>
                         @endif
