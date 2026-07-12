@@ -55,7 +55,7 @@
                         @if (! $isMine)
                             <div class="inbox-msg-avatar">
                                 @if ($message->sender?->avatar_url)
-                                    <img src="{{ $message->sender->avatar_url }}" alt="{{ $message->sender->name }}" class="inbox-mini-avatar">
+                                    <img src="{{ $message->sender->avatar_url }}" alt="{{ $message->sender->name }}" class="inbox-mini-avatar" onerror="this.onerror=null;this.style.display='none'">
                                 @else
                                     <div class="inbox-mini-avatar inbox-avatar-placeholder">
                                         {{ strtoupper(substr($message->sender?->name ?? '?', 0, 1)) }}

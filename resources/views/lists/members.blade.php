@@ -133,7 +133,7 @@
                     <button type="button" class="invite-friend-item" data-username="{{ $friend->username }}"
                         onclick="document.getElementById('invite-username-input').value='{{ $friend->username }}'; document.getElementById('invite-form').submit();">
                         @if ($friend->avatar_url)
-                            <img src="{{ $friend->avatar_url }}" alt="" class="invite-friend-avatar">
+                            <img src="{{ $friend->avatar_url }}" alt="" class="invite-friend-avatar" onerror="this.onerror=null;this.style.display='none'">
                         @else
                             <div class="invite-friend-avatar invite-friend-avatar-placeholder">{{ strtoupper(substr($friend->name, 0, 1)) }}</div>
                         @endif

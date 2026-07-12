@@ -27,7 +27,7 @@
                 <div class="detail-review-header">
                     <div class="detail-review-author">
                         @if ($review->user?->avatar_url)
-                            <img src="{{ $review->user->avatar_url }}" alt="{{ $review->user->name }}" class="detail-review-avatar">
+                            <img src="{{ $review->user->avatar_url }}" alt="{{ $review->user->name }}" class="detail-review-avatar" onerror="this.onerror=null;this.style.display='none'">
                         @else
                             <div class="detail-review-avatar detail-review-avatar-placeholder">
                                 {{ strtoupper(substr($review->user?->name ?? '?', 0, 1)) }}

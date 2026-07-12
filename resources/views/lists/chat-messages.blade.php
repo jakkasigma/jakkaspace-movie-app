@@ -40,7 +40,7 @@
                     @if (! $isMine)
                         <div class="inbox-msg-avatar">
                             @if ($msg->user?->avatar_url)
-                                <img src="{{ $msg->user->avatar_url }}" alt="" class="inbox-mini-avatar">
+                                <img src="{{ $msg->user->avatar_url }}" alt="" class="inbox-mini-avatar" onerror="this.onerror=null;this.style.display='none'">
                             @else
                                 <div class="inbox-mini-avatar inbox-avatar-placeholder">
                                     {{ strtoupper(substr($msg->user?->name ?? '?', 0, 1)) }}
