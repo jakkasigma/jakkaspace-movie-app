@@ -27,9 +27,10 @@ class ListInvitation extends Notification
             'type' => 'list_invitation',
             'list_id' => $this->list->id,
             'list_name' => $this->list->name,
-            'inviter_id' => $this->inviter->id,
-            'inviter_name' => $this->inviter->name,
-            'inviter_avatar' => $this->inviter->avatar_url,
+            'actor_id' => $this->inviter->id,
+            'actor_name' => $this->inviter->name,
+            'actor_username' => $this->inviter->username,
+            'actor_avatar' => $this->inviter->avatar_url,
             'message' => "{$this->inviter->name} mengundangmu ke list {$this->list->name}",
         ];
     }

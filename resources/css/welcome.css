@@ -9469,6 +9469,28 @@ body.list-chat-room #footer {
 }
 
 /* Plus indicator badge */
+.plus-info-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 0.3rem 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.25s ease, transform 0.2s ease;
+    vertical-align: middle;
+    margin-left: 6px;
+}
+.plus-info-trigger:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
 .plus-indicator {
     display: inline-block;
     font-size: 0.6rem;

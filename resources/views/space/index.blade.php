@@ -19,7 +19,7 @@
                             @elseif ($user->isPlus())
                                 <span class="plus-indicator" onclick="document.getElementById('plus-modal').classList.add('active')" style="cursor:pointer;">Plus</span>
                             @endif
-                            <button onclick="document.getElementById('plus-modal').classList.add('active')" class="plus-info-btn" title="Tentang Plus/Plus+">ⓘ</button>
+                            <button onclick="document.getElementById('plus-modal').classList.add('active')" class="plus-info-btn plus-info-trigger" title="Tentang Plus/Plus+">Info Plus</button>
                         </h1>
                         @if ($user->username)
                             <p class="space-username">{{ '@' . $user->username }}</p>
@@ -209,7 +209,7 @@
     <div id="plus-modal" class="plus-modal-overlay" style="display:none" onclick="if(event.target===this)this.classList.remove('active')">
         <div class="plus-modal plus-modal--info" onclick="event.stopPropagation()">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-                <h2 style="color:#fff;font-size:1.1rem;font-weight:700;letter-spacing:0.5px;">
+                <h2 style="color:#fff;font-size:1.3rem;font-family:'Bebas Neue',sans-serif;text-transform:uppercase;letter-spacing:1px;">
                     <span class="plus-brand-text" style="background:linear-gradient(135deg,#f5af19,#f12711);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">JAKKA PLUS</span>
                 </h2>
                 <button onclick="document.getElementById('plus-modal').classList.remove('active')" style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:1.3rem;cursor:pointer;padding:4px;">✕</button>
@@ -239,7 +239,7 @@
                 {{-- Free User: upgrade CTA --}}
                 <div style="text-align:center;padding:16px 0 24px;border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:20px;">
                     <p style="color:rgba(255,255,255,0.7);font-size:0.9rem;margin-bottom:12px;">Upgrade ke Plus atau Plus+ dan dapatkan fitur eksklusif!</p>
-                    <a href="{{ route('plus') }}" class="plus-cta-btn" style="display:inline-block;background:linear-gradient(135deg,#f5af19,#f12711);color:#fff;border:none;border-radius:8px;padding:10px 28px;font-size:0.85rem;font-weight:700;cursor:pointer;text-decoration:none;">Lihat Harga & Paket</a>
+                    <a href="{{ route('plus') }}" class="plus-cta-btn" style="display:inline-block;background:linear-gradient(135deg,#f5af19,#f12711);color:#fff;border:none;border-radius:8px;padding:10px 28px;font-size:0.85rem;font-family:'Bebas Neue',sans-serif;text-transform:uppercase;letter-spacing:0.5px;cursor:pointer;text-decoration:none;">Lihat Harga & Paket</a>
                 </div>
             @endif
 
@@ -268,7 +268,7 @@
             </div>
 
             <div style="text-align:center;margin-top:16px;">
-                <a href="{{ route('plus') }}" style="color:rgba(255,255,255,0.4);font-size:0.78rem;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Detail lengkap →</a>
+                <a href="{{ route('plus') }}" style="color:rgba(255,255,255,0.4);font-size:0.78rem;font-family:'Bebas Neue',sans-serif;text-transform:uppercase;letter-spacing:0.5px;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">Detail lengkap →</a>
             </div>
         </div>
     </div>
@@ -290,18 +290,25 @@
         background: rgba(255,255,255,0.07);
     }
     .plus-info-btn {
-        background: none;
-        border: none;
-        color: rgba(255,255,255,0.25);
-        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 0.78rem;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        padding: 0.3rem 0.9rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: transparent;
+        color: #fff;
         cursor: pointer;
-        padding: 0;
         margin-left: 6px;
         vertical-align: middle;
-        transition: color 0.2s;
+        transition: background 0.25s ease, transform 0.2s ease;
     }
     .plus-info-btn:hover {
-        color: rgba(255, 255, 255, 0.6);
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
     }
     .plus-modal-overlay {
         display: none;

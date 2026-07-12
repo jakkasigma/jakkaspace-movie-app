@@ -18,7 +18,7 @@
             <section class="plus-hero plus-hero--active">
                 <div style="display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;">
                     <div class="plus-hero-badge" @if($user->isPlusPlus()) style="background:linear-gradient(135deg,#f5af19,#f12711);" @endif>{{ $badgeEmoji }} {{ $tierLabel }} Active</div>
-                    <button onclick="document.getElementById('plus-info-modal').classList.add('active')" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:4px 14px;color:rgba(255,255,255,0.7);font-size:0.72rem;font-weight:600;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">Info {{ $tierLabel }}</button>
+                    <button onclick="document.getElementById('plus-info-modal').classList.add('active')" class="plus-info-trigger">Info {{ $tierLabel }}</button>
                 </div>
                 <h1 class="plus-hero-title">Subscription {{ $tierLabel }} Aktif</h1>
                 <p class="plus-hero-sub">Langganan aktif sampai <strong>{{ $user->expires_at->format('d M Y') }}</strong></p>
@@ -410,13 +410,13 @@
         <div id="plus-info-modal" class="plus-modal-overlay" style="display:none" onclick="if(event.target===this)this.classList.remove('active')">
             <div class="plus-modal plus-modal--info" onclick="event.stopPropagation()">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-                    <h2 style="color:#fff;font-size:1.1rem;font-weight:700;">
+                    <h2 style="color:#fff;font-size:1.3rem;font-family:'Bebas Neue',sans-serif;text-transform:uppercase;letter-spacing:1px;">
                         <span class="plus-brand-text" style="background:linear-gradient(135deg,#f5af19,#f12711);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Info Plus</span>
                     </h2>
                     <button onclick="document.getElementById('plus-info-modal').classList.remove('active')" style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:1.3rem;cursor:pointer;padding:4px;">✕</button>
                 </div>
 
-                <h3 style="color:#fff;font-size:0.85rem;font-weight:600;margin-bottom:12px;">Fitur Eksklusif</h3>
+                <h3 style="color:#fff;font-size:0.9rem;font-family:'Bebas Neue',sans-serif;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Fitur Eksklusif</h3>
                 <div class="plus-benefits-grid" style="grid-template-columns:1fr 1fr;gap:10px;margin-bottom:28px;">
                     <div class="plus-benefit-card" style="padding:14px;">
                         <span style="font-size:1.4rem;display:block;margin-bottom:6px;">🎨</span>
@@ -440,7 +440,7 @@
                     </div>
                 </div>
 
-                <h3 style="color:#fff;font-size:0.85rem;font-weight:600;margin-bottom:12px;">Bandingkan Fitur</h3>
+                <h3 style="color:#fff;font-size:0.9rem;font-family:'Bebas Neue',sans-serif;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Bandingkan Fitur</h3>
                 <table class="plus-table" style="font-size:0.78rem;">
                     <thead>
                         <tr>
@@ -469,9 +469,9 @@
                         <p style="color:rgba(255,255,255,0.4);font-size:0.8rem;">Kamu sudah menikmati semua fitur Plus+ 💎</p>
                     @elseif ($user->isPlus())
                         <p style="color:rgba(255,255,255,0.4);font-size:0.8rem;">Kamu Plus! Upgrade ke Plus+ untuk fitur lebih eksklusif.</p>
-                        <a href="#plans" class="plus-cta-btn" style="display:inline-block;background:linear-gradient(135deg,#f5af19,#f12711);color:#fff;border:none;border-radius:8px;padding:10px 28px;font-size:0.85rem;font-weight:700;cursor:pointer;text-decoration:none;">Upgrade ke Plus+</a>
+                        <a href="#plans" class="plus-cta-btn" style="display:inline-block;background:linear-gradient(135deg,#f5af19,#f12711);color:#fff;border:none;border-radius:8px;padding:10px 28px;font-size:0.9rem;font-family:'Bebas Neue',sans-serif;text-transform:uppercase;letter-spacing:0.5px;cursor:pointer;text-decoration:none;">Upgrade ke Plus+</a>
                     @else
-                        <a href="#plans" class="plus-cta-btn" style="display:inline-block;background:linear-gradient(135deg,#f5af19,#f12711);color:#fff;border:none;border-radius:8px;padding:10px 28px;font-size:0.85rem;font-weight:700;cursor:pointer;text-decoration:none;">Upgrade Sekarang</a>
+                        <a href="#plans" class="plus-cta-btn" style="display:inline-block;background:linear-gradient(135deg,#f5af19,#f12711);color:#fff;border:none;border-radius:8px;padding:10px 28px;font-size:0.9rem;font-family:'Bebas Neue',sans-serif;text-transform:uppercase;letter-spacing:0.5px;cursor:pointer;text-decoration:none;">Upgrade Sekarang</a>
                     @endif
                 </div>
             </div>
@@ -529,7 +529,7 @@
                         </p>
                     </div>
 
-                    <button onclick="document.getElementById('successModal').classList.remove('active')" class="plus-cta-btn" style="display:block;width:100%;background:linear-gradient(135deg,#f5af19,#f12711);color:#fff;border:none;border-radius:8px;padding:10px;font-size:0.85rem;font-weight:700;cursor:pointer;text-align:center;">Mengerti</button>
+                    <button onclick="document.getElementById('successModal').classList.remove('active')" class="plus-cta-btn" style="display:block;width:100%;background:linear-gradient(135deg,#f5af19,#f12711);color:#fff;border:none;border-radius:8px;padding:10px;font-size:0.9rem;font-family:'Bebas Neue',sans-serif;text-transform:uppercase;letter-spacing:0.5px;cursor:pointer;text-align:center;">Mengerti</button>
                 </div>
             </div>
         @endif

@@ -27,9 +27,10 @@ class ListJoinRequest extends Notification
             'type' => 'list_join_request',
             'list_id' => $this->list->id,
             'list_name' => $this->list->name,
-            'requester_id' => $this->requester->id,
-            'requester_name' => $this->requester->name,
-            'requester_avatar' => $this->requester->avatar_url,
+            'actor_id' => $this->requester->id,
+            'actor_name' => $this->requester->name,
+            'actor_username' => $this->requester->username,
+            'actor_avatar' => $this->requester->avatar_url,
             'message' => "{$this->requester->name} ingin bergabung ke list {$this->list->name}",
         ];
     }

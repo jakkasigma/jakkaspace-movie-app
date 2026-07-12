@@ -104,6 +104,8 @@
                                         <a href="{{ route('reviews.show', $data['review_id']) }}" class="notif-link">Lihat →</a>
                                     @elseif ($data['type'] === 'list_invitation')
                                         mengundangmu ke list <strong>{{ $data['list_name'] }}</strong>
+                                    @elseif ($data['type'] === 'list_join_request')
+                                        ingin bergabung ke list <strong>{{ $data['list_name'] }}</strong>
                                     @endif
                                 @endif
                                 </p>
