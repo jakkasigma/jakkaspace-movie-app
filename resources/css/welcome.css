@@ -4338,6 +4338,30 @@ body.nav-panel-open::after {
     border-radius: 0;
 }
 
+.list-chat-fullscreen {
+    display: flex;
+    flex-direction: column;
+    background: #000;
+}
+
+@media (max-width: 768px) {
+    .list-chat-fullscreen {
+        position: fixed;
+        inset: 0;
+        z-index: 500;
+    }
+
+    .list-chat-fullscreen .inbox-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 12px 4vw;
+    }
+
+    .list-chat-fullscreen .inbox-input-wrap {
+        flex-shrink: 0;
+    }
+}
+
 @media (max-width: 640px) {
     .list-chat-messages {
         padding: 8px 3vw;
@@ -8070,10 +8094,11 @@ body.list-chat-room {
 /* --- Chat page (full-screen) ------------------------------- */
 
 .inbox-chat-page {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    height: 100dvh;
     overflow: hidden;
     background: #000;
 }

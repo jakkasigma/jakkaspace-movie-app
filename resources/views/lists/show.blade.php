@@ -108,7 +108,25 @@
 
             @elseif ($tab === 'chat')
                 @if ($isOwner || $isMember)
-                    @include('lists.chat')
+                    <div class="list-chat-fullscreen">
+                        <header class="inbox-chat-header">
+                            <a href="{{ route('lists.show', [$list, 'tab' => 'movies']) }}" class="inbox-chat-back" aria-label="Kembali">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <polyline points="15 18 9 12 15 6"/>
+                                </svg>
+                            </a>
+                            <div class="inbox-chat-user">
+                                <p class="inbox-chat-name">{{ $list->name }}</p>
+                                <p style="font-size:0.73rem;color:rgba(255,255,255,0.35);">👥 {{ $list->approvedMembers()->count() }} anggota</p>
+                            </div>
+                        </header>
+                        <div class="inbox-messages">
+                            @include('lists.chat-messages')
+                        </div>
+                        <div class="inbox-input-wrap">
+                            @include('lists.chat-input')
+                        </div>
+                    </div>
                 @else
                     <div class="space-empty">Gabung ke list untuk mengobrol dengan anggota.</div>
                 @endif
