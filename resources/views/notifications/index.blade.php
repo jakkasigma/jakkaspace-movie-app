@@ -39,6 +39,19 @@
                                 $data['actor_username'] ??= $data['mentioned_by_username'] ?? null;
                                 $data['actor_avatar'] ??= null;
                             }
+
+                            // Normalize old list_invitation data keys
+                            if (isset($data['inviter_name'])) {
+                                $data['actor_name'] ??= $data['inviter_name'];
+                                $data['actor_username'] ??= null;
+                                $data['actor_avatar'] ??= $data['inviter_avatar'] ?? null;
+                            }
+                            // Normalize old list_join_request data keys
+                            if (isset($data['requester_name'])) {
+                                $data['actor_name'] ??= $data['requester_name'];
+                                $data['actor_username'] ??= null;
+                                $data['actor_avatar'] ??= $data['requester_avatar'] ?? null;
+                            }
                         @endphp
 
                         <article class="notif-item {{ $isUnread ? 'notif-unread' : '' }}">
