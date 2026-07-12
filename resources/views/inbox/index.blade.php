@@ -42,7 +42,7 @@
                                 @if ($lastMsg)
                                     <p class="inbox-conv-preview">
                                         @if ($lastMsg->type === 'film_share')
-                                            🎬 Berbagi film
+                                            🎬 {{ $lastMsg->body ?? 'Berbagi film' }}
                                         @else
                                             {{ Str::limit($lastMsg->body ?? '', 50) }}
                                         @endif

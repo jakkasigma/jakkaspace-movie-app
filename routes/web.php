@@ -14,6 +14,7 @@ use App\Http\Controllers\ListMovieController;
 use App\Http\Controllers\MidtransController;
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\MovieListController;
+use App\Http\Controllers\MovieShareController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PinnedMovieController;
 use App\Http\Controllers\PremiumController;
@@ -114,6 +115,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/inbox/{conversation}', [InboxController::class, 'show'])->whereNumber('conversation')->name('inbox.show');
     Route::post('/inbox/{conversation}/messages', [InboxController::class, 'store'])->whereNumber('conversation')->name('inbox.messages.store');
     Route::match(['get', 'post'], '/inbox/direct/{user}', [InboxController::class, 'startDirect'])->name('inbox.direct');
+
+    // Share movie
+    Route::get('/movies/{movie}/share', [MovieShareController::class, 'share'])->whereNumber('movie')->name('movies.share');
+    Route::post('/movies/{movie}/share/user', [MovieShareController::class, 'toUser'])->whereNumber('movie')->name('movies.share.user');
+    Route::post('/movies/{movie}/share/list', [MovieShareController::class, 'toList'])->whereNumber('movie')->name('movies.share.list');
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications');

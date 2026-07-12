@@ -12,6 +12,7 @@ class ListMessage extends Model
         'user_id',
         'message',
         'type',
+        'tmdb_id',
         'metadata',
     ];
 

@@ -60,7 +60,25 @@
                         @if (! $isMine)
                             <p class="inbox-msg-sender">{{ $msg->user?->name ?? 'Pengguna' }}</p>
                         @endif
-                        <p class="inbox-msg-text">{{ $msg->message }}</p>
+                        @if ($msg->type === 'film_share' && $msg->tmdb_id)
+                            @php $meta = $msg->metadata ?? []; @endphp
+                            <a href="{{ route('movies.show', $msg->tmdb_id) }}" class="list-film-share">
+                                @if (! empty($meta['poster_url']))
+                                    <img src="{{ $meta['poster_url'] }}" alt="" class="list-film-share-poster">
+                                @else
+                                    <div class="list-film-share-poster" style="background:rgba(255,255,255,0.06);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">🎬</div>
+                                @endif
+                                <div class="list-film-share-info">
+                                    <p class="list-film-share-kicker">Berbagi Film</p>
+                                    <p class="list-film-share-title">{{ $meta['title'] ?? $msg->message }}</p>
+                                    @if (! empty($meta['release_year']))
+                                        <p class="list-film-share-year">{{ $meta['release_year'] }}</p>
+                                    @endif
+                                </div>
+                            </a>
+                        @else
+                            <p class="inbox-msg-text">{{ $msg->message }}</p>
+                        @endif
                         <span class="inbox-msg-time">{{ $msg->created_at->format('H:i') }}</span>
                     </div>
                 </div>

@@ -74,16 +74,7 @@
                                     ▶ Trailer
                                 </a>
                             @endif
-                            <button class="btn-share-detail" type="button" data-share-story
-                                data-story-title="{{ $movie['title'] }}"
-                                data-story-year="{{ $movie['release_year'] ?? '' }}"
-                                data-story-rating="{{ $movie['rating'] }}"
-                                data-story-genres="{{ $movie['genres'] }}"
-                                data-story-director="{{ $movie['director'] ?? '' }}"
-                                data-story-overview="{{ $movie['overview'] }}"
-                                data-story-poster="{{ $movie['story_poster_url'] ?? $movie['poster_url'] ?? '' }}"
-                                data-story-backdrop="{{ $movie['story_backdrop_url'] ?? $movie['backdrop_url'] ?? '' }}"
-                            >Bagikan</button>
+                            <button class="btn-share-detail" type="button" onclick="openShareModal()">Bagikan</button>
                         </div>
 
                         {{-- User activity actions --}}
@@ -277,4 +268,25 @@
             </div>
         @endif
     </div>
+
+    @auth
+        <div id="share-modal-container"></div>
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            window.openShareModal = function() {
+                const container = document.getElementById('share-modal-container');
+                if (container.innerHTML === '') {
+                    fetch('{{ route('movies.share', $movie['id']) }}')
+                        .then(r => r.text())
+                        .then(html => {
+                            container.innerHTML = html;
+                            openShareModal();
+                        });
+                } else {
+                    openShareModal();
+                }
+            };
+        });
+        </script>
+    @endauth
 @endsection

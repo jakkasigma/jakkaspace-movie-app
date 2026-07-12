@@ -132,13 +132,13 @@ class InboxService
         return $message;
     }
 
-    public function sendFilmShare(User $sender, Conversation $conversation, int $tmdbId): Message
+    public function sendFilmShare(User $sender, Conversation $conversation, int $tmdbId, ?string $title = null): Message
     {
         $message = Message::create([
             'conversation_id' => $conversation->id,
             'user_id' => $sender->id,
             'type' => 'film_share',
-            'body' => null,
+            'body' => $title,
             'tmdb_id' => $tmdbId,
         ]);
 

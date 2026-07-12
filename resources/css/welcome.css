@@ -10067,6 +10067,128 @@ body.list-chat-room {
    RESPONSIVE — PLUS HISTORY TABLE
    ============================================================ */
 
+/* --- Share Modal ------------------------------------------- */
+.share-modal-overlay {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center;
+    padding: 4vw;
+}
+.share-modal-overlay.active { display: flex; }
+.share-modal {
+    background: #111; border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px; padding: 24px; width: 100%;
+    max-width: 420px; max-height: 80vh; overflow-y: auto;
+}
+.share-modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px;
+}
+.share-modal-title { color: #fff; font-size: 1rem; font-weight: 600; }
+.share-modal-close {
+    background: none; border: none; color: rgba(255,255,255,0.5);
+    font-size: 1.2rem; cursor: pointer;
+}
+.share-movie-info {
+    display: flex; gap: 12px; padding: 10px 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06); border-radius: 8px;
+    margin-bottom: 16px;
+}
+.share-movie-poster {
+    width: 40px; height: 60px; border-radius: 4px; object-fit: cover; flex-shrink: 0;
+}
+.share-movie-title {
+    color: #fff; font-size: 0.85rem; font-weight: 600;
+    margin: 0 0 2px;
+}
+.share-movie-year { color: rgba(255,255,255,0.4); font-size: 0.75rem; margin: 0; }
+.share-tabs {
+    display: flex; gap: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 16px;
+}
+.share-tab {
+    flex: 1; padding: 10px; text-align: center;
+    background: none; border: none; border-bottom: 2px solid transparent;
+    color: rgba(255,255,255,0.5); font-size: 0.82rem; font-weight: 600;
+    cursor: pointer; transition: color 0.2s, border-color 0.2s;
+}
+.share-tab.active { color: #a3e635; border-bottom-color: #a3e635; }
+.share-tab-content { display: none; }
+.share-tab-content.active { display: block; }
+.share-search-wrap { margin-bottom: 12px; }
+.share-search-input {
+    width: 100%; padding: 10px 14px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12); border-radius: 6px;
+    color: #fff; font-size: 0.85rem; outline: none;
+}
+.share-list { display: flex; flex-direction: column; gap: 2px; max-height: 300px; overflow-y: auto; }
+.share-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px; border-radius: 8px;
+    background: none; border: none; width: 100%;
+    cursor: pointer; text-align: left;
+    transition: background 0.15s;
+}
+.share-item:hover { background: rgba(255,255,255,0.05); }
+.share-item-avatar {
+    width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0;
+}
+.share-item-avatar-premium {
+    padding: 2px; background: var(--avatar-border); border-radius: 50%;
+    display: inline-flex; flex-shrink: 0;
+}
+.share-item-avatar-premium .share-item-avatar {
+    width: 32px; height: 32px;
+    border: 1.5px solid #000;
+}
+.share-item-avatar-placeholder {
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.5); font-size: 0.85rem;
+}
+.share-item-avatar-list {
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.5); font-size: 0.8rem;
+}
+.share-item-info { flex: 1; min-width: 0; }
+.share-item-name { color: #fff; font-size: 0.82rem; font-weight: 500; margin: 0 0 1px; }
+.share-item-meta { color: rgba(255,255,255,0.35); font-size: 0.7rem; margin: 0; }
+.share-empty { color: rgba(255,255,255,0.3); font-size: 0.82rem; text-align: center; padding: 20px 0; }
+
+@media (max-width: 640px) {
+    .share-modal { padding: 16px; }
+    .share-item-avatar { width: 32px; height: 32px; }
+    .share-item-avatar-premium .share-item-avatar { width: 28px; height: 28px; }
+    .share-list { max-height: 50vh; }
+}
+
+/* --- Film share card in list chat -------------------------- */
+.list-film-share {
+    display: flex; gap: 10px; padding: 10px; border-radius: 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    text-decoration: none; transition: background 0.2s;
+    max-width: 260px;
+}
+.list-film-share:hover { background: rgba(255,255,255,0.07); }
+.list-film-share-poster {
+    width: 44px; height: 66px; border-radius: 6px; object-fit: cover; flex-shrink: 0;
+}
+.list-film-share-info { min-width: 0; }
+.list-film-share-kicker {
+    font-size: 0.6rem; color: rgba(255,255,255,0.35);
+    text-transform: uppercase; letter-spacing: 0.5px;
+}
+.list-film-share-title {
+    color: #fff; font-size: 0.78rem; font-weight: 600;
+    margin: 2px 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.list-film-share-year { color: rgba(255,255,255,0.4); font-size: 0.7rem; }
+
 @media (max-width: 640px) {
     .space-body table {
         font-size: 0.75rem !important;
