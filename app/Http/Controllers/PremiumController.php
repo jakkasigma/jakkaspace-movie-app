@@ -129,8 +129,6 @@ class PremiumController extends Controller
             }
         }
 
-        $orderId = 'PLUS-'.strtoupper(uniqid());
-
         $transaction = SubscriptionTransaction::create([
             'user_id' => $user->id,
             'plan_id' => $plan->id,
@@ -148,7 +146,7 @@ class PremiumController extends Controller
         try {
             $snapToken = $this->midtrans->createSnapToken([
                 'transaction_details' => [
-                    'order_id' => $orderId.'-'.$transaction->id,
+                    'order_id' => 'PLUS-'.$transaction->id,
                     'gross_amount' => $price,
                 ],
                 'customer_details' => [
@@ -162,7 +160,7 @@ class PremiumController extends Controller
                     'name' => $plan->name,
                 ]],
                 'callbacks' => [
-                    'finish' => route('plus.finish', ['order_id' => $orderId.'-'.$transaction->id]),
+                    'finish' => route('plus.finish', ['order_id' => 'PLUS-'.$transaction->id]),
                 ],
             ]);
 
