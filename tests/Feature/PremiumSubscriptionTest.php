@@ -62,146 +62,77 @@ describe('premium subscription', function (): void {
             ->assertSee('Plus+ Active');
     });
 
-    it('subscribes to monthly plus', function (): void {
+    it('creates pending transaction for monthly plus', function (): void {
         $user = User::factory()->create();
         $plan = SubscriptionPlan::where('tier', 'plus')->where('duration_days', 30)->first();
 
         $this->actingAs($user)
-            ->post(route('plus.subscribe'), [
-                'plan_id' => $plan->id,
-                'payment_method' => 'gopay',
-            ])
-            ->assertRedirect();
+            ->postJson(route('plus.subscribe'), ['plan_id' => $plan->id])
+            ->assertOk()
+            ->assertJsonStructure(['snap_token', 'transaction_id']);
 
         $user->refresh();
-        expect($user->subscription_tier)->toBe('plus');
-        expect($user->subscribed_at->isToday())->toBeTrue();
-        expect($user->expires_at->isFuture())->toBeTrue();
-        expect(now()->diffInDays($user->expires_at))->toBeGreaterThanOrEqual(29);
-        expect(now()->diffInDays($user->expires_at))->toBeLessThanOrEqual(31);
+        expect($user->subscription_tier)->toBe('free');
     });
 
-    it('subscribes to yearly plus', function (): void {
+    it('creates pending transaction for yearly plus', function (): void {
         $user = User::factory()->create();
         $plan = SubscriptionPlan::where('tier', 'plus')->where('duration_days', 365)->first();
 
         $this->actingAs($user)
-            ->post(route('plus.subscribe'), [
-                'plan_id' => $plan->id,
-                'payment_method' => 'qris',
-            ])
-            ->assertRedirect();
-
-        $user->refresh();
-        expect($user->subscription_tier)->toBe('plus');
-        expect(now()->diffInDays($user->expires_at))->toBeGreaterThanOrEqual(364);
-        expect(now()->diffInDays($user->expires_at))->toBeLessThanOrEqual(366);
+            ->postJson(route('plus.subscribe'), ['plan_id' => $plan->id])
+            ->assertOk()
+            ->assertJsonStructure(['snap_token', 'transaction_id']);
     });
 
-    it('subscribes to monthly plus_plus', function (): void {
+    it('creates pending transaction for monthly plus_plus', function (): void {
         $user = User::factory()->create();
         $plan = SubscriptionPlan::where('tier', 'plus_plus')->where('duration_days', 30)->first();
 
         $this->actingAs($user)
-            ->post(route('plus.subscribe'), [
-                'plan_id' => $plan->id,
-                'payment_method' => 'transfer_bank',
-            ])
-            ->assertRedirect();
-
-        $user->refresh();
-        expect($user->subscription_tier)->toBe('plus_plus');
-        expect(now()->diffInDays($user->expires_at))->toBeGreaterThanOrEqual(29);
-        expect(now()->diffInDays($user->expires_at))->toBeLessThanOrEqual(31);
+            ->postJson(route('plus.subscribe'), ['plan_id' => $plan->id])
+            ->assertOk()
+            ->assertJsonStructure(['snap_token', 'transaction_id']);
     });
 
-    it('subscribes to yearly plus_plus', function (): void {
+    it('creates pending transaction for yearly plus_plus', function (): void {
         $user = User::factory()->create();
         $plan = SubscriptionPlan::where('tier', 'plus_plus')->where('duration_days', 365)->first();
 
         $this->actingAs($user)
-            ->post(route('plus.subscribe'), [
-                'plan_id' => $plan->id,
-                'payment_method' => 'gopay',
-            ])
-            ->assertRedirect();
-
-        $user->refresh();
-        expect($user->subscription_tier)->toBe('plus_plus');
-        expect(now()->diffInDays($user->expires_at))->toBeGreaterThanOrEqual(364);
-        expect(now()->diffInDays($user->expires_at))->toBeLessThanOrEqual(366);
+            ->postJson(route('plus.subscribe'), ['plan_id' => $plan->id])
+            ->assertOk()
+            ->assertJsonStructure(['snap_token', 'transaction_id']);
     });
 
-    it('extends existing plus subscription', function (): void {
+    it('prevents duplicate plus_plus subscription', function (): void {
         $user = User::factory()->create([
-            'subscription_tier' => 'plus',
-            'subscribed_at' => now()->subDays(10),
-            'expires_at' => now()->addDays(20),
+            'subscription_tier' => 'plus_plus',
+            'expires_at' => now()->addDays(30),
         ]);
         $plan = SubscriptionPlan::where('tier', 'plus')->where('duration_days', 30)->first();
 
         $this->actingAs($user)
-            ->post(route('plus.subscribe'), [
-                'plan_id' => $plan->id,
-                'payment_method' => 'gopay',
-            ])
-            ->assertRedirect();
-
-        $user->refresh();
-        expect($user->subscription_tier)->toBe('plus');
-        expect(now()->diffInDays($user->expires_at))->toBeGreaterThanOrEqual(49);
-        expect(now()->diffInDays($user->expires_at))->toBeLessThanOrEqual(51);
-    });
-
-    it('upgrades plus to plus_plus on subscribe', function (): void {
-        $user = User::factory()->create([
-            'subscription_tier' => 'plus',
-            'subscribed_at' => now()->subDays(10),
-            'expires_at' => now()->addDays(20),
-        ]);
-        $plan = SubscriptionPlan::where('tier', 'plus_plus')->where('duration_days', 30)->first();
-
-        $this->actingAs($user)
-            ->post(route('plus.subscribe'), [
-                'plan_id' => $plan->id,
-                'payment_method' => 'gopay',
-            ])
-            ->assertRedirect();
-
-        $user->refresh();
-        expect($user->subscription_tier)->toBe('plus_plus');
+            ->postJson(route('plus.subscribe'), ['plan_id' => $plan->id])
+            ->assertStatus(422);
     });
 
     it('validates plan_id is required', function (): void {
         $user = User::factory()->create();
 
         $this->actingAs($user)
-            ->post(route('plus.subscribe'), [
-                'payment_method' => 'gopay',
-            ])
-            ->assertSessionHasErrors('plan_id');
+            ->postJson(route('plus.subscribe'), [])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('plan_id');
     });
 
     it('validates plan_id must exist', function (): void {
         $user = User::factory()->create();
 
         $this->actingAs($user)
-            ->post(route('plus.subscribe'), [
-                'plan_id' => 99999,
-                'payment_method' => 'gopay',
-            ])
-            ->assertSessionHasErrors('plan_id');
-    });
-
-    it('validates payment_method is required', function (): void {
-        $user = User::factory()->create();
-        $plan = SubscriptionPlan::where('tier', 'plus')->where('duration_days', 30)->first();
-
-        $this->actingAs($user)
-            ->post(route('plus.subscribe'), [
-                'plan_id' => $plan->id,
-            ])
-            ->assertSessionHasErrors('payment_method');
+            ->postJson(route('plus.subscribe'), ['plan_id' => 99999])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('plan_id');
     });
 });
 

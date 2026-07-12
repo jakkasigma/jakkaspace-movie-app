@@ -7,6 +7,7 @@ use App\Models\SubscriptionPlan;
 use App\Models\SubscriptionPromo;
 use App\Models\SubscriptionTransaction;
 use App\Models\Theme;
+use App\Services\MidtransService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -14,6 +15,10 @@ use Illuminate\Http\Request;
 
 class PremiumController extends Controller
 {
+    public function __construct(
+        private readonly MidtransService $midtrans,
+    ) {}
+
     public function index(Request $request): View
     {
         $user = $request->user();
@@ -45,13 +50,12 @@ class PremiumController extends Controller
         ]);
     }
 
-    public function subscribe(Request $request): RedirectResponse
+    public function subscribe(Request $request): JsonResponse|RedirectResponse
     {
         $user = $request->user();
 
         $validated = $request->validate([
             'plan_id' => 'required|exists:subscription_plans,id,is_active,1',
-            'payment_method' => 'required|in:gopay,qris,transfer_bank',
         ]);
 
         $plan = SubscriptionPlan::findOrFail($validated['plan_id']);
@@ -59,12 +63,10 @@ class PremiumController extends Controller
         $period = $plan->duration_days;
 
         if ($user->isPlusPlus() && ! $isPlusPlus) {
-            return redirect()->back()->with('error', 'Kamu sudah berlangganan Plus+. Silakan pilih paket Plus+ untuk perpanjangan.');
+            return response()->json(['error' => 'Kamu sudah berlangganan Plus+. Silakan pilih paket Plus+ untuk perpanjangan.'], 422);
         }
 
         $price = $plan->price;
-
-        // Check for redeem_promo discount from session
         $redeemPromo = session('redeem_promo');
         $appliedPromo = null;
 
@@ -83,7 +85,6 @@ class PremiumController extends Controller
             }
         }
 
-        // Auto promos (SubscriptionPromo) — 1× per user
         if (! $appliedPromo) {
             $autoPromo = SubscriptionPromo::where('is_active', true)->get()
                 ->filter(fn ($p) => $p->isValid() && (! $p->plan_id || $p->plan_id === $plan->id) && $p->canUseBy($user))
@@ -98,16 +99,8 @@ class PremiumController extends Controller
         $hasActiveSub = $user->expires_at && $user->expires_at->isFuture();
         $remainingDays = $hasActiveSub ? (int) now()->diffInDays($user->expires_at, false) : 0;
 
-        $result = [
-            'tier' => $plan->tier,
-            'plan_name' => $plan->name,
-            'action' => 'subscribe',
-            'from_tier' => null,
-            'remaining_days' => $remainingDays,
-            'plan_days' => $period,
-            'converted_days' => null,
-            'total_days' => $period,
-        ];
+        $action = 'subscribe';
+        $totalDays = $period;
 
         if ($hasActiveSub) {
             $isUpgrade = ! $user->isPlusPlus() && $isPlusPlus;
@@ -115,38 +108,12 @@ class PremiumController extends Controller
             if ($isUpgrade) {
                 $convertedDays = (int) floor($remainingDays / 2);
                 $totalDays = $convertedDays + $period;
-
-                $user->update([
-                    'subscription_tier' => 'plus_plus',
-                    'expires_at' => now()->addDays($totalDays),
-                ]);
-
-                $result['action'] = 'upgrade';
-                $result['from_tier'] = 'Plus';
-                $result['converted_days'] = $convertedDays;
-                $result['total_days'] = $totalDays;
+                $action = 'upgrade';
             } else {
-                $newExpiry = $user->expires_at->isFuture()
-                    ? $user->expires_at->copy()->addDays($period)
-                    : now()->addDays($period);
-
-                $user->update([
-                    'expires_at' => $newExpiry,
-                ]);
-
-                $result['action'] = 'renew';
-                $result['total_days'] = $remainingDays + $period;
+                $totalDays = $remainingDays + $period;
+                $action = 'renew';
             }
-        } else {
-            $user->update([
-                'subscription_tier' => $plan->tier,
-                'subscribed_at' => now(),
-                'expires_at' => now()->addDays($period),
-            ]);
         }
-
-        $freshUser = $user->fresh();
-        $result['expires_at'] = $freshUser->expires_at->format('d M Y');
 
         $notes = null;
         $promoId = null;
@@ -159,35 +126,58 @@ class PremiumController extends Controller
             } else {
                 $promoId = $appliedPromo->id;
                 $notes = "Auto promo: {$appliedPromo->name}";
-
-                $appliedPromo->increment('used_count');
-                $user->subscriptionPromos()->attach($appliedPromo->id, [
-                    'plan_id' => $plan->id,
-                    'original_price' => $plan->price,
-                    'discounted_price' => $price,
-                    'code_used' => null,
-                    'applied_at' => now(),
-                ]);
             }
         }
 
-        SubscriptionTransaction::create([
+        $orderId = 'PLUS-'.strtoupper(uniqid());
+
+        $transaction = SubscriptionTransaction::create([
             'user_id' => $user->id,
             'plan_id' => $plan->id,
             'tier' => $plan->tier,
-            'action' => $result['action'],
+            'action' => $action,
             'price' => $price,
-            'payment_method' => $validated['payment_method'],
+            'status' => 'pending',
+            'payment_method' => 'midtrans',
             'promo_id' => $promoId,
             'promo_code' => $promoCode,
-            'period_days' => $result['total_days'],
-            'expires_at' => $freshUser->expires_at,
+            'period_days' => $totalDays,
             'notes' => $notes,
         ]);
 
-        session()->forget('redeem_promo');
+        try {
+            $snapToken = $this->midtrans->createSnapToken([
+                'transaction_details' => [
+                    'order_id' => $orderId.'-'.$transaction->id,
+                    'gross_amount' => $price,
+                ],
+                'customer_details' => [
+                    'first_name' => $user->name,
+                    'email' => $user->email,
+                ],
+                'item_details' => [[
+                    'id' => $plan->id,
+                    'price' => $price,
+                    'quantity' => 1,
+                    'name' => $plan->name,
+                ]],
+                'callbacks' => [
+                    'finish' => route('plus.finish', ['order_id' => $orderId.'-'.$transaction->id]),
+                ],
+            ]);
 
-        return redirect()->route('plus')->with('subscription_result', $result);
+            $transaction->update(['snap_token' => $snapToken]);
+
+            return response()->json([
+                'snap_token' => $snapToken,
+                'transaction_id' => $transaction->id,
+            ]);
+        } catch (\Throwable $th) {
+            $transaction->update(['status' => 'failed', 'notes' => 'Midtrans error: '.$th->getMessage()]);
+            report($th);
+
+            return response()->json(['error' => 'Gagal memproses pembayaran. Silakan coba lagi.'], 500);
+        }
     }
 
     public function validatePromo(Request $request): JsonResponse

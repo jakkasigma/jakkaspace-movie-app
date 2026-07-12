@@ -14,10 +14,14 @@ class SubscriptionTransaction extends Model
         'action',
         'price',
         'payment_method',
+        'status',
+        'snap_token',
+        'snap_url',
         'promo_id',
         'promo_code',
         'period_days',
         'expires_at',
+        'paid_at',
         'admin_id',
         'notes',
     ];
@@ -26,6 +30,7 @@ class SubscriptionTransaction extends Model
     {
         return [
             'expires_at' => 'datetime',
+            'paid_at' => 'datetime',
         ];
     }
 

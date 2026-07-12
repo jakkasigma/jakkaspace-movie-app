@@ -3,6 +3,10 @@
 @section('title', 'Plus — Jakka Space')
 @section('body-class', 'movie-page')
 
+@push('head')
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
+@endpush
+
 @section('body')
     <x-movie.navbar />
 
@@ -117,7 +121,7 @@
                                         <li>Riwayat analytics selamanya</li>
                                     @endif
                                 </ul>
-                                <button type="button" class="plus-plan-btn @if($plan->is_recommended)plus-plan-btn-primary @endif" onclick="showPayment({{ $plan->id }})">{{ $user->isPlus() || $user->isPlusPlus() ? 'Perpanjang' : 'Langganan' }}</button>
+                                <button type="button" class="plus-plan-btn @if($plan->is_recommended)plus-plan-btn-primary @endif" data-plan-id="{{ $plan->id }}" data-price="{{ $plan->price }}" onclick="showPayment({{ $plan->id }})">{{ $user->isPlus() || $user->isPlusPlus() ? 'Perpanjang' : 'Langganan' }}</button>
                             </div>
                         @endforeach
                     </div>
@@ -537,44 +541,33 @@
         {{-- Payment Modal --}}
         <div class="plus-modal-overlay" id="paymentModal" style="display:none" onclick="if(event.target===this)hidePayment()">
             <div class="plus-modal">
-                <h2 class="plus-modal-title">Pilih Metode Pembayaran</h2>
-                <form method="POST" action="{{ route('plus.subscribe') }}" id="paymentForm">
-                    @csrf
-                    <input type="hidden" name="plan_id" id="selectedPlan" value="">
-                    <input type="hidden" name="payment_method" id="selectedMethod" value="">
-                    <input type="hidden" name="promo_code" id="promoCodeInput" value="">
+                <h2 class="plus-modal-title">Konfirmasi Pembayaran</h2>
 
-                    <div class="plus-methods">
-                        <button type="button" class="plus-method" data-method="gopay" onclick="selectMethod(this, 'gopay')">
-                            <span class="plus-method-icon">💳</span>
-                            <span>GoPay</span>
-                        </button>
-                        <button type="button" class="plus-method" data-method="qris" onclick="selectMethod(this, 'qris')">
-                            <span class="plus-method-icon">📱</span>
-                            <span>QRIS</span>
-                        </button>
-                        <button type="button" class="plus-method" data-method="transfer_bank" onclick="selectMethod(this, 'transfer_bank')">
-                            <span class="plus-method-icon">🏦</span>
-                            <span>Transfer Bank</span>
-                        </button>
+                <div id="paymentSummary" style="margin-bottom:16px;padding:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;">
+                    <p style="font-size:0.78rem;color:var(--muted);margin:0 0 4px;">Paket dipilih</p>
+                    <p id="paymentPlanName" style="font-size:1rem;font-weight:600;color:#fff;margin:0;"></p>
+                    <p id="paymentTotal" style="font-size:1.6rem;font-family:'Bebas Neue',sans-serif;color:#a3e635;margin:8px 0 0;"></p>
+                </div>
+
+                {{-- Promo Section --}}
+                <div style="margin-bottom:16px;padding:12px;border:1px solid rgba(255,255,255,0.08);border-radius:8px;background:rgba(255,255,255,0.02);">
+                    <p style="font-size:0.78rem;color:var(--muted);margin:0 0 8px;font-weight:600;">Promo</p>
+                    <div style="display:flex;gap:8px;">
+                        <input type="text" id="promoCodeField" placeholder="Kode promo..." style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:8px 10px;color:#fff;font-size:0.82rem;outline:none;">
+                        <button type="button" id="applyPromoBtn" onclick="applyPromo()"
+                            style="background:var(--accent);color:#000;border:none;border-radius:6px;padding:8px 14px;font-size:0.78rem;font-weight:600;cursor:pointer;white-space:nowrap;">Pakai</button>
                     </div>
+                    <div id="promoResult" style="margin-top:8px;font-size:0.78rem;"></div>
+                </div>
 
-                    {{-- Promo Section --}}
-                    <div style="margin-top:16px;padding:12px;border:1px solid rgba(255,255,255,0.08);border-radius:8px;background:rgba(255,255,255,0.02);">
-                        <p style="font-size:0.78rem;color:var(--muted);margin:0 0 8px;font-weight:600;">Promo</p>
-                        <div style="display:flex;gap:8px;">
-                            <input type="text" id="promoCodeField" placeholder="Kode promo..." style="flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:8px 10px;color:#fff;font-size:0.82rem;outline:none;">
-                            <button type="button" id="applyPromoBtn" onclick="applyPromo()"
-                                style="background:var(--accent);color:#000;border:none;border-radius:6px;padding:8px 14px;font-size:0.78rem;font-weight:600;cursor:pointer;white-space:nowrap;">Pakai</button>
-                        </div>
-                        <div id="promoResult" style="margin-top:8px;font-size:0.78rem;"></div>
-                    </div>
+                <p style="font-size:0.72rem;color:var(--text-muted);margin-bottom:16px;">Pembayaran diproses via Midtrans (GoPay, QRIS, Transfer Bank, Virtual Account, dll).</p>
 
-                    <button type="submit" class="plus-modal-submit" id="payBtn" disabled>Bayar</button>
-                    <button type="button" class="plus-modal-cancel" onclick="hidePayment()">Batal</button>
-                </form>
+                <button type="button" class="plus-modal-submit" id="payBtn" onclick="processPayment()">Bayar</button>
+                <button type="button" class="plus-modal-cancel" onclick="hidePayment()">Batal</button>
             </div>
         </div>
+
+        <input type="hidden" id="selectedPlan" value="">
     </main>
 
     <style>
@@ -620,28 +613,77 @@
     </style>
     <script>
         let currentPlanId = null;
+        let planData = {};
 
         function showPayment(planId) {
             currentPlanId = planId;
             document.getElementById('selectedPlan').value = planId;
             document.getElementById('promoCodeField').value = '';
             document.getElementById('promoResult').innerHTML = '';
-            document.getElementById('promoCodeInput').value = '';
             document.getElementById('paymentModal').style.display = 'flex';
+
+            // Show plan info in modal
+            const card = document.querySelector(`[data-plan-id="${planId}"]`);
+            if (card) {
+                const name = card.querySelector('.plus-plan-name')?.textContent || 'Paket';
+                const price = card.dataset.price || '0';
+                document.getElementById('paymentPlanName').textContent = name;
+                document.getElementById('paymentTotal').textContent = 'Rp ' + parseInt(price).toLocaleString('id-ID');
+            }
         }
+
         function hidePayment() {
             document.getElementById('paymentModal').style.display = 'none';
-            document.querySelectorAll('.plus-method').forEach(m => m.classList.remove('plus-method-active'));
-            document.getElementById('selectedMethod').value = '';
-            document.getElementById('payBtn').disabled = true;
             currentPlanId = null;
         }
-        function selectMethod(el, method) {
-            document.querySelectorAll('.plus-method').forEach(m => m.classList.remove('plus-method-active'));
-            el.classList.add('plus-method-active');
-            document.getElementById('selectedMethod').value = method;
-            document.getElementById('payBtn').disabled = false;
+
+        function processPayment() {
+            const btn = document.getElementById('payBtn');
+            btn.disabled = true;
+            btn.textContent = 'Memproses...';
+
+            fetch('{{ route('plus.subscribe') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    plan_id: currentPlanId
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.snap_token) {
+                    hidePayment();
+                    snap.pay(data.snap_token, {
+                        onSuccess: function(result) {
+                            window.location.href = '{{ route('plus.finish') }}?order_id=' + result.order_id + '&transaction_status=success';
+                        },
+                        onPending: function(result) {
+                            window.location.href = '{{ route('plus.finish') }}?order_id=' + result.order_id + '&transaction_status=pending';
+                        },
+                        onError: function(result) {
+                            window.location.href = '{{ route('plus.finish') }}?order_id=' + result.order_id + '&transaction_status=error';
+                        },
+                        onClose: function() {
+                            btn.disabled = false;
+                            btn.textContent = 'Bayar';
+                        }
+                    });
+                } else {
+                    alert(data.error || 'Gagal memproses pembayaran.');
+                    btn.disabled = false;
+                    btn.textContent = 'Bayar';
+                }
+            })
+            .catch(() => {
+                alert('Terjadi kesalahan. Silakan coba lagi.');
+                btn.disabled = false;
+                btn.textContent = 'Bayar';
+            });
         }
+
         function applyPromo() {
             const code = document.getElementById('promoCodeField').value.trim();
             const resultDiv = document.getElementById('promoResult');
@@ -667,7 +709,6 @@
             .then(r => r.json())
             .then(data => {
                 if (data.valid) {
-                    document.getElementById('promoCodeInput').value = code;
                     resultDiv.innerHTML = `
                         <div style="color:#4caf50;font-size:0.82rem;">
                             Diskon: ${data.discount_label} → -Rp${(data.original_price - data.discounted_price).toLocaleString('id-ID')}
@@ -677,7 +718,6 @@
                         </div>
                     `;
                 } else {
-                    document.getElementById('promoCodeInput').value = '';
                     resultDiv.innerHTML = `<span style="color:#ef4444;font-size:0.82rem;">${data.error}</span>`;
                 }
             })

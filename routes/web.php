@@ -11,6 +11,7 @@ use App\Http\Controllers\InboxController;
 use App\Http\Controllers\ListChatController;
 use App\Http\Controllers\ListMemberController;
 use App\Http\Controllers\ListMovieController;
+use App\Http\Controllers\MidtransController;
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\MovieListController;
 use App\Http\Controllers\NotificationController;
@@ -27,6 +28,7 @@ use App\Http\Controllers\SpaceController;
 use App\Http\Controllers\TimelineController;
 use App\Http\Controllers\WatchHistoryController;
 use App\Http\Controllers\WatchlistController;
+use App\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -45,6 +47,11 @@ Route::get('/lists/{list}', [MovieListController::class, 'show'])->name('lists.s
 
 // Public review page
 Route::get('/reviews/{review}', [ReviewPageController::class, 'show'])->name('reviews.show');
+
+// Midtrans webhook — public, tanpa CSRF
+Route::post('/payment/notification', [MidtransController::class, 'notification'])
+    ->withoutMiddleware([VerifyCsrfToken::class])
+    ->name('payment.notification');
 
 // Public profiles
 Route::get('/@{username}', [ProfileController::class, 'show'])->name('profile.show');
@@ -164,6 +171,7 @@ Route::middleware('auth')->group(function () {
     // Plus subscription
     Route::get('/plus', [PremiumController::class, 'index'])->name('plus');
     Route::post('/plus/subscribe', [PremiumController::class, 'subscribe'])->name('plus.subscribe');
+    Route::any('/plus/finish', [MidtransController::class, 'finish'])->name('plus.finish');
     Route::get('/plus/simulate', [PremiumController::class, 'simulatePayment'])->name('plus.simulate');
     Route::put('/plus/theme', [PremiumController::class, 'updateTheme'])->name('plus.theme');
     Route::post('/plus/redeem', [RedeemCodeController::class, 'redeem'])->name('plus.redeem');
