@@ -9048,6 +9048,10 @@ body.list-chat-room {
 }
 
 /* Avatar premium border */
+.avatar-fallback-hidden {
+    display: none !important;
+}
+
 .avatar-premium-wrap {
     padding: 3px;
     background: var(--avatar-border);
