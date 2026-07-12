@@ -50,6 +50,23 @@
                     @include('profile.partials.linked-accounts-form')
                 </section>
 
+                {{-- Android App --}}
+                @if (str_contains(request()->userAgent(), 'Android'))
+                    <section class="settings-section">
+                        <header class="settings-section-header">
+                            <h2 class="settings-section-title">📱 Aplikasi Android</h2>
+                            <p class="settings-section-desc">Pasang Jakka Space sebagai aplikasi Android. Download sekali, update konten otomatis.</p>
+                        </header>
+
+                        <div class="settings-app-download">
+                            <a href="{{ asset('apk/jakkaspace.apk') }}" class="form-submit" download>
+                                📥 Download APK (4.5 MB)
+                            </a>
+                            <p class="form-hint" style="margin-top:10px;">Aktifkan "Install dari sumber tidak dikenal" di pengaturan HP sebelum install.</p>
+                        </div>
+                    </section>
+                @endif
+
                 {{-- Delete Account --}}
                 <section class="settings-section settings-section-danger">
                     <header class="settings-section-header">

@@ -1,0 +1,12 @@
+{
+  "appId": "com.jakkaspace.app",
+  "appName": "Jakka Space",
+  "webDir": "public",
+  "server": {
+    "url": "https://domainkamu.com",
+    "allowNavigation": ["domainkamu.com"]
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}
