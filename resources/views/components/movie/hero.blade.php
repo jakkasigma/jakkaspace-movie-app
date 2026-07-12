@@ -36,7 +36,6 @@
         <p class="hero-desc">{{ $movie['overview'] }}</p>
 
         <div class="hero-actions">
-            <a href="{{ route('movies.show', $movie['id'], false) }}" class="btn-rent">Play</a>
             <a href="{{ route('movies.show', $movie['id'], false) }}" class="btn-info">Info Film</a>
         </div>
     </div>
