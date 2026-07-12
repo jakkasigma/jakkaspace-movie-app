@@ -1266,7 +1266,7 @@ body.has-hero .movies-page-content {
     }
 
     .movie-page.is-home .hero-content {
-        padding: 0 5vw max(38px, env(safe-area-inset-bottom));
+        padding: 0 5vw max(4rem, env(safe-area-inset-bottom));
     }
 
     .movie-page.is-home .hero-badge {
@@ -7561,6 +7561,14 @@ a.notif-actor:hover {
         padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px));
     }
 
+    .inbox-page {
+        padding-top: 60px;
+    }
+
+    .inbox-body {
+        padding-bottom: 0;
+    }
+
     .bottom-nav {
         position: fixed;
         bottom: 0;
@@ -7665,6 +7673,11 @@ body.inbox-chat-room #footer,
 body.list-chat-room #navbar,
 body.list-chat-room #footer {
     display: none;
+}
+
+body.inbox-chat-room,
+body.list-chat-room {
+    padding-bottom: 0 !important;
 }
 
 /* --- Inbox page (index) ------------------------------------ */
