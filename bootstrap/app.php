@@ -25,6 +25,9 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->appendToGroup('web', CheckBanned::class);
         $middleware->redirectUsersTo('/your-space');
+        $middleware->validateCsrfTokens(except: [
+            '/payment/notification',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
