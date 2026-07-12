@@ -90,6 +90,51 @@ cp app/build/outputs/apk/debug/app-debug.apk ../../public/apk/jakkaspace.apk
 
 Atau jika hanya perubahan Blade / backend — cukup **deploy web** saja. APK tetap loading URL terbaru.
 
+## PWA (Progressive Web App) — Alternatif iOS/Windows/macOS
+
+PWA bekerja tanpa Play Store / App Store. Cukup buka dari browser → "Add to Home Screen" / "Install".
+
+### File PWA
+
+| File | Fungsi |
+|---|---|
+| `public/manifest.json` | Konfigurasi nama, icon, `display: standalone`, `theme_color` |
+| `public/icons/icon-192.png` | Ikon 192x192 — copy dari `public/assets/logo.png` |
+| `public/icons/icon-512.png` | Ikon 512x512 — copy dari `public/assets/logo.png` |
+| `public/sw.js` | Service Worker — cache CSS/font/logo |
+
+### Meta Tags
+
+Di `resources/views/layouts/movie.blade.php` `<head>` tambah:
+
+```html
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#050505">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+```
+
+### Register Service Worker
+
+Di `resources/js/app.js` atau inline:
+
+```js
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+}
+```
+
+### Settings Page — Multi-Platform
+
+Di `resources/views/profile/edit.blade.php`:
+
+| Platform | Yang Muncul |
+|---|---|
+| Android Chrome | Tombol Download APK (`.apk`) |
+| iPhone/iPad Safari | Panduan "Add to Home Screen" |
+| Windows Chrome/Edge | Info install PWA |
+| macOS Chrome/Safari | Info install PWA |
+
 ## Catatan
 
 - APK debug bisa langsung diinstall di HP (aktifkan "Install dari sumber tidak dikenal")

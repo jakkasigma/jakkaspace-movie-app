@@ -50,8 +50,10 @@
                     @include('profile.partials.linked-accounts-form')
                 </section>
 
-                {{-- Android App --}}
-                @if (str_contains(request()->userAgent(), 'Android'))
+                {{-- Aplikasi — Android (APK) / iOS/Windows (PWA) --}}
+                @php $ua = request()->userAgent(); @endphp
+
+                @if (str_contains($ua, 'Android'))
                     <section class="settings-section">
                         <header class="settings-section-header">
                             <h2 class="settings-section-title">📱 Aplikasi Android</h2>
@@ -63,6 +65,38 @@
                                 📥 Download APK (4.5 MB)
                             </a>
                             <p class="form-hint" style="margin-top:10px;">Aktifkan "Install dari sumber tidak dikenal" di pengaturan HP sebelum install.</p>
+                        </div>
+                    </section>
+                @elseif (preg_match('/iPhone|iPad|iPod/', $ua))
+                    <section class="settings-section">
+                        <header class="settings-section-header">
+                            <h2 class="settings-section-title">📱 Pasang Aplikasi</h2>
+                            <p class="settings-section-desc">Jakka Space bisa dipasang di layar utama iPhone/iPad-mu.</p>
+                        </header>
+
+                        <div class="settings-app-download">
+                            <ol style="text-align:left;color:rgba(255,255,255,0.7);font-size:0.85rem;margin:0 0 12px;padding-left:20px;line-height:2;">
+                                <li>Tap tombol <strong>Share</strong> (kotak + panah atas)</li>
+                                <li>Scroll ke bawah, tap <strong>Add to Home Screen</strong></li>
+                                <li>Tap <strong>Add</strong> di pojok kanan atas</li>
+                            </ol>
+                            <p class="form-hint">Aplikasi akan muncul di layar utama seperti app native.</p>
+                        </div>
+                    </section>
+                @elseif (str_contains($ua, 'Windows') || str_contains($ua, 'Mac') || str_contains($ua, 'Linux'))
+                    <section class="settings-section">
+                        <header class="settings-section-header">
+                            <h2 class="settings-section-title">🖥️ Pasang Aplikasi</h2>
+                            <p class="settings-section-desc">Jakka Space bisa dipasang sebagai PWA di desktop.</p>
+                        </header>
+
+                        <div class="settings-app-download">
+                            <ol style="text-align:left;color:rgba(255,255,255,0.7);font-size:0.85rem;margin:0 0 12px;padding-left:20px;line-height:2;">
+                                <li>Klik ikon <strong>Install</strong> di address bar <span style="font-size:1.2rem;">⊕</span></li>
+                                <li>Atau buka menu ⋮ → <strong>Cast, save, and share</strong> → <strong>Install page as app</strong></li>
+                                <li>Klik <strong>Install</strong></li>
+                            </ol>
+                            <p class="form-hint">Aplikasi akan muncul di taskbar/dock seperti app native.</p>
                         </div>
                     </section>
                 @endif

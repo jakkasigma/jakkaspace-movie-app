@@ -6,6 +6,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/png" href="/assets/logo.png">
     <link rel="apple-touch-icon" href="/assets/logo.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#050505">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>@yield('title', 'Jakka Space')</title>
     <meta name="description" content="@yield('description', 'Jakka Space — personal movie diary dan platform film.')">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -57,6 +61,11 @@
     <link rel="preload" href="/css/intro.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="/css/intro.css"></noscript>
     @stack('head')
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+        }
+    </script>
 </head>
 <body class="@yield('body-class')">
     @yield('body')
