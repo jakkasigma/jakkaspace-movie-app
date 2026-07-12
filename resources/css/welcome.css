@@ -630,7 +630,7 @@ body.has-hero .movies-page-content {
     color: #7a7a7a;
     font-size: 10px;
     letter-spacing: 0;
-    padding: 50px 4vw;
+    padding: 24px 4vw;
     text-transform: uppercase;
 }
 
@@ -7671,6 +7671,7 @@ body.list-chat-room #footer {
 
 body.inbox-chat-room,
 body.list-chat-room {
+    min-height: 100dvh;
     padding-bottom: 0 !important;
 }
 
@@ -7797,6 +7798,137 @@ body.list-chat-room {
 
 .inbox-conv-item:hover {
     background: rgba(255, 255, 255, 0.03);
+}
+
+/* --- List Members --- */
+.list-members-heading {
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.list-member-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--panel-border);
+    transition: background 0.18s ease;
+}
+
+.list-member-row:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.list-member-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.list-member-name {
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.list-member-name a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.list-member-name a:hover {
+    color: #a3e635;
+}
+
+.list-member-meta {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 2px;
+}
+
+.list-member-actions {
+    display: flex;
+    gap: 6px;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+}
+
+.list-member-row:hover .list-member-actions {
+    opacity: 1;
+}
+
+.list-member-btn {
+    border: none;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.list-member-btn-approve {
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+}
+
+.list-member-btn-reject {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+.list-member-btn-action {
+    background: rgba(255, 255, 255, 0.06);
+    border: none;
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+}
+
+.list-member-btn-action:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.list-member-btn-kick {
+    background: rgba(239, 68, 68, 0.1);
+    border: none;
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+}
+
+.list-member-btn-kick:hover {
+    background: rgba(239, 68, 68, 0.25);
+}
+
+.list-member-invite-btn {
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.list-member-invite-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .inbox-avatar-img {
@@ -8919,6 +9051,14 @@ body.list-chat-room {
     position: relative;
     z-index: 1;
     color: rgba(0, 0, 0, 0.55);
+}
+.inbox-msg-premium .inbox-msg-sender {
+    position: relative;
+    z-index: 1;
+    background: rgba(12, 12, 12, 0.6);
+    margin: -10px -16px 0;
+    padding: 8px 16px 2px;
+    border-radius: 18px 18px 0 0;
 }
 .inbox-msg--mine .inbox-msg-premium .inbox-msg-text {
     background: rgba(12, 12, 12, 0.82) !important;

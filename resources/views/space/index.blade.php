@@ -181,12 +181,6 @@
         </div>
     </main>
 
-    <footer id="footer">
-        <div>&copy; 2026 JAKKA SPACE</div>
-        <div id="clock">YOGYAKARTA - 00:00</div>
-        <div>STAY CURIOUS / STAY WATCHING</div>
-    </footer>
-
     {{-- Promo Popup --}}
     @if (! empty($promoPopup))
         <div id="spacePromoPopup" class="plus-modal-overlay active" onclick="if(event.target===this)this.classList.remove('active')">

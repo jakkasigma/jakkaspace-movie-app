@@ -72,5 +72,10 @@
     @unless(request()->is('login', 'register', 'forgot-password', 'reset-password', 'verify-email', 'confirm-password', 'inbox/*', 'lists/*'))
         <x-bottom-nav />
     @endunless
+
+    <footer id="footer">
+        <div>&copy; 2026 JAKKA SPACE</div>
+        <div>STAY CURIOUS / STAY WATCHING</div>
+    </footer>
 </body>
 </html>
