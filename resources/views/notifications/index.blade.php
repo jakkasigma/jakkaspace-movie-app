@@ -124,7 +124,7 @@
                                 </p>
                                 <span class="notif-time">{{ $notif->created_at->diffForHumans() }}</span>
 
-                                @if ($data['type'] === 'list_invitation' && ! empty($data['list_id']))
+                                @if ($data['type'] === 'list_invitation' && ! empty($data['list_id']) && $isUnread)
                                     <div style="display: flex; gap: 8px; margin-top: 8px;">
                                         <form method="POST" action="{{ route('lists.invitations.accept', $data['list_id']) }}" style="display:inline">
                                             @csrf

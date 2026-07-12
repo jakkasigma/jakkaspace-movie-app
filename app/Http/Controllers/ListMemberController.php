@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MovieList;
 use App\Models\User;
+use App\Notifications\ListInvitation;
 use App\Services\User\MovieListService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -130,6 +131,8 @@ class ListMemberController extends Controller
     {
         $this->listService->acceptInvitation($list, $request->user());
 
+        $this->markListInvitationRead($request, $list);
+
         return redirect()->route('lists.show', $list)->with('success', 'Kamu bergabung ke list.');
     }
 
@@ -137,6 +140,17 @@ class ListMemberController extends Controller
     {
         $this->listService->declineInvitation($list, $request->user());
 
-        return redirect()->back()->with('success', 'Undangan ditolak.');
+        $this->markListInvitationRead($request, $list);
+
+        return redirect()->route('notifications')->with('success', 'Undangan ditolak.');
+    }
+
+    private function markListInvitationRead(Request $request, MovieList $list): void
+    {
+        $request->user()->notifications()
+            ->where('type', ListInvitation::class)
+            ->where('data->list_id', $list->id)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
     }
 }
