@@ -54,11 +54,18 @@
                     <div class="inbox-msg {{ $isMine ? 'inbox-msg--mine' : 'inbox-msg--theirs' }}">
                         @if (! $isMine)
                             <div class="inbox-msg-avatar">
+                                @php $avatarPremium = $message->sender?->isPlus() && $message->sender->theme; @endphp
+                                @if ($avatarPremium)
+                                    <div class="inbox-mini-premium" style="--avatar-border: {{ $message->sender->theme->avatar_border_css }}">
+                                @endif
                                 @if ($message->sender?->avatar_url)
                                     <img src="{{ $message->sender->avatar_url }}" alt="{{ $message->sender->name }}" class="inbox-mini-avatar" onerror="this.onerror=null;this.style.display='none'">
                                 @else
                                     <div class="inbox-mini-avatar inbox-avatar-placeholder">
                                         {{ strtoupper(substr($message->sender?->name ?? '?', 0, 1)) }}
+                                    </div>
+                                @endif
+                                @if ($avatarPremium)
                                     </div>
                                 @endif
                             </div>

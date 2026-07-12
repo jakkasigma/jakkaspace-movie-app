@@ -8286,6 +8286,32 @@ body.list-chat-room {
     object-fit: cover;
 }
 
+.inbox-mini-premium {
+    padding: 2px;
+    background: var(--avatar-border);
+    border-radius: 50%;
+    display: inline-flex;
+}
+
+.inbox-mini-premium .inbox-mini-avatar {
+    border: 1.5px solid #000;
+    width: 24px;
+    height: 24px;
+}
+
+.inbox-mini-premium .inbox-avatar-placeholder {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1.5px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.6rem;
+}
+
 .inbox-msg-bubble {
     display: flex;
     flex-direction: column;

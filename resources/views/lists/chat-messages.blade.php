@@ -37,17 +37,24 @@
                 </div>
             @else
                 <div class="inbox-msg {{ $isMine ? 'inbox-msg--mine' : 'inbox-msg--theirs' }}">
-                    @if (! $isMine)
-                        <div class="inbox-msg-avatar">
-                            @if ($msg->user?->avatar_url)
-                                <img src="{{ $msg->user->avatar_url }}" alt="" class="inbox-mini-avatar" onerror="this.onerror=null;this.style.display='none'">
-                            @else
-                                <div class="inbox-mini-avatar inbox-avatar-placeholder">
-                                    {{ strtoupper(substr($msg->user?->name ?? '?', 0, 1)) }}
-                                </div>
-                            @endif
-                        </div>
-                    @endif
+                        @if (! $isMine)
+                            <div class="inbox-msg-avatar">
+                                @php $avatarPremium = $msg->user?->isPlus() && $msg->user->theme; @endphp
+                                @if ($avatarPremium)
+                                    <div class="inbox-mini-premium" style="--avatar-border: {{ $msg->user->theme->avatar_border_css }}">
+                                @endif
+                                @if ($msg->user?->avatar_url)
+                                    <img src="{{ $msg->user->avatar_url }}" alt="" class="inbox-mini-avatar" onerror="this.onerror=null;this.style.display='none'">
+                                @else
+                                    <div class="inbox-mini-avatar inbox-avatar-placeholder">
+                                        {{ strtoupper(substr($msg->user?->name ?? '?', 0, 1)) }}
+                                    </div>
+                                @endif
+                                @if ($avatarPremium)
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
                     <div class="inbox-msg-bubble {{ ($msg->user?->isPlus() && $msg->user->theme) ? 'inbox-msg-premium' : '' }}"
                          @if ($msg->user?->isPlus() && $msg->user->theme) style="--accent-color: {{ $msg->user->theme->accent_color }};" @endif>
                         @if (! $isMine)
