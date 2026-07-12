@@ -50,21 +50,23 @@
                     @include('profile.partials.linked-accounts-form')
                 </section>
 
-                {{-- Aplikasi — Android (APK) / iOS/Windows (PWA) --}}
+                {{-- Aplikasi (PWA) — semua platform --}}
                 @php $ua = request()->userAgent(); @endphp
 
                 @if (str_contains($ua, 'Android'))
                     <section class="settings-section">
                         <header class="settings-section-header">
-                            <h2 class="settings-section-title">📱 Aplikasi Android</h2>
-                            <p class="settings-section-desc">Pasang Jakka Space sebagai aplikasi Android. Download sekali, update konten otomatis.</p>
+                            <h2 class="settings-section-title">📱 Pasang Aplikasi</h2>
+                            <p class="settings-section-desc">Pasang Jakka Space di layar utama Android-mu. Update konten otomatis.</p>
                         </header>
 
                         <div class="settings-app-download">
-                            <a href="{{ asset('apk/jakkaspace.apk') }}" class="form-submit" download>
-                                📥 Download APK (4.5 MB)
-                            </a>
-                            <p class="form-hint" style="margin-top:10px;">Aktifkan "Install dari sumber tidak dikenal" di pengaturan HP sebelum install.</p>
+                            <ol style="text-align:left;color:rgba(255,255,255,0.7);font-size:0.85rem;margin:0 0 12px;padding-left:20px;line-height:2;">
+                                <li>Buka menu Chrome ⋮ <strong>(titik tiga)</strong></li>
+                                <li>Tap <strong>Add to Home Screen</strong></li>
+                                <li>Tap <strong>Add</strong></li>
+                            </ol>
+                            <p class="form-hint">Aplikasi akan muncul di layar utama seperti app native, tanpa URL bar.</p>
                         </div>
                     </section>
                 @elseif (preg_match('/iPhone|iPad|iPod/', $ua))
@@ -83,7 +85,7 @@
                             <p class="form-hint">Aplikasi akan muncul di layar utama seperti app native.</p>
                         </div>
                     </section>
-                @elseif (str_contains($ua, 'Windows') || str_contains($ua, 'Mac') || str_contains($ua, 'Linux'))
+                @else
                     <section class="settings-section">
                         <header class="settings-section-header">
                             <h2 class="settings-section-title">🖥️ Pasang Aplikasi</h2>

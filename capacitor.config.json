@@ -1,8 +1,0 @@
-{
-  "appId": "com.jakkaspace.app",
-  "appName": "Jakka Space",
-  "webDir": "public",
-  "android": {
-    "allowMixedContent": true
-  }
-}
