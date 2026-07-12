@@ -446,6 +446,14 @@ body.has-hero .movies-page-content {
 
 /* Home desktop — section film full-width (edge-to-edge kanan) */
 @media (min-width: 769px) {
+    .movie-page.is-home #hero {
+        min-height: 100vh;
+    }
+
+    .movie-page.is-home .hero-content {
+        max-width: none;
+    }
+
     .movie-page.is-home .movie-section,
     .movie-page.is-home .discover-personal-section {
         padding-right: 0;
