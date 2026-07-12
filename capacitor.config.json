@@ -3,8 +3,8 @@
   "appName": "Jakka Space",
   "webDir": "public",
   "server": {
-    "url": "https://domainkamu.com",
-    "allowNavigation": ["domainkamu.com"]
+    "url": "https://jakkaspace-movie-app-production.up.railway.app",
+    "allowNavigation": ["jakkaspace-movie-app-production.up.railway.app"]
   },
   "android": {
     "allowMixedContent": true

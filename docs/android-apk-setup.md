@@ -39,8 +39,8 @@ Buat/ubah `capacitor.config.json`:
   "appId": "com.jakkaspace.app",
   "appName": "Jakka Space",
   "server": {
-    "url": "https://domainkamu.com",
-    "allowNavigation": ["domainkamu.com"]
+    "url": "https://jakkaspace-movie-app-production.up.railway.app",
+    "allowNavigation": ["jakkaspace-movie-app-production.up.railway.app"]
   },
   "android": {
     "allowMixedContent": true
