@@ -4291,12 +4291,22 @@ body.nav-panel-open::after {
     scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
 }
 
+.space-body .list-chat-messages {
+    padding-left: 0;
+    padding-right: 0;
+}
+
 .list-chat-input-wrap {
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     background: rgba(5, 5, 5, 0.96);
     backdrop-filter: blur(16px);
     padding: 10px 4vw calc(10px + env(safe-area-inset-bottom, 0px)) 4vw;
     flex-shrink: 0;
+}
+
+.space-body .list-chat-input-wrap {
+    padding-left: 0;
+    padding-right: 0;
 }
 
 .inbox-msg-sender {
@@ -4333,8 +4343,18 @@ body.nav-panel-open::after {
         padding: 8px 3vw;
     }
 
+    .space-body .list-chat-messages {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
     .list-chat-input-wrap {
         padding: 8px 3vw calc(8px + env(safe-area-inset-bottom, 0px)) 3vw;
+    }
+
+    .space-body .list-chat-input-wrap {
+        padding-left: 0;
+        padding-right: 0;
     }
 }
 
