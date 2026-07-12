@@ -8277,7 +8277,7 @@ body.list-chat-room {
 }
 
 .inbox-msg--theirs .inbox-msg-text {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.12);
     border-bottom-left-radius: 4px;
     color: #fff;
 }

@@ -7,7 +7,6 @@ use App\Services\MidtransService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 
 class MidtransController extends Controller
 {
@@ -57,7 +56,7 @@ class MidtransController extends Controller
         }
     }
 
-    public function finish(Request $request): View|RedirectResponse
+    public function finish(Request $request): RedirectResponse
     {
         $orderId = $request->query('order_id');
         $transactionStatus = $request->query('transaction_status');
@@ -65,29 +64,36 @@ class MidtransController extends Controller
             ? SubscriptionTransaction::find((int) str_replace('PLUS-', '', $orderId))
             : null;
 
+        // Sukses — aktivasi langsung + redirect ke /plus dengan modal
+        if ($transaction && $transaction->status !== 'paid' && in_array($transactionStatus, ['success', 'settlement', 'capture'])) {
+            $this->activateTransaction($transaction, $transaction->payment_method ?? 'midtrans');
+            $transaction->refresh();
+
+            $result = [
+                'tier' => $transaction->tier,
+                'plan_name' => $transaction->plan?->name ?? '',
+                'action' => $transaction->action,
+                'total_days' => $transaction->period_days,
+                'expires_at' => $transaction->user->expires_at?->format('d M Y'),
+            ];
+
+            return redirect()->route('plus')->with('subscription_result', $result);
+        }
+
+        // Udah aktif — langsung redirect
         if ($transaction && $transaction->status === 'paid') {
-            return view('premium.finish', [
-                'status' => 'success',
-                'transaction' => $transaction,
-                'message' => 'Pembayaran berhasil! Subscription kamu sudah aktif.',
-            ]);
+            return redirect()->route('plus');
         }
 
+        // Pending
         if ($transactionStatus === 'pending') {
-            return view('premium.finish', [
-                'status' => 'pending',
-                'transaction' => $transaction,
-                'message' => 'Pembayaran sedang diproses. Cek status pembayaran di halaman riwayat.',
-            ]);
+            return redirect()->route('plus.history')->with('info', 'Pembayaran sedang diproses. Cek status di riwayat.');
         }
 
-        return view('premium.finish', [
-            'status' => 'error',
-            'transaction' => $transaction,
-            'message' => $transaction
-                ? 'Pembayaran gagal. Silakan coba lagi.'
-                : 'Transaksi tidak ditemukan.',
-        ]);
+        // Error / not found
+        return redirect()->route('plus')->with('error', $transaction
+            ? 'Pembayaran gagal. Silakan coba lagi.'
+            : 'Transaksi tidak ditemukan.');
     }
 
     private function activateTransaction(SubscriptionTransaction $transaction, string $paymentType): void
