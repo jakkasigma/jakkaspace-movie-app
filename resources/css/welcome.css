@@ -303,6 +303,27 @@ body::before {
     transform: translateY(-2px);
 }
 
+/* Hero responsive — desktop lebih lebar */
+@media (min-width: 1025px) and (max-width: 1440px) {
+    .hero-content {
+        max-width: 960px;
+    }
+
+    .hero-desc {
+        max-width: 620px;
+    }
+}
+
+@media (min-width: 1441px) {
+    .hero-content {
+        max-width: 1200px;
+    }
+
+    .hero-desc {
+        max-width: 700px;
+    }
+}
+
 .movies-page-content {
     min-height: 100vh;
     padding-top: 92px;
