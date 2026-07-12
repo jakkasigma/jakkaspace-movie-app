@@ -656,19 +656,24 @@
             .then(data => {
                 if (data.snap_token) {
                     hidePayment();
+                    let paid = false;
                     snap.pay(data.snap_token, {
                         onSuccess: function(result) {
-                            window.location.href = '{{ route('plus.finish') }}?order_id=' + result.order_id + '&transaction_status=success';
+                            paid = true;
+                            window.location.replace('{{ route('plus.finish') }}?order_id=' + result.order_id + '&transaction_status=settlement');
                         },
                         onPending: function(result) {
-                            window.location.href = '{{ route('plus.finish') }}?order_id=' + result.order_id + '&transaction_status=pending';
+                            window.location.replace('{{ route('plus.finish') }}?order_id=' + result.order_id + '&transaction_status=pending');
                         },
                         onError: function(result) {
-                            window.location.href = '{{ route('plus.finish') }}?order_id=' + result.order_id + '&transaction_status=error';
+                            paid = true;
+                            window.location.replace('{{ route('plus.finish') }}?order_id=' + result.order_id + '&transaction_status=error');
                         },
                         onClose: function() {
-                            btn.disabled = false;
-                            btn.textContent = 'Bayar';
+                            if (!paid) {
+                                btn.disabled = false;
+                                btn.textContent = 'Bayar';
+                            }
                         }
                     });
                 } else {
