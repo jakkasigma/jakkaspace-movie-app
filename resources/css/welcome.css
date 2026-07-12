@@ -444,6 +444,23 @@ body.has-hero .movies-page-content {
     scroll-snap-align: start;
 }
 
+/* Home desktop — section film full-width (edge-to-edge kanan) */
+@media (min-width: 769px) {
+    .movie-page.is-home .movie-section,
+    .movie-page.is-home .discover-personal-section {
+        padding-right: 0;
+    }
+
+    .movie-page.is-home .section-header {
+        padding-right: 4vw;
+    }
+
+    .movie-page.is-home .movie-row {
+        margin-right: -4vw;
+        padding-right: 4vw;
+    }
+}
+
 .movie-card-sm {
     position: relative;
     display: block;
@@ -2305,11 +2322,6 @@ body.has-hero .movies-page-content {
     border-bottom: 1px solid var(--panel-border);
     background: rgba(0, 0, 0, 0.82);
     scrollbar-width: none;
-    position: sticky;
-    top: 92px;
-    z-index: 10;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
 }
 
 @supports not (backdrop-filter: blur(12px)) {
