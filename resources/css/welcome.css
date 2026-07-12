@@ -7835,8 +7835,8 @@ body.list-chat-room {
 .list-member-row {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 10px 0;
+    gap: 10px;
+    padding: 6px 0;
     border-bottom: 1px solid var(--panel-border);
     transition: background 0.18s ease;
 }
@@ -7851,7 +7851,7 @@ body.list-chat-room {
 }
 
 .list-member-name {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 500;
 }
 
@@ -7865,7 +7865,7 @@ body.list-chat-room {
 }
 
 .list-member-meta {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     margin-top: 1px;
 }
 
@@ -7901,8 +7901,8 @@ body.list-chat-room {
 .list-member-btn {
     border: none;
     border-radius: 6px;
-    padding: 5px 12px;
-    font-size: 0.75rem;
+    padding: 4px 10px;
+    font-size: 0.7rem;
     font-weight: 600;
     cursor: pointer;
 }
@@ -7921,10 +7921,10 @@ body.list-chat-room {
     background: rgba(255, 255, 255, 0.06);
     border: none;
     border-radius: 6px;
-    width: 30px;
-    height: 30px;
+    width: 26px;
+    height: 26px;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -7939,10 +7939,10 @@ body.list-chat-room {
     background: rgba(239, 68, 68, 0.1);
     border: none;
     border-radius: 6px;
-    width: 30px;
-    height: 30px;
+    width: 26px;
+    height: 26px;
     cursor: pointer;
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -7955,13 +7955,13 @@ body.list-chat-room {
 
 .list-member-invite-btn {
     width: 100%;
-    padding: 10px;
+    padding: 8px;
     text-align: center;
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 8px;
     color: #fff;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.2s;

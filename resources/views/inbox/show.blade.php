@@ -64,7 +64,7 @@
                             </div>
                         @endif
 
-                        <div class="inbox-msg-bubble {{ $message->sender?->isPlus() ? 'inbox-msg-premium' : '' }}" @if ($message->sender?->isPlus() && $message->sender->theme) style="--avatar-border: {{ $message->sender->theme->avatar_border_css }}; --accent-color: {{ $message->sender->theme->accent_color }};" @endif>
+                        <div class="inbox-msg-bubble {{ ($message->sender?->isPlus() && $message->sender->theme) ? 'inbox-msg-premium' : '' }}" @if ($message->sender?->isPlus() && $message->sender->theme) style="--accent-color: {{ $message->sender->theme->accent_color }};" @endif>
                             @if ($message->type === 'film_share' && $message->tmdb_id)
                                 @php $film = $movieCache[$message->tmdb_id] ?? null; @endphp
                                 <a href="{{ route('movies.show', $message->tmdb_id) }}" class="inbox-film-share">

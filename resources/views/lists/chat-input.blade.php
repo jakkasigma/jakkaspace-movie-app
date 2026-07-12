@@ -47,10 +47,10 @@
                         div.className = 'inbox-msg inbox-msg--activity';
                         div.innerHTML = '<div class="inbox-msg-bubble"><p class="inbox-msg-text">' + e.message + '</p></div>';
                     } else {
-                        const isPremium = e.user.is_plus;
+                        const isPremium = e.user.is_plus && e.user.theme;
                         const pClass = isPremium ? ' inbox-msg-premium' : '';
-                        const pStyle = isPremium && e.user.theme
-                            ? ' style="--avatar-border:' + e.user.theme.avatar_border_css + '; --accent-color:' + e.user.theme.accent_color + '"'
+                        const pStyle = isPremium
+                            ? ' style="--accent-color:' + e.user.theme.accent_color + '"'
                             : '';
 
                         div.className = 'inbox-msg inbox-msg--theirs';
