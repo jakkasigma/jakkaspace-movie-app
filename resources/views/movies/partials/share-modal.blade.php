@@ -10,11 +10,11 @@
 
         {{-- Movie info --}}
         <div class="share-movie-info">
-            @if ($movie['poster_url'])
-                <img src="{{ $movie['poster_url'] }}" alt="{{ $movie['title'] }}" class="share-movie-poster">
+            @if (($movie['poster_url'] ?? null))
+                <img src="{{ $movie['poster_url'] ?? '' }}" alt="{{ $movie['title'] ?? '' }}" class="share-movie-poster">
             @endif
             <div>
-                <p class="share-movie-title">{{ $movie['title'] }}</p>
+                <p class="share-movie-title">{{ $movie['title'] ?? '' }}</p>
                 @if ($movie['release_year'] ?? null)
                     <p class="share-movie-year">{{ $movie['release_year'] }}</p>
                 @endif
@@ -87,11 +87,11 @@
         {{-- Tab: Story & Simpan --}}
         <div class="share-tab-content" id="share-tab-story">
             <div class="story-share-preview">
-                @if ($movie['poster_url'])
-                    <img src="{{ $movie['poster_url'] }}" alt="" class="story-share-poster">
+                @if (($movie['poster_url'] ?? null))
+                    <img src="{{ $movie['poster_url'] ?? '' }}" alt="" class="story-share-poster">
                 @endif
                 <div class="story-share-actions">
-                    <p class="share-item-name">{{ $movie['title'] }}</p>
+                    <p class="share-item-name">{{ $movie['title'] ?? '' }}</p>
                     <button type="button" class="story-action-button story-action-primary" onclick="shareStoryTemplate()">Story Instagram</button>
                     <button type="button" class="story-action-button" onclick="downloadStoryTemplate()">Unduh PNG</button>
                     <button type="button" class="story-action-button" data-copy-link onclick="copyMovieLink()">Salin Tautan</button>
