@@ -20,7 +20,7 @@
                         @if (($movie['release_year'] ?? null))
                             <p class="share-template-year">{{ $movie['release_year'] }}</p>
                         @endif
-                        <p class="share-template-rating">★ {{ $movie['rating'] ?? '0.0' }} / 10</p>
+                        <p class="share-template-rating">★ {{ number_format((float) ($movie['rating'] ?? 0), 1) }} / 10</p>
                     </div>
                 </div>
                 <p class="share-template-watermark">FILM DIARY BY JAKKA SPACE</p>
@@ -138,7 +138,7 @@
         if (overlay) {
             overlay.classList.add('active');
             document.body.style.overflow = 'hidden';
-            showMainMenu();
+            window.showMainMenu();
         }
     };
 
@@ -150,29 +150,29 @@
         }
     };
 
-    function showMainMenu() {
+    window.showMainMenu = function() {
         document.querySelectorAll('.share-subview').forEach(v => v.classList.remove('active'));
-        document.getElementById('share-menu-main').classList.add('active');
-    }
+        const menu = document.getElementById('share-menu-main');
+        if (menu) menu.classList.add('active');
+    };
 
-    function showSubview(name) {
-        document.getElementById('share-menu-main').classList.remove('active');
+    window.showSubview = function(name) {
+        const menu = document.getElementById('share-menu-main');
+        if (menu) menu.classList.remove('active');
         document.querySelectorAll('.share-subview').forEach(v => v.classList.remove('active'));
-        document.getElementById('share-subview-' + name).classList.add('active');
-    }
+        const sub = document.getElementById('share-subview-' + name);
+        if (sub) sub.classList.add('active');
+    };
 
-    window.shareStoryTemplate = window.shareStoryTemplate || shareStoryTemplate;
-    window.downloadStoryTemplate = window.downloadStoryTemplate || downloadStoryTemplate;
-
-    function filterShareUsers(query) {
+    window.filterShareUsers = function(query) {
         document.querySelectorAll('#share-user-list .share-item').forEach(item => {
             const name = item.dataset.name?.toLowerCase() || '';
             item.style.display = name.includes(query.toLowerCase()) ? '' : 'none';
         });
-    }
+    };
 
-    function shareToUser(userId) {
-        closeShareModal();
+    window.shareToUser = function(userId) {
+        window.closeShareModal();
 
         fetch('{{ route('movies.share.user', $movieId) }}', {
             method: 'POST',
@@ -188,10 +188,10 @@
                 window.location.href = data.redirect;
             }
         });
-    }
+    };
 
-    function shareToList(listId) {
-        closeShareModal();
+    window.shareToList = function(listId) {
+        window.closeShareModal();
 
         fetch('{{ route('movies.share.list', $movieId) }}', {
             method: 'POST',
@@ -207,19 +207,15 @@
                 window.location.href = data.redirect;
             }
         });
-    }
+    };
 
-    // Fallback: jika shareStoryTemplate / downloadStoryTemplate belum siap dari welcome.js
-    if (typeof shareStoryTemplate !== 'function') {
-        window.shareStoryTemplate = function() {
-            const btn = document.querySelector('[data-share-story]');
-            if (btn) btn.click();
-        };
-    }
-    if (typeof downloadStoryTemplate !== 'function') {
-        window.downloadStoryTemplate = function() {
-            const btn = document.querySelector('[data-story-download]');
-            if (btn) btn.click();
-        };
-    }
+    // Fallback: shareStoryTemplate dari welcome.js (Vite module scope — bukan global)
+    window.shareStoryTemplate = window.shareStoryTemplate || function() {
+        const btn = document.querySelector('[data-share-story]');
+        if (btn) btn.click();
+    };
+    window.downloadStoryTemplate = window.downloadStoryTemplate || function() {
+        const btn = document.querySelector('[data-story-download]');
+        if (btn) btn.click();
+    };
 </script>
