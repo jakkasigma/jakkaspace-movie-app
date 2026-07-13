@@ -23,7 +23,7 @@ class MovieShareController extends Controller
     public function share(Request $request, int $movie): View
     {
         $user = $request->user();
-        $movieData = $this->movieService->findMovie($movie);
+        [$movieData, $movieError] = $this->movieService->findMovie($movie);
 
         abort_if(! $movieData, 404);
 
