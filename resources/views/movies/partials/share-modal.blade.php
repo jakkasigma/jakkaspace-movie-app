@@ -102,31 +102,31 @@
 </div>
 
 <script>
-    function openShareModal() {
+    window.openShareModal = function() {
         document.getElementById('share-modal-overlay').classList.add('active');
         document.body.style.overflow = 'hidden';
-    }
+    };
 
-    function closeShareModal() {
+    window.closeShareModal = function() {
         document.getElementById('share-modal-overlay').classList.remove('active');
         document.body.style.overflow = '';
-    }
+    };
 
-    function switchShareTab(btn, tab) {
+    window.switchShareTab = function(btn, tab) {
         document.querySelectorAll('.share-tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.share-tab-content').forEach(t => t.classList.remove('active'));
         btn.classList.add('active');
         document.getElementById('share-tab-' + tab).classList.add('active');
-    }
+    };
 
-    function filterShareUsers(query) {
+    window.filterShareUsers = function(query) {
         document.querySelectorAll('#share-user-list .share-item').forEach(item => {
             const name = item.dataset.name?.toLowerCase() || '';
             item.style.display = name.includes(query.toLowerCase()) ? '' : 'none';
         });
-    }
+    };
 
-    function shareToUser(userId) {
+    window.shareToUser = function(userId) {
         const btn = event.target.closest('.share-item');
         const originalText = btn?.querySelector('.share-item-name')?.textContent || 'Mengirim...';
         document.getElementById('share-modal-overlay').classList.remove('active');
@@ -146,9 +146,9 @@
                 window.location.href = data.redirect;
             }
         });
-    }
+    };
 
-    function shareToList(listId) {
+    window.shareToList = function(listId) {
         document.getElementById('share-modal-overlay').classList.remove('active');
         document.body.style.overflow = '';
 
@@ -166,5 +166,5 @@
                 window.location.href = data.redirect;
             }
         });
-    }
+    };
 </script>

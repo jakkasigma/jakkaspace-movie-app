@@ -290,11 +290,20 @@
                     })
                     .then(html => {
                         container.innerHTML = html;
+                        container.querySelectorAll('script').forEach(oldScript => {
+                            const newScript = document.createElement('script');
+                            newScript.textContent = oldScript.textContent;
+                            oldScript.replaceWith(newScript);
+                        });
                         openShareModal();
                     })
                     .catch(() => {
-                        container.innerHTML = '<div class="share-modal-overlay active" onclick="if(event.target===this)closeShareModal()"><div class="share-modal" style="padding:40px;text-align:center;color:rgba(255,255,255,0.6);font-size:0.85rem;">Gagal memuat. Coba lagi.</div></div>';
-                        openShareModal();
+                        container.innerHTML = '';
+                        const t = document.createElement('div');
+                        t.textContent = 'Gagal memuat. Coba lagi.';
+                        t.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);padding:10px 24px;border-radius:8px;font-size:0.82rem;z-index:9999;';
+                        document.body.appendChild(t);
+                        setTimeout(() => t.remove(), 2500);
                     });
             } else {
                 openShareModal();
