@@ -280,10 +280,7 @@
     <div id="share-modal-container"></div>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const shareTitle = {{ Js::from($movie['title'] ?? 'Film') }};
-        const shareUrl = {{ Js::from(route('movies.show', $movie['id'] ?? 0)) }};
-
-        function loadShareModal() {
+        window.openShareModal = function() {
             const container = document.getElementById('share-modal-container');
             if (container.innerHTML === '') {
                 fetch({{ Js::from(route('movies.share', $movie['id'] ?? 0)) }})
@@ -302,15 +299,6 @@
                     });
             } else {
                 openShareModal();
-            }
-        }
-
-        window.openShareModal = function() {
-            if (navigator.share) {
-                navigator.share({ title: shareTitle, url: shareUrl })
-                    .catch(e => { if (e.name !== 'AbortError') loadShareModal(); });
-            } else {
-                loadShareModal();
             }
         };
         window.copyMovieLink = function() {
