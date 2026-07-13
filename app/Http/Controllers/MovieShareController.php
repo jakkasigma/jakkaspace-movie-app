@@ -33,7 +33,7 @@ class MovieShareController extends Controller
         if ($user) {
             // Conversations user has (recent first)
             $conversations = $user->conversations()
-                ->with(['members', 'lastMessage'])
+                ->with(['members', 'latestMessage'])
                 ->latest('updated_at')
                 ->take(20)
                 ->get()

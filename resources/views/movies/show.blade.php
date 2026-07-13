@@ -284,9 +284,16 @@
             const container = document.getElementById('share-modal-container');
             if (container.innerHTML === '') {
                 fetch('{{ route('movies.share', $movie['id']) }}')
-                    .then(r => r.text())
+                    .then(r => {
+                        if (! r.ok) throw new Error('Gagal memuat.');
+                        return r.text();
+                    })
                     .then(html => {
                         container.innerHTML = html;
+                        openShareModal();
+                    })
+                    .catch(() => {
+                        container.innerHTML = '<div class="share-modal-overlay active" onclick="if(event.target===this)closeShareModal()"><div class="share-modal" style="padding:40px;text-align:center;color:rgba(255,255,255,0.6);font-size:0.85rem;">Gagal memuat. Coba lagi.</div></div>';
                         openShareModal();
                     });
             } else {
