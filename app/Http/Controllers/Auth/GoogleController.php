@@ -46,7 +46,7 @@ class GoogleController extends Controller
                 'avatar_url' => $googleUser->getAvatar(),
             ]);
 
-            return redirect()->route('profile.edit')->with('status', 'Akun Google berhasil dihubungkan.');
+            return redirect()->route('your-space')->with('status', 'Akun Google berhasil dihubungkan.');
         }
 
         // CASE 2: Login / register via Google

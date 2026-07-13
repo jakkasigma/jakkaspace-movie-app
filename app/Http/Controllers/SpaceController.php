@@ -8,6 +8,7 @@ use App\Models\SubscriptionPromo;
 use App\Services\User\AnalyticsService;
 use App\Services\User\SpaceService;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -31,9 +32,12 @@ class SpaceController extends Controller
                 ->first(fn ($promo) => $promo->isValid());
         }
 
+        $canLinkGoogle = $user->google_id === null && ! session('google_link_dismissed', false);
+
         return view('space.index', [
             'user' => $user,
             'promoPopup' => $promoPopup,
+            'canLinkGoogle' => $canLinkGoogle,
             'stats' => $this->spaceService->getStats($user),
             'recentWatched' => $this->spaceService->getRecentWatched($user),
             'watchlistMovies' => $this->spaceService->getWatchlistMovies($user, 6),
@@ -127,6 +131,13 @@ class SpaceController extends Controller
             'movies' => $this->spaceService->getWatchlistMovies($user),
             'watchlistInfo' => $this->spaceService->getWatchlistInfo($user),
         ]);
+    }
+
+    public function dismissGoogleLink(Request $request): JsonResponse
+    {
+        $request->session()->put('google_link_dismissed', true);
+
+        return response()->json(['ok' => true]);
     }
 
     public function favorites(Request $request): View

@@ -131,6 +131,7 @@ Route::middleware('auth')->group(function () {
     // Your Space
     Route::middleware('verified')->group(function () {
         Route::get('/your-space', [SpaceController::class, 'index'])->name('your-space');
+        Route::post('/your-space/dismiss-google-link', [SpaceController::class, 'dismissGoogleLink'])->name('your-space.dismiss-google-link');
         Route::get('/your-space/analytics', [SpaceController::class, 'analytics'])->name('your-space.analytics');
         Route::get('/your-space/diary', [SpaceController::class, 'diary'])->name('your-space.diary');
         Route::get('/your-space/diary/{entry}/edit', [SpaceController::class, 'editDiary'])->name('your-space.diary.edit');
