@@ -64,14 +64,19 @@
                                 @if (! empty($meta['poster_url']))
                                     <img src="{{ $meta['poster_url'] }}" alt="" class="list-film-share-poster">
                                 @else
-                                    <div class="list-film-share-poster" style="background:rgba(255,255,255,0.06);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">🎬</div>
+                                    <div class="list-film-share-poster list-film-share-no-poster">🎬</div>
                                 @endif
                                 <div class="list-film-share-info">
                                     <p class="list-film-share-kicker">Berbagi Film</p>
                                     <p class="list-film-share-title">{{ $meta['title'] ?? $msg->message }}</p>
-                                    @if (! empty($meta['release_year']))
-                                        <p class="list-film-share-year">{{ $meta['release_year'] }}</p>
-                                    @endif
+                                    <div class="list-film-share-meta">
+                                        @if (! empty($meta['release_year']))
+                                            <span>{{ $meta['release_year'] }}</span>
+                                        @endif
+                                        @if (! empty($meta['rating']))
+                                            <span>★ {{ $meta['rating'] }}</span>
+                                        @endif
+                                    </div>
                                 </div>
                             </a>
                         @else
