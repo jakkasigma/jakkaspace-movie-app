@@ -63,6 +63,7 @@ class MovieShareController extends Controller
 
         return view('movies.partials.share-modal', [
             'movie' => $movieData,
+            'movieId' => $movie,
             'conversations' => $conversations,
             'joinedLists' => $joinedLists,
         ]);

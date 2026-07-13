@@ -280,12 +280,15 @@
     <div id="share-modal-container"></div>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
-        window.openShareModal = function() {
+        const shareTitle = {{ Js::from($movie['title'] ?? 'Film') }};
+        const shareUrl = {{ Js::from(route('movies.show', $movie['id'] ?? 0)) }};
+
+        function loadShareModal() {
             const container = document.getElementById('share-modal-container');
             if (container.innerHTML === '') {
-                fetch('{{ route('movies.share', $movie['id']) }}')
+                fetch({{ Js::from(route('movies.share', $movie['id'] ?? 0)) }})
                     .then(r => {
-                        if (! r.ok) throw new Error('Gagal memuat.');
+                        if (! r.ok) throw new Error();
                         return r.text();
                     })
                     .then(html => {
@@ -296,21 +299,22 @@
                             oldScript.replaceWith(newScript);
                         });
                         openShareModal();
-                    })
-                    .catch(() => {
-                        container.innerHTML = '';
-                        const t = document.createElement('div');
-                        t.textContent = 'Gagal memuat. Coba lagi.';
-                        t.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);padding:10px 24px;border-radius:8px;font-size:0.82rem;z-index:9999;';
-                        document.body.appendChild(t);
-                        setTimeout(() => t.remove(), 2500);
                     });
             } else {
                 openShareModal();
             }
+        }
+
+        window.openShareModal = function() {
+            if (navigator.share) {
+                navigator.share({ title: shareTitle, url: shareUrl })
+                    .catch(e => { if (e.name !== 'AbortError') loadShareModal(); });
+            } else {
+                loadShareModal();
+            }
         };
         window.copyMovieLink = function() {
-            const url = '{{ route('movies.show', $movie['id']) }}';
+            const url = {{ Js::from(route('movies.show', $movie['id'] ?? 0)) }};
             navigator.clipboard.writeText(url).then(function() {
                 const btn = document.querySelector('[data-copy-link]');
                 if (btn) {

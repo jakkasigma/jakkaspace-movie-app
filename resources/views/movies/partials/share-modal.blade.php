@@ -132,7 +132,7 @@
         document.getElementById('share-modal-overlay').classList.remove('active');
         document.body.style.overflow = '';
 
-        fetch('{{ route('movies.share.user', $movie['id']) }}', {
+        fetch('{{ route('movies.share.user', $movieId) }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -152,7 +152,7 @@
         document.getElementById('share-modal-overlay').classList.remove('active');
         document.body.style.overflow = '';
 
-        fetch('{{ route('movies.share.list', $movie['id']) }}', {
+        fetch('{{ route('movies.share.list', $movieId) }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
