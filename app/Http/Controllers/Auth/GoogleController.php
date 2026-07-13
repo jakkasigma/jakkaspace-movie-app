@@ -44,6 +44,7 @@ class GoogleController extends Controller
             $user->update([
                 'google_id' => $googleUser->getId(),
                 'avatar_url' => $googleUser->getAvatar(),
+                'email_verified_at' => $user->email_verified_at ?? now(),
             ]);
 
             return redirect()->route('your-space')->with('status', 'Akun Google berhasil dihubungkan.');
@@ -59,6 +60,7 @@ class GoogleController extends Controller
                 $user->update([
                     'google_id' => $googleUser->getId(),
                     'avatar_url' => $googleUser->getAvatar(),
+                    'email_verified_at' => $user->email_verified_at ?? now(),
                 ]);
             }
         } else {
