@@ -2,13 +2,29 @@
 
 <div id="share-modal-overlay" class="share-modal-overlay" onclick="if(event.target===this)closeShareModal()">
     <div class="share-modal share-layout-modal" onclick="event.stopPropagation()">
-        {{-- Left: Poster --}}
+        {{-- Left: Poster template --}}
         <div class="share-left">
-            @if (($movie['poster_url'] ?? null))
-                <img src="{{ $movie['poster_url'] ?? '' }}" alt="" class="share-left-poster">
-            @else
-                <div class="share-left-poster share-left-poster-empty">No Poster</div>
-            @endif
+            <div class="share-template">
+                @if (($movie['backdrop_url'] ?? null))
+                    <div class="share-template-bg" style="background-image: url('{{ $movie['story_backdrop_url'] ?? $movie['backdrop_url'] ?? '' }}')"></div>
+                @endif
+                <div class="share-template-gradient"></div>
+                <div class="share-template-body">
+                    @if (($movie['poster_url'] ?? null))
+                        <img src="{{ $movie['story_poster_url'] ?? $movie['poster_url'] ?? '' }}" alt="" class="share-template-poster">
+                    @else
+                        <div class="share-template-poster share-template-poster-empty">No Poster</div>
+                    @endif
+                    <div class="share-template-meta">
+                        <p class="share-template-title">{{ $movie['title'] ?? '' }}</p>
+                        @if (($movie['release_year'] ?? null))
+                            <p class="share-template-year">{{ $movie['release_year'] }}</p>
+                        @endif
+                        <p class="share-template-rating">★ {{ $movie['rating'] ?? '0.0' }} / 10</p>
+                    </div>
+                </div>
+                <p class="share-template-watermark">FILM DIARY BY JAKKA SPACE</p>
+            </div>
         </div>
 
         {{-- Right: Content --}}
