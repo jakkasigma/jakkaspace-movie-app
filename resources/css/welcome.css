@@ -10075,12 +10075,32 @@ body.list-chat-room {
     padding: 4vw;
 }
 .share-modal-overlay.active { display: flex; }
-.share-modal {
+
+/* --- Left-right layout modal -------------------------------- */
+.share-layout-modal {
     background: #111; border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 12px; padding: 24px; width: 100%;
-    max-width: 420px; max-height: 80vh; overflow-y: auto;
+    border-radius: 12px; width: 100%;
+    max-width: 560px; max-height: 80vh;
+    display: flex; overflow: hidden;
 }
-.share-modal-header {
+.share-left {
+    flex: 0 0 180px; display: flex; align-items: flex-start;
+    padding: 20px 0 20px 20px; background: rgba(255,255,255,0.02);
+}
+.share-left-poster {
+    width: 100%; aspect-ratio: 2/3; border-radius: 8px;
+    object-fit: cover; display: block;
+}
+.share-left-poster-empty {
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.2);
+    font-size: 0.85rem;
+}
+.share-right {
+    flex: 1; display: flex; flex-direction: column;
+    padding: 20px; min-width: 0;
+}
+.share-right-header {
     display: flex; justify-content: space-between; align-items: center;
     margin-bottom: 16px;
 }
@@ -10089,42 +10109,48 @@ body.list-chat-room {
     background: none; border: none; color: rgba(255,255,255,0.5);
     font-size: 1.2rem; cursor: pointer;
 }
-.share-movie-info {
-    display: flex; gap: 12px; padding: 10px 12px;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.06); border-radius: 8px;
-    margin-bottom: 16px;
+
+/* --- Main menu --------------------------------------------- */
+.share-menu { display: none; flex-direction: column; gap: 6px; }
+.share-menu.active { display: flex; }
+.share-menu-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; border-radius: 10px;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+    cursor: pointer; text-align: left; width: 100%;
+    transition: background 0.15s, border-color 0.15s;
 }
-.share-movie-poster {
-    width: 40px; height: 60px; border-radius: 4px; object-fit: cover; flex-shrink: 0;
+.share-menu-item:hover {
+    background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.12);
 }
-.share-movie-title {
+.share-menu-icon { font-size: 1.3rem; line-height: 1; flex-shrink: 0; }
+.share-menu-label {
     color: #fff; font-size: 0.85rem; font-weight: 600;
-    margin: 0 0 2px;
 }
-.share-movie-year { color: rgba(255,255,255,0.4); font-size: 0.75rem; margin: 0; }
-.share-tabs {
-    display: flex; gap: 0;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    margin-bottom: 16px;
+.share-menu-desc {
+    color: rgba(255,255,255,0.35); font-size: 0.7rem;
+    margin-left: auto; flex-shrink: 0;
 }
-.share-tab {
-    flex: 1; padding: 10px; text-align: center;
-    background: none; border: none; border-bottom: 2px solid transparent;
-    color: rgba(255,255,255,0.5); font-size: 0.82rem; font-weight: 600;
-    cursor: pointer; transition: color 0.2s, border-color 0.2s;
+
+/* --- Sub-views --------------------------------------------- */
+.share-subview { display: none; flex-direction: column; gap: 10px; }
+.share-subview.active { display: flex; }
+.share-subview-back {
+    background: none; border: none; color: rgba(255,255,255,0.5);
+    font-size: 0.82rem; cursor: pointer; padding: 4px 0;
+    text-align: left; align-self: flex-start;
 }
-.share-tab.active { color: #a3e635; border-bottom-color: #a3e635; }
-.share-tab-content { display: none; }
-.share-tab-content.active { display: block; }
-.share-search-wrap { margin-bottom: 12px; }
+.share-subview-back:hover { color: #fff; }
+
+/* --- Shared list/search styles ------------------------------ */
+.share-search-wrap { margin-bottom: 4px; }
 .share-search-input {
     width: 100%; padding: 10px 14px;
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.12); border-radius: 6px;
     color: #fff; font-size: 0.85rem; outline: none;
 }
-.share-list { display: flex; flex-direction: column; gap: 2px; max-height: 300px; overflow-y: auto; }
+.share-list { display: flex; flex-direction: column; gap: 2px; max-height: 240px; overflow-y: auto; }
 .share-item {
     display: flex; align-items: center; gap: 10px;
     padding: 8px 10px; border-radius: 8px;
@@ -10159,7 +10185,7 @@ body.list-chat-room {
 .share-item-meta { color: rgba(255,255,255,0.35); font-size: 0.7rem; margin: 0; }
 .share-empty { color: rgba(255,255,255,0.3); font-size: 0.82rem; text-align: center; padding: 20px 0; }
 
-/* --- Story share tab in share modal ------------------------ */
+/* --- Story sub-view ---------------------------------------- */
 .story-share-preview {
     display: flex; gap: 14px; align-items: flex-start;
     padding: 8px 0;
@@ -10177,11 +10203,14 @@ body.list-chat-room {
     width: 100%; justify-content: center;
 }
 
-@media (max-width: 640px) {
-    .share-modal { padding: 16px; }
+@media (max-width: 500px) {
+    .share-layout-modal { flex-direction: column; max-width: 380px; }
+    .share-left { flex: 0 0 auto; padding: 16px 16px 0; }
+    .share-left-poster { width: 80px; aspect-ratio: 2/3; }
+    .share-right { padding: 12px 16px 16px; }
     .share-item-avatar { width: 32px; height: 32px; }
     .share-item-avatar-premium .share-item-avatar { width: 28px; height: 28px; }
-    .share-list { max-height: 50vh; }
+    .share-list { max-height: 40vh; }
 }
 
 /* --- Film share card in list chat -------------------------- */

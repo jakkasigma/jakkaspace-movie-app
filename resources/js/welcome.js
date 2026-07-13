@@ -611,3 +611,7 @@ document.addEventListener('keydown', (event) => {
         closeStoryModal();
     }
 });
+
+window.shareStoryTemplate = shareStoryTemplate;
+window.downloadStoryTemplate = downloadStoryTemplate;
+window.openStoryModal = openStoryModal;
