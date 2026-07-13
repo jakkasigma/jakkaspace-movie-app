@@ -6,6 +6,7 @@ use App\Models\MovieList;
 use App\Models\User;
 use App\Services\Movie\MovieService;
 use App\Services\User\InboxService;
+use App\Services\User\MovieListService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,6 +17,7 @@ class MovieShareController extends Controller
     public function __construct(
         private readonly MovieService $movieService,
         private readonly InboxService $inboxService,
+        private readonly MovieListService $listService,
     ) {}
 
     public function share(Request $request, int $movie): View

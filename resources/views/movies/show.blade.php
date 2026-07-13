@@ -75,6 +75,15 @@
                                 </a>
                             @endif
                             <button class="btn-share-detail" type="button" onclick="openShareModal()">Bagikan</button>
+                            <button class="btn-share-detail" type="button"
+                                data-share-story
+                                data-story-backdrop="{{ $movie['backdrop_url'] ?? '' }}"
+                                data-story-poster="{{ $movie['poster_url'] ?? '' }}"
+                                data-story-title="{{ $movie['title'] ?? '' }}"
+                                data-story-year="{{ $movie['release_year'] ?? '' }}"
+                                data-story-genres="{{ $movie['genres'] ?? '' }}"
+                                data-story-rating="{{ $movie['rating'] ?? '' }}"
+                                data-story-director="{{ $movie['director'] ?? '' }}">Story</button>
                         </div>
 
                         {{-- User activity actions --}}
