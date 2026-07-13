@@ -75,16 +75,15 @@
                                 </a>
                             @endif
                             <button class="btn-share-detail" type="button" onclick="openShareModal()">Bagikan</button>
-                            <button class="btn-share-detail" type="button"
-                                data-share-story
-                                data-story-backdrop="{{ $movie['backdrop_url'] ?? '' }}"
-                                data-story-poster="{{ $movie['poster_url'] ?? '' }}"
-                                data-story-title="{{ $movie['title'] ?? '' }}"
-                                data-story-year="{{ $movie['release_year'] ?? '' }}"
-                                data-story-genres="{{ $movie['genres'] ?? '' }}"
-                                data-story-rating="{{ $movie['rating'] ?? '' }}"
-                                data-story-director="{{ $movie['director'] ?? '' }}">Story</button>
                         </div>
+                        <span hidden data-share-story
+                            data-story-backdrop="{{ $movie['story_backdrop_url'] ?? $movie['backdrop_url'] ?? '' }}"
+                            data-story-poster="{{ $movie['story_poster_url'] ?? $movie['poster_url'] ?? '' }}"
+                            data-story-title="{{ $movie['title'] ?? '' }}"
+                            data-story-year="{{ $movie['release_year'] ?? '' }}"
+                            data-story-genres="{{ $movie['genres'] ?? '' }}"
+                            data-story-rating="{{ $movie['rating'] ?? '' }}"
+                            data-story-director="{{ $movie['director'] ?? '' }}"></span>
 
                         {{-- User activity actions --}}
                         <div class="user-actions-wrap">
@@ -278,24 +277,33 @@
         @endif
     </div>
 
-    @auth
-        <div id="share-modal-container"></div>
-        <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            window.openShareModal = function() {
-                const container = document.getElementById('share-modal-container');
-                if (container.innerHTML === '') {
-                    fetch('{{ route('movies.share', $movie['id']) }}')
-                        .then(r => r.text())
-                        .then(html => {
-                            container.innerHTML = html;
-                            openShareModal();
-                        });
-                } else {
-                    openShareModal();
+    <div id="share-modal-container"></div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        window.openShareModal = function() {
+            const container = document.getElementById('share-modal-container');
+            if (container.innerHTML === '') {
+                fetch('{{ route('movies.share', $movie['id']) }}')
+                    .then(r => r.text())
+                    .then(html => {
+                        container.innerHTML = html;
+                        openShareModal();
+                    });
+            } else {
+                openShareModal();
+            }
+        };
+        window.copyMovieLink = function() {
+            const url = '{{ route('movies.show', $movie['id']) }}';
+            navigator.clipboard.writeText(url).then(function() {
+                const btn = document.querySelector('[data-copy-link]');
+                if (btn) {
+                    const orig = btn.textContent;
+                    btn.textContent = 'Tersalin!';
+                    setTimeout(function() { btn.textContent = orig; }, 2000);
                 }
-            };
-        });
-        </script>
-    @endauth
+            });
+        };
+    });
+    </script>
 @endsection

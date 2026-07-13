@@ -25,6 +25,7 @@
         <div class="share-tabs">
             <button type="button" class="share-tab active" data-tab="users" onclick="switchShareTab(this, 'users')">Ke User</button>
             <button type="button" class="share-tab" data-tab="lists" onclick="switchShareTab(this, 'lists')">Ke List</button>
+            <button type="button" class="share-tab" data-tab="story" onclick="switchShareTab(this, 'story')">Story & Simpan</button>
         </div>
 
         {{-- Tab: Users --}}
@@ -80,6 +81,21 @@
                 @empty
                     <p class="share-empty">Belum bergabung ke list manapun.</p>
                 @endforelse
+            </div>
+        </div>
+
+        {{-- Tab: Story & Simpan --}}
+        <div class="share-tab-content" id="share-tab-story">
+            <div class="story-share-preview">
+                @if ($movie['poster_url'])
+                    <img src="{{ $movie['poster_url'] }}" alt="" class="story-share-poster">
+                @endif
+                <div class="story-share-actions">
+                    <p class="share-item-name">{{ $movie['title'] }}</p>
+                    <button type="button" class="story-action-button story-action-primary" onclick="shareStoryTemplate()">Story Instagram</button>
+                    <button type="button" class="story-action-button" onclick="downloadStoryTemplate()">Unduh PNG</button>
+                    <button type="button" class="story-action-button" data-copy-link onclick="copyMovieLink()">Salin Tautan</button>
+                </div>
             </div>
         </div>
     </div>

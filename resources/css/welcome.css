@@ -10159,6 +10159,24 @@ body.list-chat-room {
 .share-item-meta { color: rgba(255,255,255,0.35); font-size: 0.7rem; margin: 0; }
 .share-empty { color: rgba(255,255,255,0.3); font-size: 0.82rem; text-align: center; padding: 20px 0; }
 
+/* --- Story share tab in share modal ------------------------ */
+.story-share-preview {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 8px 0;
+}
+.story-share-poster {
+    width: 72px; height: 108px; border-radius: 8px; object-fit: cover; flex-shrink: 0;
+}
+.story-share-actions {
+    display: flex; flex-direction: column; gap: 8px; flex: 1;
+}
+.story-share-actions .share-item-name {
+    margin-bottom: 4px;
+}
+.story-share-actions .story-action-button {
+    width: 100%; justify-content: center;
+}
+
 @media (max-width: 640px) {
     .share-modal { padding: 16px; }
     .share-item-avatar { width: 32px; height: 32px; }

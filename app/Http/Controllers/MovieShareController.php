@@ -27,34 +27,39 @@ class MovieShareController extends Controller
 
         abort_if(! $movieData, 404);
 
-        // Conversations user has (recent first)
-        $conversations = $user->conversations()
-            ->with(['members', 'lastMessage'])
-            ->latest('updated_at')
-            ->take(20)
-            ->get()
-            ->map(function ($conv) use ($user) {
-                $other = $conv->members->filter(fn ($m) => $m->id !== $user->id)->first();
+        $conversations = collect();
+        $joinedLists = collect();
 
-                return [
-                    'id' => $conv->id,
-                    'user_id' => $other?->id,
-                    'name' => $other?->name ?? 'Pengguna',
-                    'username' => $other?->username,
-                    'avatar_url' => $other?->avatar_url,
-                    'is_plus' => $other?->isPlus() ?? false,
-                    'theme' => $other?->theme,
-                ];
-            });
+        if ($user) {
+            // Conversations user has (recent first)
+            $conversations = $user->conversations()
+                ->with(['members', 'lastMessage'])
+                ->latest('updated_at')
+                ->take(20)
+                ->get()
+                ->map(function ($conv) use ($user) {
+                    $other = $conv->members->filter(fn ($m) => $m->id !== $user->id)->first();
 
-        // Joined lists
-        $joinedLists = MovieList::whereIn('id', $user->listMemberships()
-            ->where('status', 'approved')
-            ->pluck('movie_list_id'))
-            ->orWhere('user_id', $user->id)
-            ->withCount('listMovies')
-            ->latest()
-            ->get();
+                    return [
+                        'id' => $conv->id,
+                        'user_id' => $other?->id,
+                        'name' => $other?->name ?? 'Pengguna',
+                        'username' => $other?->username,
+                        'avatar_url' => $other?->avatar_url,
+                        'is_plus' => $other?->isPlus() ?? false,
+                        'theme' => $other?->theme,
+                    ];
+                });
+
+            // Joined lists
+            $joinedLists = MovieList::whereIn('id', $user->listMemberships()
+                ->where('status', 'approved')
+                ->pluck('movie_list_id'))
+                ->orWhere('user_id', $user->id)
+                ->withCount('listMovies')
+                ->latest()
+                ->get();
+        }
 
         return view('movies.partials.share-modal', [
             'movie' => $movieData,

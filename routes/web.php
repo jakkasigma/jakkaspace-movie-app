@@ -116,10 +116,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/inbox/{conversation}/messages', [InboxController::class, 'store'])->whereNumber('conversation')->name('inbox.messages.store');
     Route::match(['get', 'post'], '/inbox/direct/{user}', [InboxController::class, 'startDirect'])->name('inbox.direct');
 
-    // Share movie
-    Route::get('/movies/{movie}/share', [MovieShareController::class, 'share'])->whereNumber('movie')->name('movies.share');
+    // Share movie (POST needs auth)
     Route::post('/movies/{movie}/share/user', [MovieShareController::class, 'toUser'])->whereNumber('movie')->name('movies.share.user');
     Route::post('/movies/{movie}/share/list', [MovieShareController::class, 'toList'])->whereNumber('movie')->name('movies.share.list');
+
+    // Share movie modal (public — Story tab works for guests)
+    Route::get('/movies/{movie}/share', [MovieShareController::class, 'share'])->whereNumber('movie')->name('movies.share');
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications');
