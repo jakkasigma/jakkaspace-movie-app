@@ -37,7 +37,6 @@
                 </div>
             @else
                 <div class="inbox-msg {{ $isMine ? 'inbox-msg--mine' : 'inbox-msg--theirs' }}">
-                        @if (! $isMine)
                             <div class="inbox-msg-avatar">
                                 @php $avatarPremium = $msg->user?->isPlus() && $msg->user->theme; @endphp
                                 @if ($avatarPremium)
@@ -54,7 +53,6 @@
                                     </div>
                                 @endif
                             </div>
-                        @endif
                     <div class="inbox-msg-bubble {{ ($msg->user?->isPlus() && $msg->user->theme) ? 'inbox-msg-premium' : '' }}"
                          @if ($msg->user?->isPlus() && $msg->user->theme) style="--accent-color: {{ $msg->user->theme->accent_color }};" @endif>
                         @if (! $isMine)
